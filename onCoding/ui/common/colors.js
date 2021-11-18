@@ -1,0 +1,45 @@
+// Color Palette
+
+// Monochrome
+export const transparent = 'transparent'
+export const black = '#000000'
+export const grey = '#222222'
+export const grey1 = '#333333'
+export const grey2 = '#666666'
+export const grey3 = '#787878'
+export const grey4 = '#999999'
+export const grey5 = '#cccccc'
+export const grey6 = '#f0f0f0'
+export const white = '#ffffff'
+export const borderColor = '#ECECEC'
+
+// App
+export const primary = '#cba839'
+export const primary1 = '#961C03'
+export const primaryLight = '#DAC110'
+export const primaryDark = '#aa8e39'
+export const secondary = '#50AC02'
+export const secondaryLight = '#A8DE1C'
+export const secondaryDark = '#3f8d02'
+export const highlight = '#00d907'
+export const positive = '#00c407'
+export const negative = '#d90012'
+export const orangeYellow = '#FD7633'
+export const yellowOrange = '#F1AA32'
+export const blueLight = '#1658D6'
+export const lightBlue = '#3283F1'
+export const Grey = '#AAAAAA'
+// Custom
+export const purple = '#9C27B0'
+export const purple1 = '#D500F9'
+export const indigo = '#3F51B5'
+export const indigo1 = '#3D5AFE'
+export const red = '#F44336'
+export const red1 = '#FF1744'
+export const teal = '#009688'
+
+// Opacity (usage: primary + opacityLow)
+export const opacitySubtle = 'ee'
+export const opacityLow = 'cc'
+export const opacityMedium = '66'
+export const opacityHigh = '33'

@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "765623951630",
+    "firebase_url": "https://who-app-615c6.firebaseio.com",
+    "project_id": "who-app-615c6",
+    "storage_bucket": "who-app-615c6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765623951630:android:c629c48d22ec40368fb75f",
+        "android_client_info": {
+          "package_name": "com.who.tobacco"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "765623951630-t9pig8a2im44qhbo6pgsebi9pm4pde5b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.who.tobacco",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "765623951630-f7bg90ljftvrl0uhmqbp1eu9r7rclmg6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXaIoJl5adRIb5CWC9TUVgwNZI-YAoYKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "765623951630-f7bg90ljftvrl0uhmqbp1eu9r7rclmg6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "765623951630-vgmennsu37aihks1vjvgm9rgauaq25tl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.who.tobacco"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765623951630:android:10954d537f9820c38fb75f",
+        "android_client_info": {
+          "package_name": "com.who_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "765623951630-k55s09rpbstbkk2j7h8dho544fnet453.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.who_app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "765623951630-f7bg90ljftvrl0uhmqbp1eu9r7rclmg6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXaIoJl5adRIb5CWC9TUVgwNZI-YAoYKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "765623951630-f7bg90ljftvrl0uhmqbp1eu9r7rclmg6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "765623951630-vgmennsu37aihks1vjvgm9rgauaq25tl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.who.tobacco"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

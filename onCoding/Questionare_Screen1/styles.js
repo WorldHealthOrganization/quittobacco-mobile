@@ -1,0 +1,202 @@
+/* eslint-disable prettier/prettier */
+import {StyleSheet} from 'react-native';
+import {
+  responsiveHeight,
+  responsiveWidth,
+  responsiveFontSize,
+} from 'react-native-responsive-dimensions';
+import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive';
+
+export default StyleSheet.create({
+    container: {
+        backgroundColor: '#FFFFFF',
+        alignItems: 'center',
+        height: responsiveHeight(100),
+        width: responsiveWidth(100),
+      },
+      view: {
+        backgroundColor: '#FFFFFF',
+      },
+      containerToolbar: {
+        justifyContent: 'center',
+        // https://github.com/facebook/react-native/issues/2957#event-417214498
+        alignItems: 'center',
+        backgroundColor: '#0072BB',
+      },
+      toolbar: {
+        backgroundColor: '#0072BB',
+        height:responsiveHeight(7),
+        width: responsiveWidth(100),
+      },
+      toolbar_title:{
+        color: '#FFFFFF',
+        fontFamily: 'SF-Medium',
+        fontSize: responsiveFontSize(2.5),
+        alignSelf: 'center',
+        marginLeft: responsiveWidth(37),
+        marginTop: responsiveHeight(0.5),
+      },
+      content: {
+         marginLeft: responsiveWidth(6.5),
+         color: '#B6C0CB',
+         marginTop:responsiveHeight(1),
+         fontFamily: 'SF-Regular',
+      },
+      textStyle:{
+        margin: responsiveWidth(6),
+        fontSize: responsiveFontSize(2.5),
+        fontWeight: 'bold',
+    },
+    pickerStyle:{
+        height: responsiveHeight(4),
+        width: responsiveWidth(90),
+        color: '#344953',
+        justifyContent: 'center',
+        marginLeft: responsiveWidth(6.5),
+        marginTop: responsiveHeight(1),
+    },
+    text_ques:{
+      marginLeft: responsiveWidth(11),
+      color: '#B6C0CB',
+      fontFamily: 'SF-Regular',
+      fontSize: responsiveFontSize(1.5),
+      marginTop: responsiveHeight(1.5),
+    },
+    text_ques1:{
+      marginLeft: responsiveWidth(6),
+      color: '#B6C0CB',
+      fontFamily: 'SF-Regular',
+      fontSize: responsiveFontSize(1.75),
+      marginTop: responsiveHeight(2),
+    },
+    text_ques2:{
+      marginLeft: responsiveWidth(8.5),
+      color: '#B6C0CB',
+      fontFamily: 'SF-Regular',
+      fontSize: responsiveFontSize(1.75),
+      marginTop: responsiveHeight(0),
+    },
+    text_ques3:{
+      marginLeft: responsiveWidth(8),
+      color: '#B6C0CB',
+      fontFamily: 'SF-Regular',
+      fontSize: responsiveFontSize(1.5),
+      marginTop: responsiveHeight(2.75),
+    },
+    text_ques4:{
+      marginLeft: responsiveWidth(8.5),
+      color: '#B6C0CB',
+      fontFamily: 'SF-Regular',
+      fontSize: responsiveFontSize(1.5),
+      marginTop: responsiveHeight(2),
+    },
+    text:{
+      color: '#202020',
+      fontSize: responsiveFontSize(1.75),
+      fontFamily: 'SF-Regular',
+      marginLeft: responsiveWidth(0),
+      width: responsiveWidth(88),
+      marginTop: responsiveHeight(0),
+      marginBottom: responsiveHeight(1),
+
+  },
+  rowstyle:
+  {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 0,
+  },
+  view3: {
+    borderBottomWidth: responsiveWidth(0.45),
+    marginTop: responsiveHeight(4),
+    borderBottomColor: '#B6C0CB',
+    width: '87%',
+    marginLeft:responsiveWidth(9),
+  },
+  inputLayout: {
+    marginTop: responsiveHeight(0.5),
+    marginBottom: responsiveHeight(1),
+    marginHorizontal: responsiveWidth(8.5), 
+    marginLeft: responsiveWidth(11.5),
+    width: responsiveWidth(83),
+    fontFamily: 'SF-Medium',
+    // height: responsiveHeight(7),
+},
+textInput: {
+  fontSize: responsiveFontSize(1.50),
+  // height: responsiveHeight(5.5),
+  marginTop: responsiveHeight(0),
+  fontFamily: 'SF-Medium',
+  marginLeft:responsiveWidth(8),
+  marginBottom: blockMarginHalf,
+},
+textInput2: {
+  fontSize: responsiveFontSize(1.50),
+  // height: responsiveHeight(5.5),
+  marginTop: responsiveHeight(-1),
+  fontFamily: 'SF-Medium',
+  marginLeft:blockMarginHalf * 6,
+  marginBottom: blockMarginHalf,
+},
+inputLayout1: {
+  marginTop: responsiveHeight(1.0),
+  // marginHorizontal: responsiveWidth(8.5), 
+  marginLeft: responsiveWidth(8.5),
+  // width: responsiveWidth(83.5),
+  // height: responsiveHeight(7),
+},
+textInput1: {
+fontSize: responsiveFontSize(1.50),
+height: responsiveHeight(4),
+marginTop: responsiveHeight(0.5),
+fontFamily: 'SF-Medium',
+},
+backarrow: {
+  width: responsiveWidth(3),
+  height: responsiveHeight(4),
+  marginLeft: responsiveWidth(6),
+  marginTop: responsiveHeight(1.5),
+  resizeMode: 'contain',
+},
+arrow: {
+  width: responsiveWidth(2),
+  height: responsiveHeight(4),
+  marginLeft: responsiveWidth(-8),
+  marginTop: responsiveHeight(1.5),
+  resizeMode: 'contain',
+},
+cal: {
+  width: responsiveWidth(4),
+  height: responsiveHeight(4),
+  marginRight:blockMargin * 2,
+  marginTop: responsiveHeight(1.5),
+  resizeMode: 'contain',
+},
+view4: {
+  borderBottomWidth: responsiveWidth(0.22),
+  marginTop: responsiveHeight(0),
+  borderBottomColor: '#B6C0CB',
+  width: responsiveWidth(82.5),
+  marginLeft:responsiveWidth(11),
+},
+view5: {
+  borderBottomWidth: responsiveWidth(0.22),
+  marginTop: responsiveHeight(0),
+  borderBottomColor: '#B6C0CB',
+  width: responsiveWidth(83.5),
+  marginLeft:responsiveWidth(8.5),
+},
+view6: {
+  borderBottomWidth: responsiveWidth(0.22),
+  marginTop: responsiveHeight(-2.5),
+  borderBottomColor: '#B6C0CB',
+  width: responsiveWidth(83.5),
+  marginLeft:responsiveWidth(8.5),
+},
+view7: {
+  borderBottomWidth: responsiveWidth(0.22),
+  marginTop: responsiveHeight(-2.5),
+  borderBottomColor: '#B6C0CB',
+  width: responsiveWidth(83.5),
+  marginLeft:blockMarginHalf * 6,
+},
+});

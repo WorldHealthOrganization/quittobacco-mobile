@@ -1,0 +1,221 @@
+/* eslint-disable prettier/prettier */
+import {StyleSheet} from 'react-native';
+import {
+  responsiveHeight,
+  responsiveWidth,
+  responsiveFontSize,
+} from 'react-native-responsive-dimensions';
+export default StyleSheet.create({
+    container: {
+        backgroundColor: '#FFFFFF',
+        alignItems: 'center',
+        height: responsiveHeight(100),
+        width: responsiveWidth(100),
+      },
+      view: {
+        flex:1,
+        backgroundColor: '#FFFFFF',
+      },
+      scrollview: {
+        height: responsiveHeight(100),
+        marginBottom: responsiveHeight(8),
+      },
+      view2: {
+        flex:0.2,
+        backgroundColor: '#FFFFFF',
+        marginTop: responsiveHeight(3),
+        alignItems: 'center',
+      },
+      view3: {
+        flex:0.2,
+        backgroundColor: '#0072BB',
+        marginTop: responsiveHeight(2),
+        alignItems: 'center',
+      },
+      
+      containerToolbar: {
+        justifyContent: 'center',
+        // https://github.com/facebook/react-native/issues/2957#event-417214498
+        alignItems: 'center',
+        backgroundColor: '#0072BB',
+      },
+      toolbar: {
+        backgroundColor: '#0072BB',
+        height:responsiveHeight(9),
+        width: responsiveWidth(100),
+      },
+      toolbar_title:{
+        color: '#FFFFFF',
+        fontFamily: 'SF-Medium',
+        fontSize: responsiveFontSize(2.5),
+        alignContent: 'center',
+        marginLeft: responsiveWidth(12),
+        marginTop: responsiveHeight(1.75),
+      },
+  buttonContainer: {
+    height: responsiveHeight(6.5),
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: responsiveHeight(0),
+    marginLeft: responsiveHeight(1),
+    width: responsiveWidth(45),
+    borderRadius: 30,
+  },
+  submitbutton: {
+    backgroundColor: '#0072BB',
+  },
+  submitbutton1: {
+    backgroundColor: '#FFFFFF',
+  },
+ 
+    head_text: {
+    color: '#54B1F8',
+    fontSize: responsiveFontSize(2),
+    textAlign:'center',
+    fontWeight: 'bold',
+    marginTop: responsiveHeight(2),
+  },
+  cardview: {
+   backgroundColor: '#CBE2F1',
+   marginTop: responsiveHeight(2),
+   marginLeft: responsiveWidth(5.5),
+   width: responsiveWidth(90),
+  },
+  cardview1: {
+    backgroundColor: '#0072BB',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(5.5),
+    width: '90%',
+   },
+   cardview2: {
+    backgroundColor: '#FFFFFF',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(5.5),
+    width: '90%',
+   },
+  card_text1:{
+    padding: 0,
+    margin: 10,
+    color: '#0072BB',
+    fontFamily: 'SF-Medium',
+    marginLeft: responsiveWidth(3),
+  },
+  card_text2: {
+     color: '#202020',
+     fontSize:responsiveFontSize(2),
+     fontFamily: 'SF-Regular',
+    marginLeft: responsiveWidth(3),
+    marginTop: responsiveHeight(0),
+  },
+  card_text4: {
+    color: '#202020',
+    fontSize:responsiveFontSize(2),
+    fontFamily: 'SF-Regular',
+   marginLeft: responsiveWidth(1.5),
+   marginRight: responsiveWidth(2.5),
+   marginTop: responsiveHeight(0),
+ },
+  card_text3:{
+    padding: 0,
+    margin: 10,
+    color: '#0072BB',
+    fontFamily: 'SF-Medium',
+    marginLeft: responsiveWidth(1),
+  },
+
+  circle: {
+    width:responsiveWidth(16),
+    height: responsiveHeight(8),
+    borderRadius: 100 / 2,
+    backgroundColor: '#FFFFFF',
+    opacity: 100,
+    marginBottom: responsiveHeight(3),
+    marginTop: responsiveHeight(3),
+    marginLeft: responsiveWidth(2),
+    marginRight: responsiveWidth(2),
+  },
+  circle2: {
+    width:responsiveWidth(16),
+    height: responsiveHeight(8),
+    borderRadius: 100 / 2,
+    backgroundColor: '#FFFFFF',
+    opacity: 100,
+    marginBottom: responsiveHeight(3),
+    marginTop: responsiveHeight(7),
+    marginLeft: responsiveWidth(2),
+    marginRight: responsiveWidth(2),
+  },
+  circle3: {
+    width:responsiveWidth(16),
+    height: responsiveHeight(8),
+    borderRadius: 100 / 2,
+    backgroundColor: '#FFFFFF',
+    opacity: 100,
+    marginBottom: responsiveHeight(3),
+    marginTop: responsiveHeight(9),
+    marginLeft: responsiveWidth(2),
+    marginRight: responsiveWidth(2),
+  },
+  circle4: {
+    width:responsiveWidth(16),
+    height: responsiveHeight(8),
+    borderRadius: 100 / 2,
+    backgroundColor: '#FFFFFF',
+    opacity: 100,
+    marginBottom: responsiveHeight(3),
+    marginTop: responsiveHeight(7),
+    marginLeft: responsiveWidth(4),
+    marginRight: responsiveWidth(2),
+  },
+  heart: {
+    resizeMode: 'contain',
+    marginTop: responsiveHeight(2.5),
+    marginLeft: responsiveWidth(4),
+  },
+  blood: {
+    resizeMode: 'contain',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(5.3),
+  },
+  heart_hand: {
+    resizeMode: 'contain',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(4.5),
+  },
+  square: {
+    width: responsiveWidth(20),
+    borderRadius:10,
+    backgroundColor: '#FFFFFF',
+    marginTop: responsiveHeight(2),
+    marginLeft: responsiveWidth(2),
+    marginBottom: responsiveHeight(2),
+    marginRight: responsiveWidth(2),
+    padding: 10,
+  },
+  report: {
+    resizeMode: 'contain',
+    width: '100%',
+  },
+  image: {
+    resizeMode: 'contain',
+    marginTop: responsiveHeight(0),
+    marginLeft: responsiveWidth(4),
+  },
+  arrow: {
+    width: responsiveWidth(3),
+    height: responsiveHeight(4),
+    marginLeft: responsiveWidth(6),
+    marginTop: responsiveHeight(1.5),
+    resizeMode: 'contain',
+  },
+  more: {
+    width: responsiveWidth(3),
+    height: responsiveHeight(2.5),
+    marginLeft: responsiveWidth(6),
+    marginTop: responsiveHeight(2.5),
+    resizeMode: 'contain',
+  },
+ 
+  header: { width:'100%', height: '25%', backgroundColor: '#CBE2F1' },
+ 
+});
