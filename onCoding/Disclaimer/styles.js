@@ -5,19 +5,23 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMargin } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         flex:1,
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
+        flex:1,
+        flexDirection:'column',width:'100%',
         backgroundColor: '#FFFFFF',
+        height: '100%',
       },
       view2: {
-        flex:0.15,
+       marginBottom: blockMargin * 2,justifyContent:'center',alignSelf:'center',alignItems:'center',
         backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(2),
       },
@@ -34,7 +38,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         marginLeft: responsiveWidth(37),
@@ -42,18 +46,17 @@ export default StyleSheet.create({
       },
     text:{
       
-      marginTop: responsiveHeight(1),
-      marginLeft: responsiveWidth(3),
       marginRight: responsiveWidth(3),
-      lineHeight:responsiveHeight(3.5),
+      marginLeft: responsiveWidth(3),
+     
     },
   buttonContainer: {
     height: responsiveHeight(6.5),
     justifyContent: 'center',
     alignItems: 'center',
     // marginTop: responsiveHeight(0),
-    marginLeft: responsiveHeight(7),
-    width: responsiveWidth(70),
+   
+    width: responsiveWidth(60),
     borderRadius: 30,
   },
   submitbutton: {
@@ -61,7 +64,7 @@ export default StyleSheet.create({
   },
   submittext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   arrow: {

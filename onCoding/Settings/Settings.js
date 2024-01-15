@@ -1,26 +1,27 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
-import {View, Text,Alert,BackHandler,  Image,TouchableOpacity,TouchableHighlight,Button} from 'react-native';
+import {View, Text,Alert,BackHandler,  Image,
+  TouchableOpacity,TouchableHighlight,Button, SafeAreaView, ActivityIndicator,ScrollView} from 'react-native';
 import styles from '../Settings/styles';
-import ToolbarAndroid from '@react-native-community/toolbar-android';
+//import ToolbarAndroid from '@react-native-community/toolbar-android';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive';
 import Dialog, {DialogTitle, DialogContent,DialogFooter } from 'react-native-popup-dialog';
-import { DatePickerDialog } from 'react-native-datepicker-dialog'
-import moment from 'moment';
-import DatePicker from 'react-native-datepicker';
+
 import Toast from 'react-native-simple-toast';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import dateFormat from 'date-fns/format';
-import Login from '../login/Login';
+//import Login from '../login/Login';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import moment from 'moment';
 
 export default class Settings extends Component {
 
@@ -31,11 +32,14 @@ export default class Settings extends Component {
     super(props);
     this.state = {
       isSeleted: 1,
+      isHidden: false,
       visible: false,
       visible2: false,
+      visible5: false,
       quit_date: '',
       qit_date_api:'',
       quit_time: '',
+      quit_time_api: '',
       isDateTimePickerVisible: false,
       time: 0,
     };
@@ -48,9 +52,7 @@ export default class Settings extends Component {
   _showDateTimePicker = () =>{
     
       this.setState({isDateTimePickerVisible: true});
-      // alert('visible'+ this.state.isDateTimePickerVisible);
-
- 
+   
   //this.state.time==1 ? true : false
 }
 
@@ -58,25 +60,25 @@ export default class Settings extends Component {
   _hideDateTimePicker = () => this.setState({isDateTimePickerVisible: false});
 
   _handleDatePicked = (date) => {
-    console.log('A date has been picked: ', date);
     let formatDate = dateFormat(date, 'hh:mm a');
-    
+    let formatDateApi = dateFormat(date, 'HH:mm:ss');
 
     this.setState({quit_time: formatDate});
+    this.setState({quit_time_api: formatDateApi});
     this._hideDateTimePicker();
-    // alert(this.state.quit_time);
+  
     
   };
 
   handleBackButton = () => {
     Alert.alert(
       'Exit App',
-      'Are you sure want to logout and exit WHO application?',
+      'Are you sure want to logout from the APP?',
       [
         {
           text: 'Cancel',
           onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
+          style: 'default',
         },
         {
           text: 'OK',
@@ -94,21 +96,23 @@ export default class Settings extends Component {
 
     let jwt_token = await AsyncStorage.getItem('Login_JwtToken');
 
-    const {quit_date,quit_time,quit_date_api} = this.state;
-
-      console.log('login input ==> ' + quit_date + quit_time + quit_date_api);
-      this.setState({ visible: false });
+    const {quit_date,quit_time,quit_date_api,quit_time_api} = this.state;
+    this.setState({isHidden: true});
+     this.setState({ visible: false });
       this.setState({ visible1: false });
       this.setState({ visible2: false });
       this.setState({visible5: false})
 
+      var momentObj = moment(quit_date_api +' '+quit_time_api, 'YYYY-MM-DDLT');
+      console.log('response '+momentObj)
             axios
               .post(
                 ApiName.userInfoupdate,
                 {
-
+                  quit_date_time:quit_date_api +' '+quit_time_api,
                   quit_date: quit_date_api,
-                  quit_time: quit_time,
+                  quit_time: quit_time_api,
+                  quit_timestamp: new Date(momentObj).getTime()
 
                 },
                 {
@@ -118,16 +122,13 @@ export default class Settings extends Component {
                 },
               )
               .then((response) => {
-                console.log(
-                  'login response ',
-                  'response get details:==> ' + JSON.stringify(response.data),
-                );
-  
-                // Toast.show(response.data.message);
+                console.log('response '+JSON.stringify(response))
+                this.setState({isHidden: false});
                 this.setState({ visible4: false });
                 if (response.data.status == 200) {
                   this.setState({ visible4: false });
-  
+                
+
                   AsyncStorage.setItem(
                     'JwtToken',
                     'Bearer ' + response.data.jwt_token,
@@ -144,7 +145,9 @@ export default class Settings extends Component {
               })
               .catch((error) => {
                 this.setState({isHidden: false});
-                console.log('reactNativeDemo axios error:', error);
+                console.log(error)
+                Toast.show('There was some error. Please try again')
+               
               });
           }
 
@@ -164,34 +167,27 @@ export default class Settings extends Component {
                       },
                     )
                     .then((response) => {
-                      console.log(
-                        'Reset response ',
-                        'response get details:==> ' + JSON.stringify(response.data),
-                      );
-        
-        
-                      if (response.data.status == 201) {
-                        console.log(JSON.stringify( response.data));
-                        console.log(JSON.stringify( 'QS:' + response.data.questionarie_status));
-                        this.setState({ isHidden: false })
+                      this.setState({ isHidden: false })
+                      if (response.data.status == 201 || response.data.status == 200)  {
+                     
                         this.setState({ visible: false })
 
-                      
                         if (response.data.questionarie_status == 0){
-                          console.log( 'Reset All status'+response.data.questionarie_status)
+                        
                           AsyncStorage.setItem('QuestionarieStatus', '0');
                             this.props.navigation.navigate('QuestionareStack');
                         }
                         Toast.show(response.data.message);
-                      }
-                      else {
-                        console.log(response.data.message);
-                        this.setState({ isHidden: false })
+                      }else {
+                        Toast.show(response.data.message);
+                        
         
                       }
                     })
                     .catch((error) => {
-                      console.log('reactNativeDemo axios error:', error);
+                     console.log("Reset  ffd data "+error)
+                     Toast.show('There was some error. Please try again');
+
                       this.setState({ isHidden: false })
         
                     });
@@ -201,7 +197,6 @@ export default class Settings extends Component {
 
   lastEntry(clickState) {
     this.setState({ visible: false })
-    //alert(clickState);
     if (clickState == 1) {
       this.setState({isSeleted: 1});
     } else {
@@ -210,7 +205,6 @@ export default class Settings extends Component {
   }
 
   lastEntry1(sss) {
-    alert(sss + 1);
     if (this.state.isSeleted == 1) {
       this.setState({isSeleted: 0});
     } else {
@@ -231,13 +225,8 @@ export default class Settings extends Component {
       },
     )
     .then((response) => {
-      console.log(
-        'Logout response ',
-        'response get details:==> ' + JSON.stringify(response.data),
-      );
-
-      if (response.data.status == 200 || response.data.status == 201) {
-        console.log(JSON.stringify( response.data));
+    
+      //if (response.data.status == 200 || response.data.status == 201) {
        
         this.setState({ isHidden: false })
       
@@ -248,25 +237,55 @@ export default class Settings extends Component {
         
         Toast.show('You have logged out successfully');
         
-        this.props.navigation.navigate('LoginStack');
-      }
-      else {
-        console.log(response.data.message);
-        this.setState({ isHidden: false })
-      }
+        this.props.navigation.navigate('Splash');
+      // }
+      // else {
+        // this.setState({ isHidden: false })
+      // }
     })
     .catch((error) => {
-      console.log('reactNativeDemo axios error:', error);
+     
       this.setState({ isHidden: false })
+      
+      AsyncStorage.clear();
+      AsyncStorage.setItem('LoginStatus', 'false');
+      AsyncStorage.setItem('Walkthrough', 'true');
+      //BackHandler.exitApp();
+      
+      Toast.show('You have logged out successfully');
+      
+      this.props.navigation.navigate('Splash');
     });
    
   }
 
   
-  render() {
+  
+showDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: true,
+  });
+};
+hideDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: false,
+  });
+};
+handleDateConfirm = (date) => {
+  let formatDate = dateFormat(date, 'dd MMM yyyy');
+  let formatValidDate = dateFormat(date, 'yyyy-MM-dd');
 
+  this.setState({quit_date: formatDate});
+  this.setState({quit_date_api: formatValidDate});
+  this.hideDatePicker();
+};
+
+  render() {
+const {isHidden} = this.state
 
     return (
+      <SafeAreaView style={{flex: 1,}}>
+        
       <View style={{flex:1}}>
            
       <View
@@ -299,24 +318,22 @@ export default class Settings extends Component {
               </TouchableOpacity>
 
             </View>
-            <View style={{ width: '52%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: '60%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
-                marginLeft: blockMarginHalf * 9 ,
                 textAlign: 'center',
 
               }}>Settings</Text>
             </View>
             <TouchableOpacity
             style={{
-              justifyContent: 'center',
+              justifyContent: 'flex-end',
               alignItems: 'center',
-              marginTop: blockMarginHalf * 3,
-              marginLeft: blockMarginHalf * 2 ,
-              width: 108,
-              height:32,
+             
+             
+             alignSelf:'center',
               borderRadius: 30,
               backgroundColor: '#CBE2F1',
             }}
@@ -324,7 +341,10 @@ export default class Settings extends Component {
             <Text style={styles.submittext}>Feedback</Text>
         </TouchableOpacity>
             </View>
+            <ScrollView>
+              <View style={{flexDirection:'column'}}>
             <View style={{ marginTop: responsiveHeight(2)}}>
+            <TouchableOpacity  onPress={() => {this.setState({ visible2: true });}}>
     <View
             style={{
               flexDirection: 'row',
@@ -333,9 +353,9 @@ export default class Settings extends Component {
             }}>
                     <Text style={styles.text}>Change Quit Date</Text>
 
-  <TouchableOpacity  onPress={() => {this.setState({ visible2: true });}}>
+ 
                     <Image style={styles.img} source={require('../../images/next_arrow.png')}/>
-                    </TouchableOpacity>
+                 
 
                     <Dialog
                     width={0.8}
@@ -351,52 +371,37 @@ export default class Settings extends Component {
     }
   >
     <DialogContent>
-      <TouchableOpacity onPress={()=>this.setState({ visible2: false })}>
-    <Image style={{resizeMode:'contain',width:12,height:13, marginLeft: blockMarginHalf * 35, marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
-     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SF-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>SELECT DATE</Text>
+      <TouchableOpacity onPress={()=>this.setState({ visible2: false })} style={{alignItems:'flex-end'}}>
+    <Image style={{resizeMode:'contain',width:12,height:13, justifyContent:'center', marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
+     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SFCompactDisplay-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>SELECT DATE</Text>
     <View style={{backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(0),
         alignItems:'center',
     }} />
 
 
+<TouchableOpacity onPress={()=> this.showDatePicker()}>
+                  <View style={{flexDirection:'row', width:'100%', alignItems:'center',justifyContent:'center', marginTop:blockMargin * 2, marginBottom:blockMarginHalf}}>
+                <Text style={{
+                width:'75%',
+      color: '#000',
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 16,marginLeft:5}} >{this.state.quit_date != '' ? this.state.quit_date : 'Select Quit Date'}</Text>
+                <Image source={require('../../images/calendar_theme.png')}
+                resizeMode={'contain'}
+                style={{width:18,height:18, }}/>
+                </View></TouchableOpacity>
+                
+                <DateTimePickerModal
+                        isVisible={this.state.isDatePickerVisible}
+                        mode="date"
+                        minimumDate={new Date()}
+                        onConfirm={this.handleDateConfirm}
+                        onCancel={this.hideDatePicker}
+                      />
 
-<DatePicker
-style={{width: responsiveWidth(68), marginTop:blockMarginHalf * 4,}}
-date={this.state.quit_date} //initial date from state
-mode="date" //The enum of date, datetime and time
-placeholder="Select Date"
-format="DD-MM-YYYY"
-iconSource={require('../../images/calendar_theme.png')}
-minDate={new Date()}
-customStyles={{
-dateIcon: {
- position: 'absolute',
- resizeMode: 'contain',
- height: responsiveHeight(6),
- width: responsiveWidth(5),
- right: responsiveWidth(3.5),
- top: responsiveHeight(0.3),
- marginLeft: blockMarginHalf * 2,
-},
-dateInput: {
- marginLeft: responsiveWidth(-32),
- borderWidth: responsiveWidth(0),
-
-},
-}}
-onDateChange={(quit_date) => {
-           
-  let momentObj = moment(quit_date, 'DD-MM-YYYY')
-  let dateformat = moment(momentObj).format('YYYY-MM-DD')
-  
-  console.log('Quit date: ' + dateformat+'--'+quit_date);
-  
-  this.setState({quit_date: quit_date,quit_date_api: dateformat});
-}}
-/>
                    <View style={{marginTop: responsiveHeight(0),
-        borderBottomWidth: responsiveWidth(0.22),
+        borderBottomWidth: responsiveWidth(0.30),
         borderBottomColor: '#B6C0CB',
         width: responsiveWidth(60),
         marginLeft:blockMarginHalf * 3}} />
@@ -416,7 +421,7 @@ onDateChange={(quit_date) => {
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         Continue
@@ -431,27 +436,34 @@ onDateChange={(quit_date) => {
   </Dialog>
 
                     </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Change_tobacco_data')}}>
                     <View
             style={{
               flexDirection: 'row',
-         
             }}>
                     <Text style={styles.text}>Change Tobacco Data</Text>
-                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Change_tobacco_data')}}>
+                   
                     <Image style={styles.img1} source={require('../../images/next_arrow.png')}/>
-                    </TouchableOpacity>
+                    
                    
                     </View>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Notification_Settings',{isButton: '0'})}}>
                     <View
             style={{
               flexDirection: 'row',
             
             }}>
-                    <Text style={styles.text}>Notifications</Text>
-                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Notifications')}}>
+                    <Text style={styles.text}>Notifications and Reminders</Text>
+                   
                     <Image style={styles.img2} source={require('../../images/next_arrow.png')}/>
-                    </TouchableOpacity>
+                    
                     </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Quit_Reasons')}}>
                     <View
             style={{
               flexDirection: 'row',
@@ -460,19 +472,21 @@ onDateChange={(quit_date) => {
 
                     <Text style={styles.text}>Reasons to Quit Tobacco</Text>
                    
-                    <TouchableOpacity  onPress={() => {this.props.navigation.navigate('Quit_Reasons')}}>
+                    
                     <Image style={styles.img3} source={require('../../images/next_arrow.png')}/>
-                    </TouchableOpacity>
+                  
 
                     </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity  onPress={() => {this.setState({ visible: true });}}>
                     <View
             style={{
               flexDirection: 'row',
           
             }}>
-                                  <TouchableOpacity  onPress={() => {this.setState({ visible: true });}}>
+                                  
                     <Text style={styles.text}>Reset all data</Text>
-                    </TouchableOpacity>
+                    
                     <Dialog
                     width={0.8}
                         // dialogTitle={<DialogTitle title="RESET DATA" style={{backgroundColor: '#FFFFFF'}} textStyle={{color:'#0072BB'}} />}
@@ -490,10 +504,10 @@ onDateChange={(quit_date) => {
   >
     <DialogContent>
       <View>
-        <TouchableOpacity onPress={()=>this.setState({ visible: false })}>
-        <Image style={{resizeMode:'contain',width:12,height:13, marginLeft: blockMarginHalf * 35, marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
-     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SF-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>RESET DATA</Text>
-     <Text style={{color:'#202020', textAlign:'center',fontFamily: 'SF-Medium',fontSize: scalable(14),marginTop: blockMarginHalf * 2,lineHeight: deviceHeight / 25}}>This will clear all the data you've{'\n'}entered and reset the app entirely</Text>
+        <TouchableOpacity onPress={()=>this.setState({ visible: false })} style={{alignItems:'flex-end'}}>
+        <Image style={{resizeMode:'contain',width:12,height:13, marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
+     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SFCompactDisplay-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>RESET DATA</Text>
+     <Text style={{color:'#202020', textAlign:'center',fontFamily: 'SFCompactDisplay-Medium',fontSize: scalable(14),marginTop: blockMarginHalf * 2,}}>This will clear all the data you've{'\n'}entered and reset the app entirely</Text>
      <View>
                     <TouchableHighlight
                       style={{
@@ -505,13 +519,13 @@ onDateChange={(quit_date) => {
                         justifyContent: 'center',
                         alignItems: 'center',
                         alignSelf: 'center',
-                        marginTop:blockMarginHalf * 2,
+                        marginTop:blockMarginHalf * 3,
                       }}
                       onPress={() => this.resetdata()}>
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         YES
@@ -536,7 +550,7 @@ onDateChange={(quit_date) => {
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         NO
@@ -549,14 +563,18 @@ onDateChange={(quit_date) => {
   </Dialog>
 
                     </View>
+                    </TouchableOpacity>
        </View>
+    
        <View style={styles.view2}>
-       <TouchableOpacity
+       {/* <TouchableOpacity
             style={[styles.buttonContainer1, styles.submitbutton]}
             onPress={() => this.handleBackButton()}>
             <Text style={styles.submittext}>Log Out</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 </View>
+</View>  
+</ScrollView>
       </View>
 
       </View>
@@ -575,9 +593,9 @@ onDateChange={(quit_date) => {
     }
   >
     <DialogContent>
-      <TouchableOpacity onPress={()=>this.setState({ visible5: false })}>
-    <Image style={{resizeMode:'contain',width:12,height:13, marginLeft: blockMarginHalf * 35, marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
-     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SF-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>SELECT TIME</Text>
+      <TouchableOpacity onPress={()=>this.setState({ visible5: false })} style={{alignItems:'flex-end'}}>
+    <Image style={{resizeMode:'contain',width:12,height:13, marginTop: blockMarginHalf * 2}} source={require('../../images/close.png')}></Image></TouchableOpacity>
+     <Text style={{color:'#0072BB', textAlign:'center',fontFamily: 'SFCompactDisplay-Medium',fontSize: scalable(17),marginTop: blockMarginHalf * 2}}>SELECT TIME</Text>
     <View style={{backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(0),
         alignItems:'center',
@@ -589,16 +607,17 @@ onDateChange={(quit_date) => {
 <TouchableOpacity onPress={()=>this.setState({isDateTimePickerVisible: true})}>
                       <Text
                         style={{
-                          fontFamily: 'SF-Regular',
+                          fontFamily: 'SFCompactDisplay-Regular',
+                          color:'black',
                           marginTop: blockMarginHalf * 6,
                           marginLeft: blockMarginHalf * 3,
                         }}>
-                        Select Time {'\n'} {this.state.quit_time}
+                        {this.state.quit_time != '' ? this.state.quit_time : 'Select Quit Time'}
                       </Text>
                     </TouchableOpacity>
                   
                    <View style={{marginTop: responsiveHeight(1),
-        borderBottomWidth: responsiveWidth(0.22),
+        borderBottomWidth: responsiveWidth(0.30),
         borderBottomColor: '#B6C0CB',
         width: responsiveWidth(60),
         marginLeft:blockMarginHalf * 3}} />
@@ -618,7 +637,7 @@ onDateChange={(quit_date) => {
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         Continue
@@ -637,6 +656,7 @@ onDateChange={(quit_date) => {
   <View>
   <DateTimePicker
                       mode="time"
+                      headerTextIOS="Pick a time"
                       isVisible={this.state.isDateTimePickerVisible}
                       onConfirm={this._handleDatePicked}
                       onCancel={this._hideDateTimePicker}
@@ -645,7 +665,30 @@ onDateChange={(quit_date) => {
 
   </View>
   : null}
-        </View>
+
+
+       </View>
+
+       {isHidden ? (
+            <View style={{
+              width: '100%',
+              height: '100%',
+             position:'absolute',
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignSelf: 'center',
+              backgroundColor:'transparent'
+            }}>
+              <ActivityIndicator
+                size={40}
+                color="#0072bb"
+                animating={true}
+                backgroundColor={'transparent'}
+              />
+            </View>
+          ) : null}
+           
+    </SafeAreaView>
     );
   }
 }

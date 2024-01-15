@@ -10,8 +10,8 @@ export default StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    height: responsiveHeight(100),
-    width: responsiveWidth(100),
+    height: '100%',
+    width: '100%',
   },
   view: {
     flex: 1,
@@ -28,21 +28,21 @@ export default StyleSheet.create({
   },
   text: {
     color: '#B6C0CB',
-    fontSize: responsiveFontSize(1.75),
-    textAlign: 'left',
+    fontSize: 15,
+    textAlign: 'center',
     marginTop: responsiveHeight(1.5),
-    marginRight: responsiveWidth(3),
-    marginLeft: responsiveWidth(8),
-    fontFamily: 'SF-Regular',
+    marginRight: responsiveWidth(7),
+    marginLeft: responsiveWidth(7),
+    fontFamily: 'SFCompactDisplay-Regular',
   },
   text2: {
     color: '#B6C0CB',
-    fontSize: responsiveFontSize(1.75),
+    fontSize: responsiveFontSize(2),
     textAlign: 'left',
     marginTop: responsiveHeight(3.5),
     marginRight: responsiveWidth(5),
-    marginLeft: responsiveWidth(10),
-    fontFamily: 'SF-Regular',
+    marginLeft: responsiveWidth(7),
+    fontFamily: 'SFCompactDisplay-Regular',
   },
   phonenumber: {
     height: responsiveHeight(5),
@@ -66,26 +66,26 @@ export default StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   newuser: {
     color: '#949494',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   signup: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginLeft: responsiveWidth(3),
-    fontWeight: 'bold',
+    
   },
   back_arrow: {
     width:responsiveWidth(3),
     height: responsiveHeight(3),
     marginTop: responsiveHeight(3),
-    marginLeft: responsiveWidth(3),
+    marginLeft:responsiveWidth(5),
   },
   pwd: {
     fontSize: responsiveFontSize(3.5),
@@ -93,7 +93,7 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(8),
     marginLeft: responsiveWidth(2),
     textAlign:'center',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
 
   },
   textBackground3: {
@@ -107,7 +107,7 @@ export default StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     marginStart: responsiveWidth(1),
-    marginTop: responsiveHeight(1),
+   
     marginEnd: responsiveWidth(5),
   },
   textBackground4: {
@@ -120,7 +120,8 @@ export default StyleSheet.create({
     // marginEnd: 20,
     flex: 1,
     backgroundColor: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: responsiveFontSize(2),
     borderRadius: 15,
   },
   view4: {
@@ -134,7 +135,7 @@ export default StyleSheet.create({
     width: responsiveWidth(2),
     height: responsiveHeight(4),
     marginLeft: responsiveWidth(3),
-    marginTop: responsiveHeight(0),
+    justifyContent:'center',alignSelf:'center',
     resizeMode: 'contain',
   },
   box2: {

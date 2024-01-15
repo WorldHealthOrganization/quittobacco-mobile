@@ -5,7 +5,6 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import { Dropdown } from 'react-native-material-dropdown-v2';
 import CardView from 'react-native-cardview';
 
 import {
@@ -13,16 +12,15 @@ import {
   TextInput,
   Image,
   Text,
-  Alert,
   FlatList,
-  TouchableOpacity,
-  TouchableHighlight,ActivityIndicator
+  TouchableOpacity,Share,
+  TouchableHighlight,ActivityIndicator, SafeAreaView
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
-import {TextInputLayout} from 'rn-textinputlayout';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
+
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive';
 import Dialog, {DialogTitle, DialogContent,DialogFooter } from 'react-native-popup-dialog';
 import Toast from 'react-native-simple-toast';
@@ -42,7 +40,8 @@ export default class Push_Notifications extends Component {
           profile_image: '',
           fcm: '',
           token: '',
-    
+     //ShareAPPLink
+     uniqueShareAPPLink: 'https://tobacco.page.link/Sohr',
           notificationlist: [],
         };
     }
@@ -81,7 +80,7 @@ export default class Push_Notifications extends Component {
       const profile_image = await AsyncStorage.getItem('UserProfileImage');
       const fcm = await AsyncStorage.getItem('UserFCM');
       const token = await AsyncStorage.getItem('Login_JwtToken');
-  
+      AsyncStorage.setItem('pushNotify', '0');
       if (token !== '') {
         this.setState({
   
@@ -95,9 +94,9 @@ export default class Push_Notifications extends Component {
     Notificationlist = async () => {
 
       const { token } = this.state
-      console.log('input ==> ' + token + ' ' + ApiName.List_notifications);
   
       this.setState({ isHidden: true })
+
       axios
         .post(
           ApiName.List_notifications, {},
@@ -108,49 +107,41 @@ export default class Push_Notifications extends Component {
           },
         )
         .then((response) => {
-          console.log(
-            'Notification response ',
-            'response get details:==> ' + JSON.stringify(response.data),
-          );
-  
-  
+
+          this.setState({ isHidden: false })
+
           if (response.data.status == 200) {
-            console.log(JSON.stringify(response.data));
-  
+          
             this.setState({
               notificationlist: response.data.data });
-
-            this.setState({ isHidden: false })
-          }
-          else {
-            this.setState({ isHidden: false })
-            console.log(response.data.message);
           }
         })
         .catch((error) => {
           this.setState({ isHidden: false })
           Toast.show('There was some error. Please try again')
-          console.log('reactNativeDemo axios error:', error);
+         
         });
     }
 
     redirect_to_carving = ({ notify_id }) => {
-      console.log('Hiii redirect'+notify_id)
       const { navigation } = this.props
       navigation.navigate('Add_Cravings', {
         notification_id: notify_id,type: 1
       })
   }
 
-    add_Achievement = async ({notify_id}) => {
-
+    add_Achievement = async ({type_id,achievement_id,notify_id}) => {
+      
       const { token } = this.state
-      console.log('input ==> ' + token + ' ' +  ApiName.seen_notifications+notify_id);
+      
   
       this.setState({ isHidden: true })
+
+      if(type_id == '2'){
+  
       axios
         .post(
-          ApiName.seen_notifications, {type: 1,notification_id: notify_id},
+          ApiName.store_achievements, {type: type_id,notification_id: notify_id,achievement_id: achievement_id},
           {
             headers: {
               'Authorization': token,
@@ -158,27 +149,60 @@ export default class Push_Notifications extends Component {
           },
         )
         .then((response) => {
-          console.log(
-            'Notification seen response ',
-            'response get details:==> ' + JSON.stringify(response.data),
-          );
-  
-  
+          this.setState({ isHidden: false })
+
           if (response.data.status == 200) {
-            console.log(JSON.stringify(response.data));
-  
-            this.setState({ isHidden: false })
+          
+            this.props.navigation.navigate('Achievements')
+           
           }
           else {
             this.setState({ isHidden: false })
-            console.log(response.data.message);
+           Toast.show(response.data.message);
           }
         })
         .catch((error) => {
           this.setState({ isHidden: false })
           Toast.show('There was some error. Please try again')
-          console.log('reactNativeDemo axios error:', error);
+         
         });
+      }else{
+        
+  axios
+  .post(
+    ApiName.store_craving,
+    {
+      tobacco_rating :0,
+      carving_status: 0,
+      type: type_id,
+      notification_id: notify_id
+    
+    },
+    {
+      headers: {
+        'Authorization': token,
+      },
+    },
+  )
+  .then((response) => {
+   
+    this.setState({isHidden: false});
+    if (response.data.status == 200) {
+    
+      this.Notificationlist()
+      Toast.show(response.data.data.message)
+      }
+    else {
+      Toast.show(response.data.data.message)
+     
+    }
+  })
+  .catch((error) => {
+    this.setState({isHidden: false});
+    Toast.show('There was some error. Please try again')
+   
+  });
+      }
     }
   
     ListEmpty = () => {
@@ -190,7 +214,7 @@ export default class Push_Notifications extends Component {
             <View style={{ alignItems: 'center', justifyContent: 'center' }} >
               <Text numberOfLines={2} style={{
                 color: '#555555',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(14), alignItems: 'center',
               }}>No Notifications Yet</Text>
             </View>
@@ -207,12 +231,34 @@ export default class Push_Notifications extends Component {
     };
   
 
+    shareApp = async () => {
+      const {
+        uniqueShareAPPLink} = this.state;
+  
+     
+        Share.share(
+          {
+            subject: 'Quit Tobacco App Link',
+            message: 'Hurray!! I have completed 1 Month without using Tobacco \n Click to download the app \n' + uniqueShareAPPLink,
+            title: 'Quit Tobacco App Link',
+          },
+          {
+            dialogTitle: 'Quit Tobacco App Link', // Android
+            subject: 'Quit Tobacco App Link', // iOS
+          },
+        ).then(
+          (success) => console.log("success"),
+          (reason) => console.log("DeepLink Reason"),
+        );
+      
+    };
    
 
 render() {
   const {isHidden,notificationlist} = this.state;
 
     return (
+      <SafeAreaView style={{flex:1}}>
       <View
       style={{
         flex: 1,
@@ -222,40 +268,36 @@ render() {
       }}>
       <View style={{ flex: 1, width: '100%', height: '100%', flexDirection: 'column', backgroundColor: '#FFFFFF' }}>
 
-           <View style={{
-          flexDirection: 'row', width: '100%', height: '12%',
-          backgroundColor: '#0072BB',
-        }}>
-          {/* <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', alignContent: 'center', alignSelf: 'center' }}>
-
-            <TouchableOpacity style={{
-
-              alignItems: 'center',
-            }} onPress={() => this.props.navigation.goBack()}>
-
-              <Image style={{
-                width: responsiveWidth(3),
-                height: responsiveHeight(4),
-                resizeMode: 'contain',
-              }} source={require('../../images/back_arrow.png')} />
-
-            </TouchableOpacity>
-
-          </View> */}
-          <View style={{ width: '100%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{
+      <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            height: '12%',
+            backgroundColor: '#0072BB',
+            alignSelf: 'center',
+            justifyContent:'center',
+            alignContent:'center',
+            alignItems:'center',
+          }}>
+          <Text
+            style={{
+              
               color: '#FFFFFF',
-              fontFamily: 'SF-Medium',
+            
+              fontFamily: 'SFCompactDisplay-Medium',
               fontSize: scalable(18),
-              justifyContent: 'center',
-              textAlign: 'center',
+            
+              alignSelf: 'center',
+              justifyContent:'center',
+              alignContent:'center',
+              alignItems:'center',
+             
+            }}>
+            Notifications
+          </Text>
+        </View>
 
-            }}>Notifications</Text>
-
-          </View>
-          </View>
-
-          <FlatList
+           <FlatList
        style={{marginTop: blockMargin,marginBottom:blockMargin}}
        keyboardShouldPersistTaps={'handled'}
     //    data={[{
@@ -297,7 +339,7 @@ render() {
                  <Text numberOfLines={6} style={{
                   //  marginBottom: blockMarginHalf ,  
                    color: '#202020',
-                   fontFamily: 'SF-Bold',
+                   fontFamily: 'SFCompactDisplay-Medium',
                    fontSize: scalable(15),
                    textAlign:'left'
                   //  marginTop: blockMarginHalf *2,
@@ -311,33 +353,59 @@ render() {
                <View style={{ width: '100%', flexDirection: 'row'}}>
                <View style={{width: '35%',flexDirection:'row',justifyContent:'flex-start',alignSelf:'center'}}>   
                <TimeAgo
-                              time={item.created_at}
+                              time={item.created_at*1000}
                               style={{
                                 textAlign: 'left',
                                 color: '#B6C0CB',
-                                fontFamily: 'SF-Medium',
+                                fontFamily: 'SFCompactDisplay-Medium',
                                 fontSize: scalable(12),
                                 margin: blockMarginHalf
                               }}
                             />
                             </View>
-                
-                { item.seen_status == '0' &&  item.type == '1' && 
+
+
+                         { item.notify_type == '3' &&  <View style={{width: '65%',flexDirection:'row',justifyContent:'flex-end'}}> 
+                          <TouchableOpacity
+                      onPress={() => this.shareApp()}
+                      style={{
+                       
+                        width: 30,
+                        
+                        justifyContent: 'flex-end',alignSelf:'center',alignItems:'center',
+                        end: 0,
+                        marginRight: responsiveWidth(5),
+                      }}>
+                      <Image
+                        style={{
+                          resizeMode: 'contain',
+                          width: 18,
+                          height: 18,
+                          justifyContent: 'flex-end',
+                          end: 0,
+                        }}
+                        source={require('../../images/share.png')}
+                      />
+                    </TouchableOpacity>
+     </View>
+       }
+                { item.seen_status == '0' &&  item.notify_type == '2' && 
                   <View style={{width: '65%',flexDirection:'row',justifyContent:'flex-end'}}> 
-                  <TouchableOpacity onPress={() =>  this.redirect_to_carving({notify_id: item.id})}>
+                  <TouchableOpacity onPress={() =>  this.redirect_to_carving({notify_id: item.id})
+                  }>
                 <Text style={{
                    color: '#09E544',
-                   fontFamily: 'SF-Bold',
+                   fontFamily: 'SFCompactDisplay-Semibold',
                    fontSize: scalable(15),
                    padding: blockMarginHalf,
                   
                  }}>{item.positive.toUpperCase()}</Text>
                  </TouchableOpacity>
 
-                 <TouchableOpacity onPress={() => this.add_Achievement({notify_id: item.id})}>
+                 <TouchableOpacity onPress={() =>  this.redirect_to_carving({notify_id: item.id})}>
                 <Text style={{
                    color: '#DB0909',
-                   fontFamily: 'SF-Bold',
+                   fontFamily: 'SFCompactDisplay-Semibold',
                    fontSize: scalable(15),
                    padding: blockMarginHalf,
                   marginRight: blockMargin,
@@ -372,7 +440,7 @@ render() {
                   }}>
                     <ActivityIndicator
                       size={40}
-                      color="#3283F1"
+                      color="#0072BB"
                       animating={true}
                       backgroundColor={'transparent'}
                     />
@@ -382,6 +450,7 @@ render() {
 
        </View>
         </View>
+        </SafeAreaView>
     );
 }
 }

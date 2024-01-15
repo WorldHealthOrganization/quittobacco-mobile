@@ -5,21 +5,24 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+
+
+import { blockMargin, blockMarginHalf, scalable } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
           flex:1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FFFFFF',flexDirection:'column'
       },
       view1: {
         flex: 0.5,
         backgroundColor: '#FFFFFF',
-        marginTop: responsiveHeight(2),
+        marginTop: blockMarginHalf,
         // marginLeft: responsiveWidth(8),
         alignSelf: 'center',
         width: responsiveWidth(80),
@@ -28,7 +31,7 @@ export default StyleSheet.create({
       {
         //  flex:0.7,
          backgroundColor: '#0072BB',
-         width: responsiveWidth(100),
+         width: '100%',
       },
       view3:
       {
@@ -46,7 +49,7 @@ export default StyleSheet.create({
       },
       text_prg:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         marginTop: responsiveHeight(1),
         justifyContent:'center',
@@ -88,12 +91,11 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(0),
   },
   square:{
-    height: responsiveHeight(25),
-    width: responsiveWidth(76),
+    height: responsiveHeight(22),
+    width: '80%',
     borderRadius:100/2,
     borderStyle:'dashed',
-    position: 'absolute',
-    bottom: responsiveHeight(6),
+    marginBottom:30,
     // right: responsiveWidth(5),
     alignSelf:'center',
     justifyContent: 'center',
@@ -101,38 +103,38 @@ export default StyleSheet.create({
     backgroundColor:'#0072BB',
     borderWidth: 2,
     borderColor: '#CBE2F1',
+    marginTop:15
   },
   square2:{
-    height: responsiveHeight(25),
-    width: responsiveWidth(76),
-    borderRadius:100/2,
-    borderStyle:'dashed',
-    position: 'absolute',
+    height: responsiveHeight(22),
+    width: responsiveWidth(100),
+   
+   
     // bottom: responsiveHeight(0),
-    marginTop: responsiveHeight(2),
+    
     // right: responsiveWidth(5),
     alignSelf:'center',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor:'#0072BB',
-    borderWidth: 2,
+    borderWidth: 0,
     borderColor: '#CBE2F1',
   },
   text: {
-    marginTop: responsiveHeight(10),
+    marginTop: blockMargin,
     alignSelf: 'center',
     textAlign: 'center',
     color: '#CBE2F1',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2.5),
     width: responsiveWidth(100),
   },
   text2:{
     color: '#202020',
-    fontSize: responsiveFontSize(1.5),
-    fontFamily: 'SF-Regular',
-    fontWeight: 'bold',
+    fontSize: scalable(14),
+    fontFamily: 'SFCompactDisplay-Regular',
     width: '100%',
+    minHeight:45
 },
 buttonContainer: {
   height: responsiveHeight(6.5),
@@ -148,15 +150,35 @@ confirmbutton: {
 },
 confirmtext: {
   color: '#FFFFFF',
-  fontFamily: 'SF-Medium',
+  fontFamily: 'SFCompactDisplay-Medium',
   fontSize: responsiveFontSize(2),
 },
 img: {
-  height: responsiveHeight(25),
+  height: responsiveHeight(22),
   width: responsiveWidth(76),
   justifyContent: 'center',
   alignItems: 'center',
-  position: 'absolute',
+
   borderRadius:100/2,
+},
+
+modalContainer: {
+  flex: 1,
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  borderRadius:10,
+  backgroundColor: 'rgba(0, 0, 0, 0.7)',
+},
+modalButton: {
+  backgroundColor: 'white',
+  width: '100%',
+  padding: 20,
+  borderBottomWidth: 2,
+  borderColor: '#ccc',
+},
+modalButtonText: {
+  fontSize: 18,
+  color:'black',
+  textAlign: 'center',
 },
     });

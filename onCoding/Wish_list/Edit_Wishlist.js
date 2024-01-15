@@ -15,22 +15,21 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
-  Platform,ActivityIndicator
+  Platform,ActivityIndicator, SafeAreaView, TouchableWithoutFeedback, Keyboard
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import { Header } from 'react-navigation-stack';
 import Toast from 'react-native-simple-toast';
 
 
 
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 export default class Edit_Wishlist extends Component {
@@ -64,6 +63,8 @@ export default class Edit_Wishlist extends Component {
       price: '',
       notes: '',
       currency: '',
+
+      currency_in:'INR',
       
     };
   }
@@ -91,6 +92,8 @@ export default class Edit_Wishlist extends Component {
     const profile_image = await AsyncStorage.getItem('UserProfileImage');
     const fcm = await AsyncStorage.getItem('UserFCM');
     const token = await AsyncStorage.getItem('Login_JwtToken');
+    const currency_in= await AsyncStorage.getItem('Currency_Abrv');
+
     const wish_id = navigation.getParam('WishId', 'ID');
 
     if (token !== '' && wish_id != '') {
@@ -119,15 +122,9 @@ export default class Edit_Wishlist extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'get Wishh response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
+        
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-
+        
           this.setState({
             name: response.data.data.name,
             price: response.data.data.price+'',
@@ -137,20 +134,17 @@ export default class Edit_Wishlist extends Component {
             wishImageurl: response.data.data.image
           });
 
-          console.log(
-            'Wishh response ',
-            response.data.data.price);
           this.setState({ isHidden: false })
         }
         else {
           this.setState({ isHidden: false })
-          console.log(response.data.message);
+         
         }
       })
       .catch((error) => {
         this.setState({ isHidden: false })
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
   
@@ -239,7 +233,6 @@ export default class Edit_Wishlist extends Component {
   
     const {name,price,notes,wishbase64Image,token,wish_id} = this.state;
     this.setState({ isHidden: true })
-      console.log('input ==> ' + token+' '  +name + ' ' + price + ' ' + notes );
   
             axios
               .post(
@@ -257,27 +250,21 @@ export default class Edit_Wishlist extends Component {
                 },
               )
               .then((response) => {
-                console.log(
-                  'Update without Image WishList response ',
-                   JSON.stringify(response.data),
-                );
-  
-                // Toast.show(response.data.message);
-  
+                this.setState({ isHidden: false })
                 if (response.data.status == 200) {
-                  this.setState({ isHidden: false })
+                
                   Toast.show(response.data.message)
                    this.props.navigation.goBack();
                   }
                 else {
-                  this.setState({ isHidden: false })
-                  console.log(response.data.message);
+                 
+                  Toast.show(response.data.message)
                 }
               })
               .catch((error) => {
                 this.setState({isHidden: false});
                 Toast.show('There was some error. Please try again')
-                console.log('reactNativeDemo axios error:', error);
+               
               });
           }
  
@@ -285,8 +272,7 @@ export default class Edit_Wishlist extends Component {
   
             const {name,price,notes,wishbase64Image,token,wish_id} = this.state;
             this.setState({ isHidden: true })
-              console.log('input Iamge ==> ' + token+' '  +name + ' ' + price + ' ' + notes +wishbase64Image );
-          
+            
                     axios
                       .post(
                         ApiName.update_wishlist+wish_id+'/update',
@@ -303,27 +289,21 @@ export default class Edit_Wishlist extends Component {
                         },
                       )
                       .then((response) => {
-                        console.log(
-                          'Update WishList response ',
-                           JSON.stringify(response.data),
-                        );
-          
-                        // Toast.show(response.data.message);
-          
+                        this.setState({ isHidden: false })
                         if (response.data.status == 200) {
-                          this.setState({ isHidden: false })
+                        
                           Toast.show(response.data.message)
                            this.props.navigation.goBack();
                           }
                         else {
-                          this.setState({ isHidden: false })
-                          console.log(response.data.message);
-                        }
+                         
+                          Toast.show(response.data.message)}
+
                       })
                       .catch((error) => {
                         this.setState({isHidden: false});
                         Toast.show('There was some error. Please try again')
-                        console.log('reactNativeDemo axios error:', error);
+                       
                       });
                   }
   
@@ -366,16 +346,14 @@ export default class Edit_Wishlist extends Component {
         },
       };
       ImagePicker.showImagePicker(options, (response) => {
-        console.log('Response = ', response);
-  
+      
         if (response.didCancel) {
           console.log('User cancelled image picker');
         } else if (response.error) {
           console.log('ImagePicker Error: ', response.error);
         }
         else {
-          // let source = response;
-          console.log('filePath ==> ' + JSON.stringify(response.path));
+      
   
           this.setState({
             wishImageurl: '',
@@ -384,79 +362,165 @@ export default class Edit_Wishlist extends Component {
   
           ImgToBase64.getBase64String(response.uri)
             .then((base64String) =>{
-              console.log(base64String),
+          
               this.setState({
                 wishbase64Image: base64String,
               })}
             )
             // eslint-disable-next-line no-undef
             .catch((err) => doSomethingWith(err));
-  
-           
-  
-          // alert(this.state.wishImage);
-          console.log('wishImage ==> ' + JSON.stringify(this.state.wishImage)+ ' -- ' +this.state.wishbase64Image);
-        }
+         }
       });
+    };
+
+    getExtensionFormat = (filename) => {
+   
+      if(filename.split('.').pop() === 'png' || filename.split('.').pop() ==='jpg' || filename.split('.').pop() ==='jpeg'){
+        return false
+      }
+      return true
     };
   
 
   render () {
     const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength} = this.state
             return (
+              <SafeAreaView style={{flex:1}}>
                 <View style={styles.container}>
                 <View style={styles.view}>
+                <View style={{
+            flexDirection: 'row', width: '100%', height: '12%',
+            backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', alignContent: 'center', alignSelf: 'center', }}>
+
+              <TouchableOpacity style={{
+
+                alignItems: 'center',
+              }} onPress={() => this.props.navigation.goBack()}>
+
+                <Image style={{
+                  width: responsiveWidth(3),
+                  height: responsiveHeight(4),
+
+                  resizeMode: 'contain'
+                }} source={require('../../images/back_arrow.png')} />
+
+              </TouchableOpacity>
+
+            </View>
+            <View style={{ width: '76%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontFamily: 'SFCompactDisplay-Medium',
+                fontSize: scalable(18),
+                justifyContent: 'center',
+                textAlign: 'center',
+
+              }}>Edit Wish List</Text>
+            </View>
+            <View style={{ width: '12%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center', marginRight: blockMarginHalf }}>
+
+             
+                <Image style={{
+                  width: 0,
+                  height: 0,
+                  tintColor: '#fff',
+                  resizeMode: 'contain'
+                }} source={require('../../images/share.png')} />
+
+              
+            </View>
+          </View>
+
+                <View style={{height:'35%', width:'100%', }}>
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
                 <View style={styles.view2}>
-                <View style={{flexDirection: 'row', width: '100%', marginTop: responsiveHeight(2),
-                  }}>
-                        <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-         <Image style={styles.arrow} source={require('../../images/back_arrow.png')} />
-         </TouchableOpacity>
-               <Text style={styles.text_prg}>Edit Wish List</Text>
-               {/* <Image style={styles.share_img2} source={require('../../images/share.png')}/> */}
-           </View>
+                
     
           
-       <View style={{flex: 1, marginTop: responsiveHeight(35)}}>
+       <View style={{marginTop: 0}}>
          {this.state.wishImage != ''  ?
 
+<View style={styles.square}>
+<TouchableOpacity style={styles.square2} onPress={this.chooseFile.bind(this)}>
 
-       <View style={styles.square}>
-                <TouchableOpacity style={styles.square2} onPress={this.chooseFile.bind(this)}>
+<Image  source={{ uri: this.state.wishImage, cache: 'force-cache' }} style={styles.img} />
+</TouchableOpacity>
+</View>
 
-             <Image  source={{ uri: this.state.wishImage, cache: 'force-cache' }} style={styles.img} />
-             </TouchableOpacity>
-       </View>
 
        : this.state.wishImageurl != '' ?
 
        <View style={styles.square}>
        <TouchableOpacity style={styles.square2} onPress={this.chooseFile.bind(this)}>
 
-    <Image  source={{ uri: 'http://whoapp.dci.in/uploads/files/' + this.state.wishImageurl, cache: 'force-cache' }} style={styles.img} />
+    <Image  source={ this.state.wishImageurl === '' || this.state.wishImageurl === null || this.getExtensionFormat(this.state.wishImageurl)
+                                        ? require('../../images/placeholder.png')
+                                        : { uri: ApiName.baseLink + this.state.wishImageurl, cache: 'force-cache' }} style={styles.img} />
     </TouchableOpacity>
-</View> :  <View style={styles.square}>
+</View> :  
+       <View style={styles.square}>
+<TouchableOpacity style={{marginBottom: 0}} onPress={this.chooseFile.bind(this)}>
+            <View style={{
+              width: 50,
+              height: 50,
+              borderStyle: 'dotted',
+              borderRadius: 100 / 2,
+              backgroundColor: '#0072bb',
+              opacity: 100,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              margin: blockMarginHalf, justifyContent: 'center',alignSelf:'center'
+            }}>
+              <Image
 
-<TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
-     <Text style={styles.text_fab}>+</Text>
-   </TouchableOpacity>
-   <Text style={styles.text}>TAP TO ADD IMAGE</Text>
-</View>
+                resizeMode='contain'
+                tintColor={'#FFFFFF'}
+                source={require('../../images/add.png')}
+                style={{
+                  width: 15,
+                  height: 15,
+                  resizeMode: 'contain',
+                  justifyContent: 'center',
+                  alignSelf: 'center',
+                  borderRadius: 100 / 2,
+                  tintColor:'#FFFFFF'
+                }}
+              />
+            </View>
+          </TouchableOpacity>
+       {/* <TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
+            <Text style={styles.text_fab}>+</Text>
+          </TouchableOpacity> */}
+          <Text style={styles.text}>TAP TO ADD IMAGE</Text>
+       </View>
 
-
+    
     }
 
        </View>
 
     
                     </View>
+                   </TouchableWithoutFeedback>
+</View>
+                   <KeyboardAwareScrollView
+          style={{ flex: 1}}
+          contentContainerStyle={{ flexGrow: 1, }}
+        >
+                  
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={{flexDirection:'column'}}>
+                
                 <View style={styles.view1}>
             <TextInput style={styles.text2}
                 placeholder="Name"
                 placeholderTextColor="#B6C0CB"
-                autoCorrect={false}
+           
                 returnKeyType="next"
-                underlineColorAndroid="#B6C0CB"
+                underlineColorAndroid="transparent"
                 onChangeText={(name) => {
                   this.setState({name})
                   if(name.trim() != ''){
@@ -479,23 +543,30 @@ export default class Edit_Wishlist extends Component {
                 }} value={this.state.name}
                 onSubmitEditing={()=>this.price.focus()}
               />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
     {nameValid && <Text style={{color: 'red',textAlign: 'left',
       
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: scalable(9)}}>Please Enter the name</Text>}
          {nameValidLength && <Text style={{color: 'red',textAlign: 'left',
       
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: scalable(9),}}>Please Enter atleast 3 characters</Text>}
     
                 <TextInput style={styles.text2}
                 ref={(input)=>this.price = input}
-                placeholder="Price"
+                placeholder={'Price'+' ('+this.state.currency_in + ')'}
                 keyboardType="numeric"
                 placeholderTextColor="#B6C0CB"
-                autoCorrect={false}
+                
                 returnKeyType="next"
-                underlineColorAndroid="#B6C0CB"
+                underlineColorAndroid="transparent"
                 onChangeText={(price) =>
                   {  this.setState({price})
                   if(price.trim() != ''){
@@ -513,17 +584,24 @@ export default class Edit_Wishlist extends Component {
                 value={this.state.price}
                 onSubmitEditing={()=>this.notes.focus()}
               />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
               {priceValid && <Text style={{color: 'red',textAlign: 'left',
       
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: scalable(9),}}>Please Enter the price</Text>}
                 <TextInput style={styles.text2}
                 ref={(input)=>this.notes = input}
                 placeholder="Notes"
                 placeholderTextColor="#B6C0CB"
-                autoCorrect={false}
+              
                 returnKeyType="done"
-                underlineColorAndroid="#B6C0CB"
+                underlineColorAndroid="transparent"
                 onChangeText={(notes) =>
                   {
                     this.setState({ notes})
@@ -548,13 +626,20 @@ export default class Edit_Wishlist extends Component {
                 
                 } value={this.state.notes}
               />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
                {notesValid && <Text style={{color: 'red',textAlign: 'left',
       
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: scalable(9),}}>Please Enter the notes</Text>}
       {notesValidLength && <Text style={{color: 'red',textAlign: 'left',
     
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: scalable(9),}}>Please Enter atleast 6 characters</Text>}
             </View>
            
@@ -573,6 +658,10 @@ export default class Edit_Wishlist extends Component {
               </TouchableOpacity>
             </View>
                     </View>
+                   
+                    </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>
+                </View>
                     {isHidden ? (
           <View style={{
             width: '100%',
@@ -592,6 +681,7 @@ export default class Edit_Wishlist extends Component {
           </View>
         ) : null}
                     </View>
+            </SafeAreaView>
             );
         }
 }

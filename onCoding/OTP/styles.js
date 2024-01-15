@@ -23,14 +23,14 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(9),
     marginLeft: responsiveWidth(2),
     textAlign:'center',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
 
   },
   back_arrow: {
     width:responsiveWidth(3),
     height: responsiveHeight(3),
     marginTop: responsiveHeight(3),
-    marginLeft: responsiveWidth(3),
+    marginLeft: responsiveWidth(5),
   },
   view1: {
     backgroundColor: '#FFFFFF',
@@ -43,11 +43,12 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(1),
     marginRight: responsiveWidth(3),
     marginLeft: responsiveWidth(3),
-    fontFamily: 'SF-regular',
+    fontFamily: 'SFCompactDisplay-regular',
   },
   text_phnno: {
     color: '#202020',
-    fontWeight: 'bold',
+    fontFamily: 'SFCompactDisplay-Bold',
+    fontSize: 16
   },
   view2: {
     backgroundColor: '#FFFFFF',
@@ -78,21 +79,21 @@ export default StyleSheet.create({
   },
   confirmtext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   OTP_text1: {
     color: '#949494',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
-    marginLeft: responsiveWidth(8),
+    
   },
   OTP_Resend: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginLeft: responsiveWidth(2),
-    fontWeight: 'bold',
+  
   },
   box2: {
     width: '100%',

@@ -5,6 +5,7 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMargin, blockMarginHalf } from '../ui/common/responsive';
 
 export default StyleSheet.create({
     container: {
@@ -20,21 +21,27 @@ export default StyleSheet.create({
       view1: {
         backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(3),
-        marginLeft: responsiveWidth(15),
-        marginRight: responsiveWidth(15),
+       
+        width:'100%',
         height: '100%',
+        justifyContent:'center',alignItems:'center'
       },
       view2: {
         flex: 1,
         backgroundColor: '#FFFFFF',
-        marginTop: responsiveHeight(4.5),
+        marginTop: blockMargin * 4,
+        marginBottom: blockMargin,
         alignItems:'center',
         height: '100%',
       },
+      
       view3: {
-        borderBottomWidth: responsiveWidth(0.15),
-        marginTop: responsiveHeight(0.5),
+        borderBottomWidth: responsiveWidth(0.30),
+       
         borderBottomColor: '#B6C0CB',
+        width: '100%',
+        justifyContent:'center',alignSelf:'center',
+        marginTop:responsiveWidth(2),
       },
   change_text: {
     fontSize: responsiveFontSize(3.5),
@@ -42,14 +49,16 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(8),
     marginLeft: responsiveHeight(2),
     textAlign:'center',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
   },
   text:{
-      marginTop: responsiveHeight(5),
-      color: '#202020',
-      fontSize: responsiveFontSize(1.5),
-      fontFamily: 'SF Display',
-      fontWeight: 'bold',
+   
+      color: '#B6C0CB',
+    fontSize: responsiveFontSize(2),
+    textAlign: 'left',
+    marginLeft: responsiveWidth(0),
+    marginBottom: 5,
+    fontFamily: 'SFCompactDisplay-Regular',
   },
   submitbutton: {
     backgroundColor: '#0072BB',
@@ -65,14 +74,14 @@ export default StyleSheet.create({
   },
   buttontext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   back_arrow: {
     width:responsiveWidth(3),
     height: responsiveHeight(3),
     marginTop: responsiveHeight(3),
-    marginLeft: responsiveWidth(3),
+    marginLeft: responsiveWidth(5),
   },
   scrollview:
   {
@@ -80,19 +89,16 @@ export default StyleSheet.create({
   },
   textBoxBtnHolder:
   {
-    position: 'relative',
-    alignSelf: 'stretch',
+    width:'90%',
     justifyContent: 'center',
-    marginTop: responsiveHeight(4),
+    marginTop: responsiveHeight(1.5),
   },
   textBox:
   {
+    width:'95%',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
-    paddingRight: responsiveWidth(3),
-    paddingLeft: responsiveWidth(3),
-    paddingVertical: 0,
-    fontFamily: 'SF-Medium',
-
+    height:45, fontSize:16
   },
 
   visibilityBtn:

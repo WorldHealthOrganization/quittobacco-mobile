@@ -5,22 +5,14 @@ import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
-} from 'react-native-responsive-dimensions';
-import DatePicker from 'react-native-datepicker';
-import Slider from 'react-native-slider';
-// import {
-//   StepProgressBar
-// } from 'react-native-step-progress-bar';
-import Counter from 'react-native-counters';
+} from 'react-native-responsive-dimensions'
+
 import Feather from 'react-native-vector-icons/Feather';
 import dateFormat from 'date-fns/format';
-import { Dropdown } from 'react-native-material-dropdown-v2';
 import ToggleSwitch from 'toggle-switch-react-native';
-import GetLocation from 'react-native-get-location';
-import Geolocation from 'react-native-geolocation-service';
-import Geocoder from 'react-native-geocoding';
-import SnapSlider from 'react-native-snap-slider';
-
+// import SnapSlider from 'react-native-snap-slider';
+import Slider from '@react-native-community/slider';
+import ReactNativePickerModule from "react-native-picker-module"
 import {
   View,
   Image,
@@ -28,19 +20,15 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
-  TouchableHighlight, ActivityIndicator
+  TouchableHighlight, ActivityIndicator, SafeAreaView,TouchableWithoutFeedback,Keyboard
 } from 'react-native';
-import {TextInputLayout} from 'rn-textinputlayout';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
-import { SimpleStepper } from 'react-native-simple-stepper';
-import { Stepper } from 'react-form-stepper';
-import StepIndicator from 'react-native-step-indicator';
+
+
 import {
   scalable,
   deviceWidth,
@@ -53,14 +41,14 @@ import {
   blockPaddingHalf,
   buttonPadding,
 } from '../../ui/common/responsive';
-//import TimePicker from the package we installed
-import TimePicker from "react-native-24h-timepicker";
+
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Dialog, {ScaleAnimation,DialogTitle, DialogContent,DialogFooter } from 'react-native-popup-dialog';
 
 import { min } from 'date-fns';
 const labels = ['Not At All', 'Moderate', 'Too Strong'];
-
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { SinglePickerMaterialDialog } from 'react-native-material-dialog';
 
 const customStyles = {
   stepIndicatorSize: 18,
@@ -84,14 +72,22 @@ const customStyles = {
   labelColor: '#202020',
   labelSize: responsiveFontSize(1.45),
   currentStepLabelColor: '#202020',
-  labelFontFamily: 'SF-Medium',
+  labelFontFamily: 'SFCompactDisplay-Medium',
   labelAlign: 'center',
 };
 
 export default class Add_Cravings extends Component {
   constructor(props) {
     super(props);
+
+    this.pick_timeCraving = React.createRef();
+    this.pick_feelings = React.createRef()
+    this.pick_people = React.createRef()
+
     this.state = {
+      selTimeCraving:'',
+      selFeelings:'',
+      selPeople:'',
       isHidden: false,
     //userInfo
     user_id: '',
@@ -115,31 +111,36 @@ export default class Add_Cravings extends Component {
       isSeleted: 2,
       isUseTobacco: false,
       isUse:'',
-      feelings: [],
+      // feelings:   [{"value":"5","label":"Feeling Low"},{"value":"4","label":"Lonely"},{"value":"3","label":"Bored"},{"value":"2","label":"Depressed"},{"value":"1","label":"Other"}],
+      feelings : [],
       feelings_value: '',
       feelings_type: 0,
       feelings_other:'',
-      doing: [],
+      doing:  [],
       doing_value: '',
-      whom: [],
+      whom:  [{"value":"3","label":"Family"},{"value":"2","label":"Friends"},{"value":"1","label":"Other"}],
       whom_value: '',
 
       triggersYou: '',
       location: '',
       typeLocation:'',
       locValue: [
-        { value: 'Home' },
-        { value: 'Office' },
-        { value: 'Shopping' },
-        { value: 'Outside' },
-        { value: 'Nearby Shop' },
-        { value: 'Others' }
+        {label:'Home', value: 'Home' },
+        { label:'Office', value: 'Office' },
+        { label:'Shopping', value: 'Shopping' },
+        { label:'Outside', value: 'Outside' },
+        { label:'Others', value: 'Others' }
       ],
-   
+
+      
       defaultItem: 0,
 
       time: 'Select Time',
-      isTimePickerVisible: false
+      isTimePickerVisible: false,
+      sliderValue: 1,
+      locate_Visible : false,
+      select_People : false,
+      feeling_Visible : false,
     };
   }
 
@@ -155,6 +156,7 @@ export default class Add_Cravings extends Component {
   }
 
   componentDidMount = () => {
+
     //AppState.addEventListener('change', this._handleAppStateChange);
     const { navigation } = this.props;
     // BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
@@ -183,15 +185,13 @@ export default class Add_Cravings extends Component {
     const type = navigation.getParam('type', '');
     const notification_id = navigation.getParam('notification_id', 'ID');
 
-    console.log('Navigated Data:-'+type+'---'+notification_id+'--'+this.state.defaultItem)
 
     if(type == '1'){
       
       this.setState({ type: type,notification_id: notification_id,defaultItem: 0});
-      console.log('Navigated Data:-'+type+'---'+notification_id+'--'+this.state.defaultItem)
 
     }
-
+console.log("token======>", token)
     if (token !== '') {
       this.setState({
         defaultItem: 0,
@@ -200,8 +200,9 @@ export default class Add_Cravings extends Component {
         isUseTobacco: false,
         token: token,
       });
+
       this.getFeelings();
-      this.getDoing();
+      // this.getDoing();
       this.getWhom();
      
     }
@@ -230,24 +231,20 @@ export default class Add_Cravings extends Component {
   };
 
   onChange(number, type) {
-    console.log(number, type);
     this.setState({ craving_count: number }); // 1, + or -
   }
 
 
   onPageChange(position) {
     this.setState({ currentPosition: position });
-    console.log(position);
   }
 
  
 
   slidingComplete = (itemSelected) => {
-    console.log("slidingComplete");
-    console.log("item selected " + this.refs.slider.state.item);
-    console.log("item selected(from callback)" + itemSelected);
+
     this.setState({ defaultItem: itemSelected })
-    // console.log("value " + this.sliderOptions[this.refs.slider.state.item].value);
+    
   }
 
   inputValidation() {
@@ -261,7 +258,7 @@ export default class Add_Cravings extends Component {
       feelings_type,
       feelings_other,
       whom_value,
-      doing_value,
+      // doing_value,
 
     } = this.state;
     if (triggersYou.trim() != '') {
@@ -272,62 +269,60 @@ export default class Add_Cravings extends Component {
             Toast.show('Please type the location');
           }else{
             if (feelings_value != '') {
-              console.log('feelings_value --'+feelings_value+'-'+feelings_type)
               if(feelings_type == 1){
                 if(feelings_other.trim() == '' ){
                   Toast.show('Please type the feelings');
                 }else{
-                  if (doing_value != '') {
+                  // if (doing_value != '') {
                     if (whom_value != '') {
-                      this.addCravingData({carvingStatus: 1})
+                      this.addCravingData({carvingStatus: isSeleted})
                     }else {
                       Toast.show('Please select whom are you with');
                     }
-                  }else {
-                    Toast.show('Please select what are you doing');
-                  }
+                  // }else {
+                  //   Toast.show('Please select what are you doing');
+                  // }
                 }
               }else{
-              if (doing_value != '') {
+             
                 if (whom_value != '') {
-                  this.addCravingData({carvingStatus: 1})
+                  this.addCravingData({carvingStatus: isSeleted})
                 }else {
                   Toast.show('Please select whom are you with');
                 }
-              }else {
-                Toast.show('Please select what are you doing');
-              }}
+            }
             }else {
               Toast.show('Please select how you feel');
             }
           }
         }else{
           if (feelings_value != '') {
-            console.log('feelings_value --'+feelings_value+'-'+feelings_type)
+          
             if(feelings_type == 1){
               if(feelings_other.trim() == '' ){
                 Toast.show('Please type the feelings');
               }else{
-                if (doing_value != '') {
+                // if (doing_value != '') {
                   if (whom_value != '') {
-                    this.addCravingData({carvingStatus: 1})
+                    this.addCravingData({carvingStatus: isSeleted})
                   }else {
                     Toast.show('Please select whom are you with');
                   }
-                }else {
-                  Toast.show('Please select what are you doing');
-                }
+                // }else {
+                //   Toast.show('Please select what are you doing');
+                // }
               }
             }else{
-            if (doing_value != '') {
+            // if (doing_value != '') {
               if (whom_value != '') {
-                this.addCravingData({carvingStatus: 1})
+                this.addCravingData({carvingStatus: isSeleted})
               }else {
                 Toast.show('Please select whom are you with');
               }
-            }else {
-              Toast.show('Please select what are you doing');
-            }}
+            // }else {
+            //   Toast.show('Please select what are you doing');
+            // }}
+            }
           }else {
             Toast.show('Please select how you feel');
           }
@@ -349,13 +344,12 @@ export default class Add_Cravings extends Component {
 
 
   lastEntry(clickState) {
-    //alert(clickState);
     if (clickState == 1) {
       this.setState({ isSeleted: 1,isUseTobacco: true,isUse:'' });
     } else {
-    
-      this.setState({  isUse:'No', isSeleted: 0,isUseTobacco: false});
-      this.addCravingData({carvingStatus: 0})
+      this.setState({ isSeleted: 0,isUseTobacco: true,isUse:'' });
+      // this.setState({  isUse:'No', isSeleted: 0,isUseTobacco: false});
+      // this.addCravingData({carvingStatus: 0})
     }
   }
 
@@ -373,36 +367,31 @@ export default class Add_Cravings extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Feelings response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
+        // console.log("checking feelingsfd",JSON.stringify(response.data.data) )
         if (response.data.status == 200) {
+          console.log("print====",JSON.stringify(response.data.data));
 
           const obj = [];
-
-          for (var i = 0; i < response.data.data.length; i++) {
+          const _data = response.data.data;
+          for (var i = 0; i < _data.length; i++) {
             obj.push({
               value: response.data.data[i].id + '',
-              label: response.data.data[i].name,
-  
+              label: response.data.data[i].name
             });
+            console.log("for===",response.data.data[i].name);
           }
-          this.setState({ feelings: obj });
-          console.log(JSON.stringify(response.data));
 
-          // Toast.show(response.data.message);
+          console.log("checking feelings",JSON.stringify(obj))
+          this.setState({ feelings: obj});
+        
         }
         else {
           Toast.show(response.data.data.message)
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
 
@@ -420,11 +409,7 @@ export default class Add_Cravings extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Doing response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
+  
       
 
         if (response.data.status == 200) {
@@ -440,18 +425,16 @@ export default class Add_Cravings extends Component {
           }
           this.setState({ doing: obj });
 
-          console.log(JSON.stringify(response.data));
-
+        
           // Toast.show(response.data.message);
         }
         else {
           Toast.show(response.data.message);
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
 
@@ -468,36 +451,32 @@ export default class Add_Cravings extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Whom response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-      
+     
         if (response.data.status == 200) {
 
-          console.log(JSON.stringify(response.data));
           const obj = [];
 
           for (var i = 0; i < response.data.data.length; i++) {
+            console.log("log----",i);
             obj.push({
               value: response.data.data[i].id + '',
               label: response.data.data[i].relation,
   
             });
           }
+          console.log("checking whom",JSON.stringify(obj))
           this.setState({ whom: obj });
   
           // Toast.show(response.data.message);
         }
         else {
           Toast.show(response.data.message);
-          console.log(response.data.message);
+         
         }
       })
       .catch((error) => {
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
 
@@ -507,12 +486,10 @@ addCravingData = async ({carvingStatus}) =>{
   
   const {defaultItem,triggersYou,time,location,token ,feelings_value,feelings_other,feelings_type,
     whom_value,typeLocation,type,notification_id,
-    doing_value,} = this.state
+    doing_value} = this.state;
+    
   this.setState({isHidden: true});
-    console.log('input ==> '+ApiName.store_craving+' --- ' + token+' =---= '+carvingStatus+" =--= "+defaultItem+' =--= '+triggersYou+' =--= '+time+' =--= '+location + ' =-= ' + feelings_value+ ' =-= '+whom_value +' =-= '+doing_value);
- 
-    console.log('Navigation'+type+'---'+notification_id)
-    if(carvingStatus == 1){
+    // if(carvingStatus == 1){
 
   let LocationField = ''
   if(location == 'Others'){
@@ -520,9 +497,7 @@ addCravingData = async ({carvingStatus}) =>{
   }else{
     LocationField = location
   }
-
-  console.log('Yes'+ LocationField+'---$'+feelings_other+'$---'+feelings_type);
-
+console.log("feelings_type  "+feelings_type +" defaultItem "+defaultItem+" carvingStatus "+carvingStatus+" triggersYou "+triggersYou+" time "+time+" feelings_value "+feelings_value+" feelings_other "+feelings_other+" LocationField "+LocationField+" whom_value "+whom_value+" type "+type+ " notification_id "+notification_id)
   axios
   .post(
     ApiName.store_craving,
@@ -536,7 +511,7 @@ addCravingData = async ({carvingStatus}) =>{
       other_feeling:feelings_other,
       location: LocationField,
      
-      doing_id:doing_value,
+      // doing_id:doing_value,
       with_whom_id:whom_value,
 
       type: type,
@@ -550,75 +525,25 @@ addCravingData = async ({carvingStatus}) =>{
     },
   )
   .then((response) => {
-    console.log(
-      'Add Yes craving response ',
-       JSON.stringify(response.data),
-    );
 
-    // Toast.show(response.data.message);
+ this.setState({isHidden: false});
     this.setState({  isUse:''})
+
     if (response.data.status == 200) {
-      this.setState({isHidden: false});
+     
       Toast.show(response.data.message)
        this.props.navigation.goBack();
       }
     else {
       Toast.show(response.data.message);
-      console.log(response.data.message);
     }
   })
   .catch((error) => {
     this.setState({isHidden: false});
     Toast.show('There was some error. Please try again')
-    console.log('reactNativeDemo axios error:', error);
+   
   });
 
- }else{
-
-  console.log('Noo');
-
-  axios
-  .post(
-    ApiName.store_craving,
-    {
-      tobacco_rating :defaultItem,
-      carving_status: carvingStatus,
-      type: type,
-      notification_id: notification_id
-    
-    },
-    {
-      headers: {
-        'Authorization': token,
-      },
-    },
-  )
-  .then((response) => {
-    console.log(
-      'Add Noo craving response ',
-       JSON.stringify(response.data),
-    );
-
-    // Toast.show(response.data.message);
-
-    if (response.data.status == 200) {
-      this.setState({isHidden: false});
-      Toast.show(response.data.data.message)
-      }
-    else {
-      Toast.show(response.data.data.message)
-      console.log(response.data.message);
-    }
-  })
-  .catch((error) => {
-    this.setState({isHidden: false});
-    Toast.show('There was some error. Please try again')
-    console.log('reactNativeDemo axios error:', error);
-  });
- }
-
-
-        
         }
 
   onCancel() {
@@ -633,8 +558,16 @@ addCravingData = async ({carvingStatus}) =>{
   render() {
 
     const { isHidden,defaultItem, feelings, feelings_value,feelings_type, doing, doing_value, whom, whom_value,time,location,locValue,typeLocation,isTimePickerVisible } = this.state;
-
+    const sliderValueLabels = ['Not at all', 'Medium', 'Strong'];
+    if(feelings.length==0)
+    {
+    this.getFeelings();
+    this.getWhom();
+    }
+    console.log("feelings",feelings)
+    console.log('Loc Value ',locValue)
     return (
+      <SafeAreaView style={{flex:1}}>
       <View
         style={{
           flex: 1,
@@ -667,7 +600,7 @@ addCravingData = async ({carvingStatus}) =>{
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -676,7 +609,11 @@ addCravingData = async ({carvingStatus}) =>{
 
             </View>
           </View>
-          <ScrollView style={{ marginTop: 0 }} keyboardShouldPersistTaps={'handled'}>
+          <KeyboardAwareScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <View style={{padding: blockMargin * 1.3}}>
 
               <View
@@ -693,7 +630,7 @@ addCravingData = async ({carvingStatus}) =>{
                     marginTop: blockMarginHalf * 2,
                     width: '100%',
                   }}>
-                  <SnapSlider ref="slider" containerStyle={styles.snapsliderContainer} style={styles.snapslider}
+                  {/* <SnapSlider ref="slider" containerStyle={styles.snapsliderContainer} style={styles.snapslider}
                     itemWrapperStyle={styles.snapsliderItemWrapper}
                     itemStyle={styles.snapsliderItem}
                     items={[{ value: 0, label: 'Not at All' },
@@ -702,7 +639,28 @@ addCravingData = async ({carvingStatus}) =>{
                     ]}
                     labelPosition="bottom"
                     defaultItem={defaultItem}
-                    onSlidingComplete={this.slidingComplete} />
+                    onSlidingComplete={this.slidingComplete} /> */}
+                      <Slider
+                        style={styles.snapslider}
+                        step={1}
+                        minimumValue={1}
+                        maximumValue={3}
+                        // minimumTrackTintColor="#0072BB"
+                        // maximumTrackTintColor="#000000"
+                        thumbTintColor="#0072BB"
+                        value={this.state.sliderValue}
+                        // onValueChange={(value) => this.setState({ sliderValue: value })}
+                        onValueChange={(value) => this.slidingComplete(value)}
+                        
+                        />
+                        {console.log("slider value", defaultItem)}
+                      <View style={styles.labelContainer}>
+                        {sliderValueLabels.map((label, index) => (
+                          <Text key={index} style={styles.label}>
+                            {label}
+                          </Text>
+                        ))}
+                      </View>
                 </View>
               </View>
 
@@ -737,7 +695,7 @@ addCravingData = async ({carvingStatus}) =>{
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         YES
@@ -763,7 +721,7 @@ addCravingData = async ({carvingStatus}) =>{
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         NO
@@ -784,7 +742,7 @@ addCravingData = async ({carvingStatus}) =>{
     <Text
                         style={{
                           color: '#222222',
-                          fontFamily: 'SF-Bold',
+                          fontFamily: 'SFCompactDisplay-Semibold',
                           fontSize: scalable(15),
                           textAlign:'center',
                          margin: blockMargin,
@@ -805,7 +763,7 @@ addCravingData = async ({carvingStatus}) =>{
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(12),
                         }}>
                         Okay
@@ -827,11 +785,11 @@ addCravingData = async ({carvingStatus}) =>{
                 <Text
                         style={{
                           color: '#222222',
-                          fontFamily: 'SF-Bold',
+                          fontFamily: 'SFCompactDisplay-Semibold',
                           fontSize: scalable(15),
                           textAlign:'center',
                          margin: blockMarginHalf
-                        }}>{'Very Good, you are successfully on the track. Keep it up!!'}</Text>
+                        }}>{'Very good, you are successfully on track. Keep it up!'}</Text>
                  </View>
 
 
@@ -846,22 +804,29 @@ addCravingData = async ({carvingStatus}) =>{
                   width: '100%',
                 }}>
 
-<Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14),}}>What triggered you?</Text>
+<Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14),}}>What triggered the craving?</Text>
                   
 
-                  <TextInput  style={{  width: '100%' }}
+                  <TextInput  style={{  width: '100%', minHeight:45,fontFamily: 'SFCompactDisplay-Regular', color:'black'}}
                     ref={(input) => this.trigger = input}
                     placeholder=""
                     placeholderTextColor="#B6C0CB"
                    
-                    autoCorrect={false}
+                  
                     returnKeyType="next"
-                    underlineColorAndroid="#B6C0CB"
+                    underlineColorAndroid="transparent"
                     onChangeText={(triggersYou) => { this.setState({ triggersYou }); }
                     }
                     value={this.state.triggersYou}
                    
                   />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
                 </View>
 
 
@@ -871,7 +836,7 @@ addCravingData = async ({carvingStatus}) =>{
                   marginBottom: blockMarginHalf * 2,
                   width: '100%',
                 }}>
-                  <Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14),}}>How long craving lasted?</Text>
+                  <Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14),}}>When did the cravings occur?</Text>
                   <View
                     style={{
                       flex: 1,
@@ -886,12 +851,13 @@ addCravingData = async ({carvingStatus}) =>{
          
         }}>
         
-                   <Text style={{ width: '100%', flex:1, color: '#222222', fontFamily: 'SF-Regular', fontSize: scalable(14),marginTop:blockMargin,marginBottom:blockMarginHalf}}>{time}</Text>
+                   <Text style={{ width: '100%', flex:1, color: '#222222', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14),marginTop:blockMargin,marginBottom:blockMarginHalf}}>{time}</Text>
                    </TouchableOpacity>
                    <DateTimePickerModal
 
 isVisible={isTimePickerVisible}
 mode='time'
+locale="en_GB" 
 is24Hour={true}  
 onConfirm={this.handleTimeConfirm}
 onCancel={this.hideTimePicker}
@@ -919,15 +885,39 @@ onCancel={this.hideTimePicker}
                   width: '100%',
                 }}>
 
-<Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14),}}>Where were you at the time of craving? (At home, At office, etc..)</Text>
-<View
+<Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14),}}>Where were you at the time of craving? (At home, At office, etc..)</Text>
+
+        <TouchableOpacity onPress={() => { locValue.length > 0 && this.setState({locate_Visible : true}) }} >
+          <View style={{
+            flexDirection: 'row',
+
+            marginLeft: responsiveWidth(0), marginRight: responsiveWidth(4), marginTop: 8, alignItems: 'center', marginBottom: 5
+          }}>
+            <Text style={{
+              color: '#202020', fontFamily: 'SFCompactDisplay-Regular',
+              fontSize: 14, width: '95%',
+            }}>{this.state.selTimeCraving != '' ? this.state.selTimeCraving : 'Select Location of Craving'}</Text>
+
+
+            <Image source={require('../../../images/down_arrow.png')} style={{
+              width: responsiveWidth(3),
+              height: responsiveHeight(3),
+              marginLeft: responsiveWidth(2),
+              resizeMode: 'contain',
+            }} />
+
+          </View>
+
+        </TouchableOpacity>
+
+{/* <View
                     style={{
                       flex: 1,
                       flexDirection: 'row',
                       marginTop: responsiveHeight(0),
                     }}>
-                   
-                     <Dropdown
+                   <Text >{this.state.selTimeCraving}</Text> */}
+                     {/* <Dropdown
                       underlineColor="transparent"
                       ref='Where'
                       value={location}
@@ -943,33 +933,38 @@ onCancel={this.hideTimePicker}
                       useNativeDriver="true"
                       dropdownPosition={0}
                       labelHeight={7}
-                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SF-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
-                      itemTextStyle={{ fontFamily: 'SF-Medium',  fontSize: scalable(14), height: 25 }}
-                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SF-Medium',alignSelf:'center',justifyContent:'center' }}
+                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SFCompactDisplay-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
+                      itemTextStyle={{ fontFamily: 'SFCompactDisplay-Medium',  fontSize: scalable(14), height: 25 }}
+                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SFCompactDisplay-Medium',alignSelf:'center',justifyContent:'center' }}
                       inputContainerStyle={{ borderBottomColor: 'transparent' }}
                       data={locValue}
                       valueExtractor={({ value }) => value}
                     />
-                    <Image source={require('../../../images/down_arrow.png')} style={styles.arrow} />
+                    <Image source={require('../../../images/down_arrow.png')} style={styles.arrow} /> */}
 
-                  </View>
+                  {/* </View> */}
                   <View style={styles.view4} />
 
 
 { location == 'Others' && <View style={{marginTop: blockMarginHalf}}>                  
-<TextInput  style={{  width: '100%' }}
+<TextInput  style={{  width: '100%', minHeight:45 ,fontFamily: 'SFCompactDisplay-Regular'}}
                     ref={(input) => this.loc = input}
                     placeholder="Type your Place here.."
                     placeholderTextColor="#B6C0CB"
                    
-                    autoCorrect={false}
+                    
                     returnKeyType="next"
-                    underlineColorAndroid="#B6C0CB"
+                    underlineColorAndroid="transparent"
                     onChangeText={(typeLocation) => { this.setState({ typeLocation }); }
                     }
                     value={this.state.typeLocation}
-                    onSubmitEditing={() => this.feelings.focus()}
+                   // onSubmitEditing={() => this.feelings.focus()}
                   />
+                  <View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
 
 </View>}
                  
@@ -981,8 +976,28 @@ onCancel={this.hideTimePicker}
                   marginTop: blockMargin,
                   width: '100%',
                 }}>
-                  <Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14), marginTop: blockMarginHalf,}}>How are you feeling?</Text>
-                  <View
+                  <Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14), marginTop: blockMarginHalf,}}>How were you feeling?</Text>
+                 
+                  <TouchableOpacity onPress={() => {feelings.length > 0 && this.setState({feeling_Visible: true})}} >
+<View style={{
+              flexDirection: 'row',
+             
+              marginLeft: responsiveWidth(0),marginRight: responsiveWidth(4), marginTop:8, alignItems:'center',marginBottom:5
+            }}>
+              <Text style={{ color:'#202020',fontFamily: 'SFCompactDisplay-Regular', 
+              fontSize: 14, width: '95%',}}>{this.state.selFeelings != '' ? this.state.selFeelings : 'Select Feeling'}</Text>
+              
+              
+              <Image source={require('../../../images/down_arrow.png')} style={{width: responsiveWidth(3),
+  height: responsiveHeight(3),
+  marginLeft: responsiveWidth(2),
+  resizeMode: 'contain',}} />
+       
+        </View>
+        
+        </TouchableOpacity>
+                 
+                  {/* <View
                     style={{
                       flex: 1,
                       flexDirection: 'row',
@@ -998,13 +1013,12 @@ onCancel={this.hideTimePicker}
                         for (var i = 0; i < feelings.length; i++) {
                        
                           if(feelings[i].value == feelings_value){
-                            console.log('Selected Feelings -'+feelings[i].label.toLowerCase())
-
+                           
                           if(feelings[i].label.toLowerCase() == 'others'){
                             this.setState({ feelings_type : 1 });
-                           console.log('Selected Others Feelings');
+                         
                           }else{
-                            console.log('Selected Feelings');
+                         
                             this.setState({ feelings_type : 0,feelings_other:'' });
                           }}
                         }
@@ -1014,44 +1028,48 @@ onCancel={this.hideTimePicker}
                       useNativeDriver="true"
                       dropdownPosition={0}
                       labelHeight={7}
-                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SF-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
-                      itemTextStyle={{ fontFamily: 'SF-Medium',  fontSize: scalable(14), height: 25 }}
-                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SF-Medium',alignSelf:'center',justifyContent:'center' }}
+                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SFCompactDisplay-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
+                      itemTextStyle={{ fontFamily: 'SFCompactDisplay-Medium',  fontSize: scalable(14), height: 25 }}
+                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SFCompactDisplay-Medium',alignSelf:'center',justifyContent:'center' }}
                       inputContainerStyle={{ borderBottomColor: 'transparent' }}
                       data={feelings}
                       valueExtractor={({ value }) => value}
                     />
                     <Image source={require('../../../images/down_arrow.png')} style={styles.arrow} />
 
-                  </View>
+                  </View> */}
                   <View style={styles.view4} />
 
                   
 { feelings_type == 1 && <View style={{marginTop: blockMarginHalf}}>                  
-<TextInput  style={{  width: '100%' }}
+<TextInput  style={{  width: '100%', minHeight:45 ,fontFamily: 'SFCompactDisplay-Regular'}}
                     ref={(input) => this.loc = input}
                     placeholder="Type your feeling here.."
                     placeholderTextColor="#B6C0CB"
                    
-                    autoCorrect={false}
+                  
                     returnKeyType="next"
-                    underlineColorAndroid="#B6C0CB"
+                    underlineColorAndroid="transparent"
                     onChangeText={(feelings_other) => { this.setState({ feelings_other }); }
                     }
                     value={this.state.feelings_other}
-                    onSubmitEditing={() => this.doing.focus()}
+                    //onSubmitEditing={() => this.whom.focus()}
                   />
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
 
 </View>}
                 </View>
 
 
-                <View style={{
+                {/* <View style={{
                   marginTop: blockMarginHalf * 2,
                   width: '100%',
                 }}>
                  
-                  <Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14)}}>What are you doing?</Text>
+                  <Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14)}}>What are you doing?</Text>
                   <View
                     style={{
                       flex: 1,
@@ -1061,7 +1079,7 @@ onCancel={this.hideTimePicker}
                     <Dropdown
                       underlineColor="transparent"
                       ref={(input) => this.doing = input}
-                      value={doing_value}
+                      value={evalue}
                       onChangeText={doing_value => {
                         this.setState({ doing_value });
                       }}
@@ -1070,9 +1088,9 @@ onCancel={this.hideTimePicker}
                       useNativeDriver="true"
                       dropdownPosition={0}
                       labelHeight={7}
-                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SF-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
-                      itemTextStyle={{ fontFamily: 'SF-Medium',  fontSize: scalable(14), height: 25 }}
-                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SF-Medium',alignSelf:'center',justifyContent:'center' }}
+                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SFCompactDisplay-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
+                      itemTextStyle={{ fontFamily: 'SFCompactDisplay-Medium',  fontSize: scalable(14), height: 25 }}
+                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SFCompactDisplay-Medium',alignSelf:'center',justifyContent:'center' }}
                       inputContainerStyle={{ borderBottomColor: 'transparent' }}
                       data={doing}
                       valueExtractor={({ value }) => value}
@@ -1080,7 +1098,7 @@ onCancel={this.hideTimePicker}
                     <Image source={require('../../../images/down_arrow.png')} style={styles.arrow} />
                   </View>
                   <View style={styles.view4} />
-                </View>
+                </View> */}
 
 
                 
@@ -1089,15 +1107,34 @@ onCancel={this.hideTimePicker}
                   marginTop: blockMarginHalf * 2,
                   width: '100%',
                 }}>
-                  <Text style={{ color: '#B6C0CB', fontFamily: 'SF-Regular', fontSize: scalable(14) }}>Whom were the people with you at the time of craving?</Text>
-                  <View
+                  <Text style={{ color: '#B6C0CB', fontFamily: 'SFCompactDisplay-Regular', fontSize: scalable(14) }}>Who were the people with you at the time of craving?</Text>
+                  <TouchableOpacity onPress={() => {whom.length > 0 && this.setState({select_People : true})}} >
+<View style={{
+              flexDirection: 'row',
+             
+              marginLeft: responsiveWidth(0),marginRight: responsiveWidth(4), marginTop:8, alignItems:'center',marginBottom:5
+            }}>
+              <Text style={{ color:'#202020',fontFamily: 'SFCompactDisplay-Regular', 
+              fontSize: 14, width: '95%',}}>{this.state.selPeople != '' ? this.state.selPeople : 'Select People'}</Text>
+              
+              
+              <Image source={require('../../../images/down_arrow.png')} style={{width: responsiveWidth(3),
+  height: responsiveHeight(3),
+  marginLeft: responsiveWidth(2),
+  resizeMode: 'contain',}} />
+       
+        </View>
+        
+        </TouchableOpacity>
+                  
+                  {/* <View
                     style={{
                       flex: 1,
                       flexDirection: 'row',
                     }}>
                     <Dropdown
                       underlineColor="transparent"
-                      ref="Whom"
+                      ref={(input) => this.whom = input} 
                       value={whom_value}
                       onChangeText={whom_value => {
                         this.setState({ whom_value });
@@ -1107,16 +1144,16 @@ onCancel={this.hideTimePicker}
                       useNativeDriver="true"
                       dropdownPosition={0}
                       labelHeight={7}
-                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SF-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
-                      itemTextStyle={{ fontFamily: 'SF-Medium',  fontSize: scalable(14), height: 25 }}
-                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SF-Medium',alignSelf:'center',justifyContent:'center' }}
+                      style={{ backgroundColor: '#FFFFFF', marginLeft: -blockMarginHalf,marginTop: blockMarginHalf / 2, fontFamily: 'SFCompactDisplay-Medium', fontSize: scalable(14), width: responsiveWidth(85), height: 35 }}
+                      itemTextStyle={{ fontFamily: 'SFCompactDisplay-Medium',  fontSize: scalable(14), height: 25 }}
+                      pickerStyle={{ width: '90%',marginLeft: blockMarginHalf, marginTop: blockMarginHalf * 4, fontFamily: 'SFCompactDisplay-Medium',alignSelf:'center',justifyContent:'center' }}
                       inputContainerStyle={{ borderBottomColor: 'transparent' }}
                       data={whom}
                       valueExtractor={({ value }) => value}
                     />
                     <Image source={require('../../../images/down_arrow.png')} style={styles.arrow} />
 
-                  </View>
+                  </View> */}
                   <View style={styles.view4} />
                 </View>
 
@@ -1134,7 +1171,7 @@ onCancel={this.hideTimePicker}
                     }}>
                       <Text style={{
                         color: '#FFFFFF',
-                        fontFamily: 'SF-Medium',
+                        fontFamily: 'SFCompactDisplay-Medium',
                         fontSize: scalable(16), alignSelf: 'center'
                       }}>Save</Text>
                     </View>
@@ -1149,8 +1186,8 @@ onCancel={this.hideTimePicker}
              
 
             </View>
-            
-          </ScrollView>
+            </TouchableWithoutFeedback>
+          </KeyboardAwareScrollView>
           {isHidden ? (
                 <View style={{
                   width: '100%',
@@ -1171,46 +1208,196 @@ onCancel={this.hideTimePicker}
               ) : null}
         </View>
       </View>
+{/*     
+      <ReactNativePickerModule
+        // pickerRef={this.pick_timeCraving}
+        ref={this.pick_timeCraving}
+        value={this.state.location}
+        title={"Select Location of Craving"}
+        items={locValue}
+        tintColor='black'
+        titleStyle={{ color: "white" }}
+        itemStyle={{ color: "white" }}
+        selectedColor="#0072bb"
+        confirmButtonEnabledTextStyle={{ color: "white" }}
+        confirmButtonDisabledTextStyle={{ color: "grey" }}
+        cancelButtonTextStyle={{ color: "white" }}
+        confirmButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        cancelButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        contentContainerStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        onCancel={() => {
+          console.log("Cancelled")
+        }}
+        onValueChange={value => {
+          let branch = locValue.find((item) => item.value === value );
+          this.setState({selTimeCraving:branch.label ,location:branch.value})
+        }}
+      /> */}
+         <SinglePickerMaterialDialog
+            title={'Select Location of Craving'}
+            items={locValue}
+            scrolled = {true}
+            colorAccent={'#0072BB'}
+            cancelLabel={'Cancel'}
+            okLabel={'Confirm'}
+            visible={this.state.locate_Visible}
+            selectedItem={this.state.location}
+            onCancel={() => this.setState({ locate_Visible: false })}
+            onOk={result => {
+              if(result.selectedItem != undefined){
+
+                this.setState({ locate_Visible: false });
+                this.setState({selTimeCraving:result.selectedItem.label ,location:result.selectedItem.value})
+              }else {
+                this.setState({ locate_Visible: false });
+
+              }
+            }}
+        />
+      {/* <ReactNativePickerModule
+        // pickerRef={this.pick_feelings}
+        ref={this.pick_feelings}
+        value={this.state.feelings_value}
+        title={"Select Feeling"}
+        items={feelings}
+        tintColor='black'
+        titleStyle={{ color: "white" }}
+        itemStyle={{ color: "white" }}
+        selectedColor="#0072bb"
+        confirmButtonEnabledTextStyle={{ color: "white" }}
+        confirmButtonDisabledTextStyle={{ color: "grey" }}
+        cancelButtonTextStyle={{ color: "white" }}
+        confirmButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        cancelButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        contentContainerStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        onCancel={() => {
+          console.log("Cancelled")
+        }}
+        onValueChange={value => {
+          let branch = feelings.find((item) => item.value === value );
+          this.setState({selFeelings:branch.label ,feelings_value:branch.value})
+
+          for (var i = 0; i < feelings.length; i++) {
+                       
+            if(feelings[i].value == value){
+          
+            if(feelings[i].label.toLowerCase() == 'others'){
+              this.setState({ feelings_type : 1 });
+            
+            }else{
+             
+              this.setState({ feelings_type : 0,feelings_other:'' });
+            }}
+          }
+
+        }}
+      /> */}
+    <SinglePickerMaterialDialog
+            title={'Select Feeling'}
+            items={feelings}
+            colorAccent={'#0072BB'}
+            cancelLabel={'Cancel'}
+            okLabel={'Confirm'}
+            visible={this.state.feeling_Visible}
+            selectedItem={this.state.feelings_value}
+            onCancel={() => this.setState({ feeling_Visible: false })}
+            onOk={result => {
+              if(result.selectedItem != undefined){
+
+                this.setState({ feeling_Visible: false });
+                this.setState({selFeelings:result.selectedItem.label ,feelings_value:result.selectedItem.value})
+              } else {
+                this.setState({ feeling_Visible: false });
+
+              }
+                // for (var i = 0; i < feelings.length; i++) {
+                       
+                  // if(feelings[i].value == result.selectedItem.value){
+                console.log("print====",result);
+                if(result.selectedItem != undefined){
+                  if(result.selectedItem.label == 'Other'){
+                    this.setState({ feelings_type : 1 });
+                  
+                  }else{
+                   
+                    this.setState({ feelings_type : 0,feelings_other:'' });
+                  }
+                } else {
+
+                }
+                 
+                // }
+                // }
+            }}
+        />
+{/* <ReactNativePickerModule
+        // pickerRef={this.pick_people}
+        ref={this.pick_people}
+        value={this.state.whom_value}
+        title={"Select People"}
+        items={whom}
+        tintColor='black'
+        titleStyle={{ color: "white",fontFamily:'SFCompactDisplay-Medium', fontWeight: '300' }}
+        itemStyle={{ color: "white" ,fontFamily:'SFCompactDisplay-Medium', fontWeight: '300'}}
+        selectedColor="#0072bb"
+        confirmButtonEnabledTextStyle={{ color: "white" }}
+        confirmButtonDisabledTextStyle={{ color: "grey" }}
+        cancelButtonTextStyle={{ color: "white" }}
+        confirmButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        cancelButtonStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        contentContainerStyle={{
+          backgroundColor: "rgba(0,0,0,1)",
+        }}
+        onCancel={() => {
+          console.log("Cancelled")
+        }}
+        onValueChange={value => {
+      
+          let branch = whom.find((item) => item.value === value );
+          this.setState({selPeople:branch.label ,whom_value:branch.value})
+
+
+        }}
+      /> */}
+    <SinglePickerMaterialDialog
+            title={'Select People'}
+            items={whom}
+            scrolled = {true}
+            colorAccent={'#0072BB'}
+            cancelLabel={'Cancel'}
+            okLabel={'Confirm'}
+            visible={this.state.select_People}
+            selectedItem={this.state.whom_value}
+            onCancel={() => this.setState({ select_People : false })}
+            onOk={result => {
+              if(result.selectedItem != undefined){
+
+                this.setState({ select_People: false });
+                this.setState({selPeople:result.selectedItem.label ,whom_value:result.selectedItem.value})
+              }else {
+                this.setState({ select_People: false });
+
+              }
+            }}
+        />
+    </SafeAreaView>
     );
   }
 }
-  //  this.getLocation();
-
-    //  Geolocation.getCurrentPosition(
-    //               (position) => {
-    //                   this.setState({
-    //                       latitude: position.coords.latitude,
-    //                       longitude: position.coords.longitude,
-    //                   });
-    //   Geocoder.init("AIzaSyBgJpywvW_gPepfPigGtCfEjzsPK_OZVc8");
-    //                   Geocoder.from(position.coords.latitude, position.coords.longitude)
-    //                       .then(json => {
-    //                           console.log(json);
-    //                           var addressComponent = json.results[0].address_components;
-    //                           this.setState({
-    //                               Address: addressComponent,
-    //                           });
-    //                           console.log(addressComponent);
-    //                       })
-    //                       .catch(error => console.warn(error));
-    //               },
-    //               (error) => {
-    //                   // See error code charts below.
-    //                    this.setState({ error: error.message }),
-    //                      console.log(error.code, error.message);
-    //                },
-    //               { enableHighAccuracy: false, timeout: 10000, maximumAge: 100000 }
-    //           ); 
-    //getLocation() {
-  //   GetLocation.getCurrentPosition({
-  //     enableHighAccuracy: true,
-  //     timeout: 15000,
-  //   })
-  //     .then(location => {
-  //       console.log(location);
-  //     })
-  //     .catch(error => {
-  //       const { code, message } = error;
-  //       console.warn(code, message);
-  //     });
-  // }
+ 

@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
+  Platform,
   StyleSheet,
 } from 'react-native';
 
@@ -11,8 +12,9 @@ import DiaryStack from './diaryStack';
 import CravingStack from './cravingStack';
 import NotificationStack from './notificationStack';
 
-import {getRoutesForStack} from '../../helpers/utils';
-import {createBottomTabNavigator} from 'react-navigation-tabs';
+import { getRoutesForStack } from '../../helpers/utils';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { IOS } from 'react-native-permissions/lib/typescript/constants';
 
 export const routesUserHome = {
   // Dashboard
@@ -23,8 +25,8 @@ export const routesUserHome = {
     navigationOptions: {
       title: 'Dashboard',
       headerTitle: 'Dashboard',
-      tabBarLabel: 'Dashboard',
-      tabBarIcon: ({tintColor, size}) => (
+      tabBarLabel: 'Home',
+      tabBarIcon: ({ tintColor, size }) => (
         <Feather name="home" color={tintColor} size={22} />
       ),
     },
@@ -37,7 +39,7 @@ export const routesUserHome = {
     screen: DiaryStack,
     navigationOptions: {
       tabBarLabel: 'Diary',
-      tabBarIcon: ({tintColor, size}) => (
+      tabBarIcon: ({ tintColor, size }) => (
         <Feather name="book" color={tintColor} size={22} />
       ),
     },
@@ -50,7 +52,7 @@ export const routesUserHome = {
     screen: CravingStack,
     navigationOptions: {
       tabBarLabel: 'Cravings',
-      tabBarIcon: ({tintColor, size}) => (
+      tabBarIcon: ({ tintColor, size }) => (
         <Feather name="bar-chart-2" color={tintColor} size={22} />
       ),
     },
@@ -63,20 +65,21 @@ export const routesUserHome = {
     screen: PlanStack,
     navigationOptions: {
       tabBarLabel: 'Plans',
-      tabBarIcon: ({tintColor, size}) => (
+      tabBarIcon: ({ tintColor, size }) => (
         <Feather name="award" color={tintColor} size={22} />
       ),
     },
   },
 
-   // Notifications
-   notificationHome: {
+  // Notifications
+  notificationHome: {
     name: 'Notifications',
     path: 'Notifications',
     screen: NotificationStack,
+
     navigationOptions: {
       tabBarLabel: 'Notifications',
-      tabBarIcon: ({tintColor, size}) => (
+      tabBarIcon: ({ tintColor, size }) => (
         <Feather name="bell" color={tintColor} size={22} />
       ),
     },
@@ -94,7 +97,7 @@ const bottomTab = createBottomTabNavigator(getRoutesForStack(routesUserHome), {
     activeTintColor: '#0072BB',
     inactiveTintColor: '#B6C0CB',
     backgroundColor: '#FFFFFF',
-   
+
     showLabel: true,
     indicatorStyle: {
       backgroundColor: 'white',
@@ -102,22 +105,31 @@ const bottomTab = createBottomTabNavigator(getRoutesForStack(routesUserHome), {
     style: {
       backgroundColor: 'white',
       overflow: 'hidden',
-      height: 60,
+      height: Platform.OS == 'ios' ? 70 : 60,
+      width: '100%',
+      justifyContent: "center",
+      // marginLeft:6,
+      // marginRight: 6
+      paddingStart: Platform.OS == 'ios' ? 20 : 0,
+      paddingEnd: Platform.OS == 'ios' ? 20 : 0
     },
     tabStyle: {
+      flex: 1,
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: 'white',
+      justifyContent: "space-evenly",
+      // backgroundColor: 'red',
+      paddingBottom: Platform.OS == "ios" ? 10 : 0,
+      borderWidth: 0,
       width: 'auto',
-      height: 'auto',
+      borderTopWidth: 0,
+      borderColor: 'white',
     },
     labelStyle: {
-      fontSize: 12,
-      paddingStart: 2,
-      paddingEnd: 2,
-      paddingTop:3,
-      paddingBottom:5
+      fontSize: 11,
+      fontFamily: 'SFCompactDisplay-Medium',
+      paddingTop: 2,
+      paddingBottom: 5
     },
   },
 });

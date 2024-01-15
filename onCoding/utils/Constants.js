@@ -1,10 +1,9 @@
 /* eslint-disable prettier/prettier */
-
+import BuildConfig from 'react-native-build-config';
 
 const common = {
   //Base Url
-  baseUrl: 'http://whoapp.dci.in/api/',
-
+  baseUrl: BuildConfig.API_URL,
    //Path
   auth: 'auth/',
   users: 'users/',
@@ -13,9 +12,12 @@ const common = {
   members: 'members/',
   socialmedia: 'social-media/',
   userinformations: 'user-informations/',
+  quitPlan: 'user-quit-plan/',
+  
   cravings: 'cravings/',
   health: 'health/',
   motivations: 'motivations/',
+  user_motivations: 'user-motivations/',
   wish_lists: 'wish-lists/',
   missions: 'missions/',
   diaries: 'diaries/',
@@ -25,6 +27,7 @@ const common = {
   notifications: 'notifications/',
 
 };
+{console.log(BuildConfig.API_URL)}
 
 const variables = {
   //API
@@ -54,8 +57,10 @@ const variables = {
   loginSocialMedia:    common.baseUrl + common.socialmedia + 'login',
 
   //User Information
-  userInformation: common.baseUrl + common.userinformations + 'store',
+  userInformation: common.baseUrl + common.userinformations + 'update',
   userInfoupdate: common.baseUrl + common.userinformations + 'update',
+  userQuitPlan: common.baseUrl + common.quitPlan + 'store',
+  userQuitPlanIndex: common.baseUrl + common.quitPlan + 'index',
   userInfoshow: common.baseUrl + common.userinformations + 'show',
 
 
@@ -71,8 +76,11 @@ const variables = {
   health_improve: common.baseUrl + 'health-improvements',
   
   //Motivations
-  add_motivation: common.baseUrl + common.motivations + 'store',
+  add_motivation: common.baseUrl + common.user_motivations + 'store',
   update_motivation: common.baseUrl + common.motivations ,
+  list_motivation: common.baseUrl + common.user_motivations + 'index',
+  delete_motivation  : common.baseUrl + common.user_motivations ,
+  select_motivation: common.baseUrl + common.user_motivations,
 
   //Wishlists
 
@@ -86,7 +94,10 @@ const variables = {
 
   //Diaries
   index_diary: common.baseUrl + common.diaries + 'index',
+  show_diary: common.baseUrl + common.diaries + 'show',
   store_diary: common.baseUrl + common.diaries + 'store',
+  delete_diary: common.baseUrl + common.diaries,
+
 
   //contents
   difficult_situations: common.baseUrl + common.contents + 'difficult-situations',
@@ -99,6 +110,10 @@ const variables = {
   about_us: common.baseUrl + common.contents + 'about-us',
   tobacco_infection: common.baseUrl + 'tobacco-infections',
 
+  //BaseUrl
+  baseLink: BuildConfig.BASE_URL+'uploads/files/',
+  baseVideoLink: BuildConfig.BASE_URL+'uploads/video/',
+  baseImageLink: BuildConfig.BASE_URL+'uploads/userimages/',
 
   //Dashboard
   dashboard: common.baseUrl + 'dashboard',
@@ -108,6 +123,8 @@ const variables = {
   savings: common.baseUrl + 'savings',
 //educations
   educations: common.baseUrl + 'educations',
+//countries
+countries: common.baseUrl + 'countries',
 //frequent-smokes
   frequent_smokes: common.baseUrl + 'frequent-smokes',
 //feelings
@@ -125,7 +142,7 @@ const variables = {
 //use-reasons
   use_reasons: common.baseUrl + 'use-reasons',
 //first-smoke-timings
-  first_smoke_timings: common.baseUrl + 'first-smoke-timings',//http://whoapp.dci.in/api/first-smoke-timings
+  first_smoke_timings: common.baseUrl + 'first-smoke-timings',
 //feedback
   feedback: common.baseUrl + 'feedback',
   //tobacco-product
@@ -136,6 +153,8 @@ const variables = {
   reset_data: common.baseUrl + common.settings + 'reset',
   //Achievements
   Achievements: common.baseUrl + common.achievements + 'show',
+  store_achievements: common.baseUrl + common.achievements + 'store',
+
 
   //Notifications
   view_notifications:  common.baseUrl + common.notifications + 'show',

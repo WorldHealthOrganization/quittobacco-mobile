@@ -38,19 +38,19 @@ export default StyleSheet.create({
        },
       text_prg:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         marginTop: responsiveHeight(1),
         marginLeft: responsiveWidth(28),
-        fontWeight: 'bold',
+        
       },
       money:{
         color: '#CBE2F1',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2),
         marginTop: responsiveHeight(3),
         marginLeft: responsiveWidth(32),
-        fontWeight: 'bold',
+    
       },
       share_img2: {
         width: 25,
@@ -67,7 +67,7 @@ export default StyleSheet.create({
       },
       amount: {
         color: '#FFFFFF',
-        fontFamily: 'SF-Bold',
+        fontFamily: 'SFCompactDisplay-Bold',
         fontSize: responsiveFontSize(3.5),
         marginTop: responsiveHeight(3),
        
@@ -76,7 +76,7 @@ export default StyleSheet.create({
       card_text1: {
         color: '#0072BB',
         fontSize:responsiveFontSize(2.25),
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontWeight: 'bold',
         textAlign: 'center',
        marginTop: responsiveHeight(0),
@@ -87,7 +87,7 @@ export default StyleSheet.create({
         marginTop: responsiveHeight(2),
         fontSize:responsiveFontSize(2.5),
         fontWeight: 'bold',
-        fontFamily: 'SF-Bold',
+        fontFamily: 'SFCompactDisplay-Bold',
         color: '#202020',
         textAlign: 'center',
       },

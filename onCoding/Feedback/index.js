@@ -15,20 +15,19 @@ import {
   FlatList,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
   Platform, ActivityIndicator, Share,
-  TouchableOpacity
+  TouchableOpacity, Keyboard,TouchableWithoutFeedback
 } from 'react-native';
-import {  TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 
 
 
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
 
 export default class Feedback extends Component {
@@ -93,7 +92,7 @@ export default class Feedback extends Component {
   };
 
   validate = (text) => {
-    console.log(text);
+
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (reg.test(text) === false) {
       console.log('Email is Not Correct');
@@ -166,7 +165,6 @@ export default class Feedback extends Component {
    
     const {email, message} = this.state;
     this.setState({isHidden: true});
-    console.log('Feedback input ==> ' + email + ' ' + message + ' ');
 
     let inputapiname = ApiName.feedback;
 
@@ -185,25 +183,21 @@ export default class Feedback extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Feedback response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
 
-        // Toast.show(response.data.message);
+        this.setState({isHidden: false});
 
         if (response.data.status == 200) {
-          this.setState({isHidden: false});
+         
           Toast.show(response.data.message);
           this.props.navigation.goBack();
         } else {
-          console.log(response.data.message);
+        Toast.show(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({isHidden: false});
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   };
 
@@ -213,10 +207,11 @@ export default class Feedback extends Component {
   render() {
     const {isHidden,email,emailValid,message,messageValid,emailEmpty,messageLength} = this.state;
     return (
+      <SafeAreaView style={{flex: 1,}}>
       <View
         style={{
           flex: 1,
-          height: deviceHeight,
+          height: '100%',
           width: '100%',
           flexDirection: 'column',
           backgroundColor: '#FFFFFF', 
@@ -246,7 +241,7 @@ export default class Feedback extends Component {
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -254,7 +249,10 @@ export default class Feedback extends Component {
               }}>Feedback</Text>
             </View>           
           </View>
-
+          <KeyboardAwareScrollView
+          >
+<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+<View style={{flexDirection:'column'}}>
           <View>
                 <Text style={styles.text}>Leave us your email and we will get {'\n'} in touch with you</Text>
             </View>
@@ -263,9 +261,9 @@ export default class Feedback extends Component {
         <TextInput style={styles.text2}
             placeholder="Email"
             placeholderTextColor="#B6C0CB"
-            autoCorrect={false}
+            
             returnKeyType="next"
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(email) => {
               this.setState({email})
               if(email.trim() != ''){
@@ -284,22 +282,30 @@ export default class Feedback extends Component {
             }} value={this.state.email}
             onSubmitEditing={()=>this.message.focus()}
           />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
 {emailEmpty && <Text style={{color: 'red',textAlign: 'left',
-  
-    fontFamily: 'SF-Medium',
-    fontSize: scalable(9)}}>Please Enter the email</Text>}
+    marginTop: blockMarginHalf,
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: scalable(12)}}>Please Enter the email</Text>}
    {emailValid && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9)}}>Please Enter Valid email</Text>}
+  marginTop: blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12)}}>Please Enter Valid email</Text>}
 
             <TextInput style={styles.text2}
             ref={(input)=>this.message = input}
             placeholder="Message"
             placeholderTextColor="#B6C0CB"
-            autoCorrect={false}
+            
             returnKeyType="done"
-            underlineColorAndroid="#B6C0CB"
+            multiline={true}
+            underlineColorAndroid="transparent"
             onChangeText={(message) =>
               {  this.setState({message})
               if(message.trim() != ''){
@@ -321,19 +327,25 @@ export default class Feedback extends Component {
               }
                }} value={this.state.message}
           />
+
+          <View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
           {messageValid && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9),}}>Please Enter the Message</Text>}
+    marginTop: blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12),}}>Please Enter the Message</Text>}
    {messageLength && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9),}}>Please Enter atleast 6 characters</Text>}
+    marginTop: blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12),}}>Please Enter atleast 6 characters</Text>}
            
         </View>
        
       
-        <View style={{flex:0.5}}>
+        <View>
         <TouchableOpacity
             
             onPress={() => this.inputValidation()}>
@@ -345,15 +357,20 @@ export default class Feedback extends Component {
               opacity: 100,
               borderWidth: 2,
               borderColor: '#FFFFFF',
-              margin: blockMarginHalf, alignSelf: 'center',justifyContent: 'center',
+              marginTop: blockMargin * 4, alignSelf: 'center',justifyContent: 'center',
             }}>
             <Text style={{ color: '#FFFFFF',
-                           fontFamily: 'SF-Medium',
+                           fontFamily: 'SFCompactDisplay-Medium',
                         fontSize: scalable(16),alignSelf: 'center'}}>Submit</Text>
             </View>
                       </TouchableOpacity>
         </View>
 
+        </View>
+          
+        </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>    
+          
           {isHidden ? (
             <View style={{
               width: '100%',
@@ -365,7 +382,7 @@ export default class Feedback extends Component {
             }}>
               <ActivityIndicator
                 size={40}
-                color="#3283F1"
+                color="#0072BB"
                 animating={true}
                 backgroundColor={'transparent'}
               />
@@ -377,7 +394,7 @@ export default class Feedback extends Component {
 
 
       </View>
-
+</SafeAreaView>
     );
   
   }

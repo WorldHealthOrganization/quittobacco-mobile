@@ -5,6 +5,8 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive';
+
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
@@ -19,7 +21,7 @@ export default StyleSheet.create({
         backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(1),
         width: '100%',
-        height: '29%',
+        height: '50%',alignSelf:'center',
       },
       back_arrow: {
         width:responsiveWidth(3),
@@ -28,9 +30,10 @@ export default StyleSheet.create({
         marginLeft: responsiveWidth(3),
       },
       text: {
-        marginTop: responsiveHeight(1),
+        marginTop: blockMargin,
         marginRight: responsiveWidth(3),
         marginLeft: responsiveWidth(3),
+      
       },
       mid_text: {
         color: '#DF9436',
@@ -39,7 +42,7 @@ export default StyleSheet.create({
         marginTop: responsiveHeight(2),
         marginRight: responsiveWidth(3),
         marginLeft: responsiveWidth(3),
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         lineHeight: responsiveWidth(8),
         textTransform: 'uppercase',
         fontWeight: 'bold',
@@ -51,13 +54,13 @@ export default StyleSheet.create({
         marginTop: responsiveHeight(2),
         marginRight: responsiveWidth(3),
         marginLeft: responsiveWidth(3),
-        fontFamily: 'SF-Regular',
+        fontFamily: 'SFCompactDisplay-Regular',
       },
       buttonContainer: {
         height: responsiveHeight(6.5),
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: responsiveHeight(16),
+      
         marginLeft: responsiveHeight(0),
         width: responsiveWidth(70),
         borderRadius: 30,
@@ -67,12 +70,12 @@ export default StyleSheet.create({
       },
       view2: {
         backgroundColor: '#FFFFFF',
-        marginTop: responsiveHeight(0),
-        alignItems:'center',
+        justifyContent:'center',alignSelf:'center',
+        marginTop:blockMargin * 3
       },
       conttext: {
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2),
       },
 });

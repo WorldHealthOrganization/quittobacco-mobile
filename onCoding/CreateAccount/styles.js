@@ -5,14 +5,14 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-
+import { blockMarginHalf,blockMargin } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
          flex: 1,
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
         flex:1,
@@ -23,8 +23,8 @@ export default StyleSheet.create({
         flex: 1,
         backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(1),
-        marginLeft: responsiveWidth(10),
-        width: '80%',
+        marginLeft: responsiveWidth(7),
+        width: '85%',
         height: '100%',
       },
       view2: {
@@ -35,14 +35,14 @@ export default StyleSheet.create({
         height: '100%',
         width: '100%',
         justifyContent: 'center',
-        marginTop: responsiveHeight(0),
+        marginTop: blockMargin * 4,
       },
       view3: {
         borderBottomWidth: responsiveWidth(0.30),
         marginTop: responsiveHeight(0),
         borderBottomColor: '#B6C0CB',
-        width: '98%',
-        marginLeft:responsiveWidth(1.20),
+        width: '100%',
+        
       },
       scrollview:
       {
@@ -55,21 +55,23 @@ export default StyleSheet.create({
     marginTop: responsiveHeight(8.5),
     marginLeft: responsiveHeight(2),
     textAlign:'center',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
 
   },
   text:{
       color: '#202020',
-      fontSize: responsiveFontSize(1.65),
-      fontFamily: 'SF-Medium',
+      fontSize: 16,
+      fontFamily: 'SFCompactDisplay-Medium',
       width: '100%',
+      height:45
   },
   text_email:{
     color: '#202020',
-    fontSize: responsiveFontSize(1.65),
+    fontSize: 16,
     marginTop: responsiveHeight(1),
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     width: '100%',
+    height:45
     
 },
   loginButton: {
@@ -77,7 +79,7 @@ export default StyleSheet.create({
   },
   signuptext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     alignSelf: 'center',
   },
@@ -91,21 +93,22 @@ export default StyleSheet.create({
   },
   register_user: {
     color: '#949494',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginLeft: responsiveHeight(0),
   },
   login: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginLeft: responsiveWidth(3),
+  
   },
   back_arrow: {
     width:responsiveWidth(3),
     height: responsiveHeight(3),
     marginTop: responsiveHeight(3),
-    marginLeft: responsiveWidth(3),
+    marginLeft: responsiveWidth(5),
   },
   textBoxBtnHolder:
   {
@@ -140,14 +143,15 @@ export default StyleSheet.create({
   textBackground3: {
     flex: 0.25,
     flexDirection: 'row',
-    height: responsiveHeight(5),
+    
+    height:45,
     width:responsiveWidth(1),
     // alignItems: 'center',
     // justifyContent: 'center',
     // alignContent: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
-    marginStart: responsiveWidth(1),
+    
     marginTop: responsiveHeight(1),
     marginEnd: responsiveWidth(5),
   },
@@ -156,13 +160,13 @@ export default StyleSheet.create({
     width: responsiveWidth(100),
     marginTop: responsiveHeight(0.69),
     marginLeft: responsiveWidth(0),
-    fontSize: responsiveFontSize(1.65),
+    fontSize: 16,
     // paddingStart: 20,
     // marginStart: responsiveWidth(0),
     // marginEnd: 20,
     flex: 1,
     backgroundColor: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     borderRadius: 15,
   },
   arrow: {
@@ -176,8 +180,8 @@ export default StyleSheet.create({
     borderBottomWidth: responsiveWidth(0.25),
     marginTop: responsiveHeight(0),
     borderBottomColor: '#B6C0CB',
-    width: responsiveWidth(78.5),
-    marginLeft:responsiveWidth(1),
+    width: '100%',
+    
   },
   box2: {
     width: '100%',

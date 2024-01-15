@@ -5,18 +5,19 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import { blockMarginHalf } from '../ui/common/responsive';
+import { blockMarginHalf,blockMargin } from '../ui/common/responsive';
 
 export default StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    height: responsiveHeight(100),
-    width: responsiveWidth(100),
+    height: '100%',
+    width: '100%',
   },
   view: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF',
     flex: 1,
+    width:'100%',
   },
   view1: {
     flex: 0.38,
@@ -42,8 +43,8 @@ export default StyleSheet.create({
   },
   scrollview:
   {
-    flex: 0.75,
     backgroundColor: '#FFFFFF',
+    
   },
   logo: {
     width: responsiveWidth(95),
@@ -54,11 +55,11 @@ export default StyleSheet.create({
   },
   logo_view: {
     width: '100%',
-  
+  justifyContent:'center',
   alignSelf:'center',
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop:blockMarginHalf
+    marginTop:15,
    
   },
   text: {
@@ -66,7 +67,8 @@ export default StyleSheet.create({
     fontSize: responsiveFontSize(2),
     textAlign: 'left',
     marginLeft: responsiveWidth(0),
-    fontFamily: 'SF-Regular',
+    marginBottom: 5,
+    fontFamily: 'SFCompactDisplay-Medium',
   },
   phonenumber: {
     height: responsiveHeight(5),
@@ -78,15 +80,15 @@ export default StyleSheet.create({
     fontSize: responsiveFontSize(2),
     textAlign: 'right',
     marginTop: responsiveHeight(1),
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     marginLeft: responsiveWidth(50),
   },
   login: {
     color: '#202020',
     fontSize: responsiveFontSize(1.75),
-    fontFamily: 'SF-Regular',
-    marginTop: responsiveHeight(2),
-    marginLeft: responsiveWidth(43),
+    fontFamily: 'SFCompactDisplay-Regular',
+    marginTop: responsiveHeight(4),
+    justifyContent:'center',alignSelf:'center'
   },
   fb_logo: {
     width: 30,
@@ -119,17 +121,18 @@ export default StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   newuser: {
     color: '#949494',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
+    marginBottom: blockMarginHalf
   },
   signup: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginLeft: responsiveWidth(3),
   },
@@ -142,10 +145,12 @@ export default StyleSheet.create({
   },
   textBox:
   {
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     paddingRight: responsiveWidth(3),
     paddingLeft: responsiveWidth(3),
     paddingVertical: 0,
+    height:45, fontSize:16
   },
   visibilityBtn:
   {
@@ -219,8 +224,9 @@ export default StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 15,
     marginStart: responsiveWidth(1),
-    marginTop: responsiveHeight(1),
+   
     marginEnd: responsiveWidth(5),
+    height:45, fontSize:14
   },
   textBackground4: {
     height: responsiveHeight(7),
@@ -231,9 +237,12 @@ export default StyleSheet.create({
     // marginStart: responsiveWidth(0),
     // marginEnd: 20,
     flex: 1,
+    color: '#131313',
     backgroundColor: '#FFFFFF',
-    fontFamily: 'SF Display',
+    fontFamily: 'SFCompactDisplay-Medium',
     borderRadius: 15,
+    
+    height:45, fontSize:15
   },
   view4: {
     borderBottomWidth: responsiveWidth(0.45),
@@ -246,7 +255,7 @@ export default StyleSheet.create({
     width: responsiveWidth(2),
     height: responsiveHeight(4),
     marginLeft: responsiveWidth(3),
-    marginTop: responsiveHeight(0),
+    justifyContent:'center',alignSelf:'center',
     resizeMode: 'contain',
   },
   box2: {

@@ -28,7 +28,7 @@ export default StyleSheet.create({
   },
   text_prg: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2.5),
     marginTop: responsiveHeight(1),
     marginLeft: responsiveWidth(25),
@@ -48,22 +48,22 @@ export default StyleSheet.create({
     marginLeft: responsiveWidth(6.5),
     color: '#B6C0CB',
     marginTop: responsiveHeight(1),
-    fontFamily: 'SF-Regular',
+    fontFamily: 'SFCompactDisplay-Medium',
   },
   text: {
     marginTop: responsiveHeight(2),
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     marginLeft: responsiveWidth(7),
   },
   text1: {
     marginTop: responsiveHeight(0.5),
-    fontFamily: 'SF-Regular',
+    fontFamily: 'SFCompactDisplay-Regular',
     marginLeft: responsiveWidth(7),
     color: '#B6C0CB',
   },
   view4: {
     borderBottomWidth: responsiveWidth(0.22),
-    marginTop: responsiveHeight(0),
+    marginTop: responsiveHeight(1),
     borderBottomColor: '#B6C0CB',
     width: responsiveWidth(85),
     marginLeft: responsiveWidth(7),
@@ -92,14 +92,16 @@ export default StyleSheet.create({
   },
   btntext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   input: {
     marginTop: responsiveHeight(0),
     width: responsiveWidth(88),
     marginLeft: responsiveWidth(7),
-    textAlignVertical: 'top'
+    textAlignVertical: 'top',
+    color:'black',
+    fontFamily:'SFCompactDisplay-Medium'
   },
   buttonContainer1: {
     height: responsiveHeight(6.5),
@@ -115,7 +117,7 @@ export default StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   snapsliderContainer: {
@@ -135,9 +137,23 @@ export default StyleSheet.create({
     marginRight: 15,
   },
   snapsliderItem: {
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: scalable(12),
     color:'#0072BB',
     borderWidth: 0,
-  }
+  },
+  slider: {
+    width: '100%',
+  },
+  labelContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+
+  },
+  label: {
+    fontSize: scalable(12),
+    width:'70%',
+    textAlign: 'center',
+    color:'#0072BB'
+  },
 });

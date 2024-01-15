@@ -15,20 +15,17 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
-  Platform,ActivityIndicator
+  Platform,ActivityIndicator, SafeAreaView,TouchableWithoutFeedback,Keyboard
 } from 'react-native';
 import ImagePicker from 'react-native-image-picker';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import { Header } from 'react-navigation-stack';
 import Toast from 'react-native-simple-toast';
-
-
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
 
@@ -63,6 +60,8 @@ constructor(props) {
     name: '',
     price: '',
     notes: '',
+
+    currency:'',
     
   };
 }
@@ -90,6 +89,7 @@ getUser = async () => {
   const profile_image = await AsyncStorage.getItem('UserProfileImage');
   const fcm = await AsyncStorage.getItem('UserFCM');
   const token = await AsyncStorage.getItem('Login_JwtToken');
+  const currency= await AsyncStorage.getItem('Currency_Abrv');
 
   if (token !== '') {
     this.setState({
@@ -184,8 +184,6 @@ addWishData = async () =>{
 
   const {name,price,notes,wishbase64Image,token} = this.state;
   this.setState({isHidden: true});
-    console.log('input ==> ' + token+' '  +name + ' ' + price + ' ' + notes );
-
           axios
             .post(
               ApiName.add_wishlist,
@@ -202,26 +200,20 @@ addWishData = async () =>{
               },
             )
             .then((response) => {
-              console.log(
-                'Added WishList response ',
-                 JSON.stringify(response.data),
-              );
-
-              // Toast.show(response.data.message);
-
+              this.setState({isHidden: false});
               if (response.data.status == 200) {
-                this.setState({isHidden: false});
+               
                 Toast.show(response.data.message)
                  this.props.navigation.goBack();
                 }
               else {
-                alert(response.data.message);
+                Toast.show(response.data.message);
               }
             })
             .catch((error) => {
               this.setState({isHidden: false});
               Toast.show('There was some error. Please try again')
-              console.log('reactNativeDemo axios error:', error);
+             
             });
         }
 
@@ -265,18 +257,13 @@ addWishData = async () =>{
       },
     };
     ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
-
+  
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       }
       else {
-        // let source = response;
-        console.log('filePath ==> ' + JSON.stringify(response.path));
-
-
         ImgToBase64.getBase64String(response.uri)
           .then((base64String) =>
             this.setState({
@@ -291,8 +278,6 @@ addWishData = async () =>{
         this.setState({
           wishImage: response.uri,
         });
-        // alert(this.state.wishImage);
-        console.log('wishImage ==> ' + JSON.stringify(wishImage)+ ' -- ' +wishbase64Image);
       }
     });
   };
@@ -300,19 +285,60 @@ addWishData = async () =>{
     render () {
 const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength} = this.state
         return (
+          <SafeAreaView style={{flex:1}}>
             <View style={styles.container}>
             <View style={styles.view}>
-            <View style={styles.view2}>
-            <View style={{flexDirection: 'row', width: '100%', marginTop: responsiveHeight(2),
-              }}>
-                    <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-     <Image style={styles.arrow} source={require('../../images/back_arrow.png')} />
-     </TouchableOpacity>
-           <Text style={styles.text_prg}>Wish List</Text>
-           {/* <Image style={styles.share_img2} source={require('../../images/share.png')}/> */}
-       </View>
+            <View style={{
+            flexDirection: 'row', width: '100%', height: '12%',
+            backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', alignContent: 'center', alignSelf: 'center', }}>
 
-       <View style={{flex: 1, marginTop: responsiveHeight(35)}}>
+              <TouchableOpacity style={{
+
+                alignItems: 'center',
+              }} onPress={() => this.props.navigation.goBack()}>
+
+                <Image style={{
+                  width: responsiveWidth(3),
+                  height: responsiveHeight(4),
+
+                  resizeMode: 'contain'
+                }} source={require('../../images/back_arrow.png')} />
+
+              </TouchableOpacity>
+
+            </View>
+            <View style={{ width: '76%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontFamily: 'SFCompactDisplay-Medium',
+                fontSize: scalable(18),
+                justifyContent: 'center',
+                textAlign: 'center',
+
+              }}>Wish List</Text>
+            </View>
+            <View style={{ width: '12%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center', marginRight: blockMarginHalf }}>
+
+             
+                <Image style={{
+                  width: 0,
+                  height: 0,
+                  tintColor: '#fff',
+                  resizeMode: 'contain'
+                }} source={require('../../images/share.png')} />
+
+            
+            </View>
+          </View>
+<View style={{height:'35%', width:'100%', }}>
+  
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.view2}>
+         
+       
+       <View style={{ marginTop: 0}}>
          {this.state.wishImage != ''  ?
 
 
@@ -326,25 +352,62 @@ const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength
        :
 
        <View style={styles.square}>
+<TouchableOpacity style={{marginBottom: 0}} onPress={this.chooseFile.bind(this)}>
+            <View style={{
+              width: 50,
+              height: 50,
+              borderStyle: 'dotted',
+              borderRadius: 100 / 2,
+              backgroundColor: '#0072bb',
+              opacity: 100,
+              borderWidth: 2,
+              borderColor: '#FFFFFF',
+              margin: blockMarginHalf, justifyContent: 'center',alignSelf:'center'
+            }}>
+              <Image
 
-       <TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
-            <Text style={styles.text_fab}>+</Text>
+                resizeMode='contain'
+                tintColor={'#FFFFFF'}
+                source={require('../../images/add.png')}
+                style={{
+                  width: 15,
+                  height: 15,
+                  resizeMode: 'contain',
+                  justifyContent: 'center',
+                  alignSelf: 'center',
+                  borderRadius: 100 / 2,
+                  tintColor:'#FFFFFF'
+                }}
+              />
+            </View>
           </TouchableOpacity>
+       {/* <TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
+            <Text style={styles.text_fab}>+</Text>
+          </TouchableOpacity> */}
           <Text style={styles.text}>TAP TO ADD IMAGE</Text>
        </View>
 
     }
 
        </View>
+               
+                </View>
+                </TouchableWithoutFeedback>
 
                 </View>
+              
+                <KeyboardAwareScrollView
+          style={{ flex: 1}}
+          contentContainerStyle={{ flexGrow: 1}}>
+                  
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={{flexDirection:'column', alignContent:'center' }}>
             <View style={styles.view1}>
         <TextInput style={styles.text2}
             placeholder="Name"
             placeholderTextColor="#B6C0CB"
-            autoCorrect={false}
             returnKeyType="next"
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(name) => {
               this.setState({name})
               if(name.trim() != ''){
@@ -367,23 +430,29 @@ const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength
             }} value={this.state.name}
             onSubmitEditing={()=>this.price.focus()}
           />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
 {nameValid && <Text style={{color: 'red',textAlign: 'left',
-  
-    fontFamily: 'SF-Medium',
-    fontSize: scalable(9)}}>Please Enter the name</Text>}
+  marginTop:blockMarginHalf,
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: scalable(12)}}>Please Enter the name</Text>}
      {nameValidLength && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9),}}>Please Enter atleast 3 characters</Text>}
+  marginTop:blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12),}}>Please Enter atleast 3 characters</Text>}
 
             <TextInput style={styles.text2}
             ref={(input)=>this.price = input}
-            placeholder="Price"
+            placeholder={'Price'+' ('+this.state.currency + ')'}
             keyboardType="numeric"
             placeholderTextColor="#B6C0CB"
-            autoCorrect={false}
             returnKeyType="next"
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(price) =>
               {  this.setState({price})
               if(price.trim() != ''){
@@ -400,17 +469,24 @@ const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength
             } value={this.state.price}
             onSubmitEditing={()=>this.notes.focus()}
           />
+
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
           {priceValid && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9),}}>Please Enter the price</Text>}
+  marginTop:blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12),}}>Please Enter the price</Text>}
             <TextInput style={styles.text2}
             ref={(input)=>this.notes = input}
             placeholder="Notes"
             placeholderTextColor="#B6C0CB"
-            autoCorrect={false}
+            
             returnKeyType="done"
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(notes) =>
               {
                 this.setState({ notes})
@@ -435,23 +511,24 @@ const {isHidden,nameValid,priceValid,notesValid,nameValidLength,notesValidLength
             
             } value={this.state.notes}
           />
-           {notesValid && <Text style={{color: 'red',textAlign: 'left',
-  
-  fontFamily: 'SF-Medium',
-  fontSize: scalable(9),}}>Please Enter the notes</Text>}
-  {notesValidLength && <Text style={{color: 'red',textAlign: 'left',
 
-fontFamily: 'SF-Medium',
-fontSize: scalable(9),}}>Please Enter atleast 6 characters</Text>}
+<View style={{ borderBottomWidth: responsiveWidth(0.30),
+        marginTop: responsiveHeight(0),
+        borderBottomColor: '#B6C0CB',
+        width: '100%',}} />
+
+
+           {notesValid && <Text style={{color: 'red',textAlign: 'left',
+  marginTop:blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+  fontSize: scalable(12),}}>Please Enter the notes</Text>}
+  {notesValidLength && <Text style={{color: 'red',textAlign: 'left',
+marginTop:blockMarginHalf,
+fontFamily: 'SFCompactDisplay-Medium',
+fontSize: scalable(12),}}>Please Enter atleast 6 characters</Text>}
         </View>
        
-        {/* <View style={{flex:0.5,justifyContent: 'center'}}>
-        <Image  source={
-                      this.state.wishImage != ''
-                        ? {uri: this.state.wishImage}
-                        : require('../../images/ITU_Logo.png')
-                    } style={styles.img} />
-        </View> */}
+  
         <View style={{flex:0.5}}>
         <TouchableOpacity
             style={[styles.buttonContainer, styles.confirmbutton]}
@@ -459,6 +536,10 @@ fontSize: scalable(9),}}>Please Enter atleast 6 characters</Text>}
             <Text style={styles.confirmtext}>Save</Text>
           </TouchableOpacity>
         </View>
+        </View>
+        
+        </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>
                 </View>
                
                 {isHidden ? (
@@ -480,6 +561,7 @@ fontSize: scalable(9),}}>Please Enter atleast 6 characters</Text>}
           </View>
         ) : null}
                 </View>
+        </SafeAreaView>
         );
     }
 

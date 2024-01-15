@@ -11,18 +11,20 @@ export default StyleSheet.create({
       flex:1,
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
-        flex:1,
+        flex:1,width:'100%',
         backgroundColor: '#FFFFFF',
+        height: '100%',
       },
       view2: {
-        flex:0.15,
+       justifyContent:'center',alignItems:'center',alignSelf:'center',
         backgroundColor: '#FFFFFF',
         // marginTop: responsiveHeight(2),
-        marginTop: blockMargin * 2,
+        marginTop: blockMargin * 1.5,
+        marginBottom: blockMargin*2
       },
       containerToolbar: {
         justifyContent: 'center',
@@ -37,7 +39,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         marginLeft: responsiveWidth(39),
@@ -56,9 +58,9 @@ export default StyleSheet.create({
     text_ques2:{
       textAlign: 'center',
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
-      fontSize: responsiveFontSize(1.75),
-      marginTop: responsiveHeight(0),
+      fontFamily: 'SFCompactDisplay-Semibold',
+      fontSize: responsiveFontSize(2),
+      marginTop: blockMargin * 2,
     },
   rowstyle:
   {
@@ -67,14 +69,15 @@ export default StyleSheet.create({
     padding:responsiveHeight(1),
     marginLeft: responsiveWidth(3),
     marginTop: responsiveHeight(0.50),
+    fontFamily: 'SFCompactDisplay-Medium',
   },
   buttonContainer: {
     height: responsiveHeight(6.5),
     justifyContent: 'center',
     alignItems: 'center',
     // marginTop: responsiveHeight(0),
-    marginLeft: responsiveHeight(7),
-    width: responsiveWidth(70),
+   
+    width: responsiveWidth(60),
     borderRadius: 30,
   },
   submitbutton: {
@@ -82,7 +85,7 @@ export default StyleSheet.create({
   },
   submittext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   arrow: {

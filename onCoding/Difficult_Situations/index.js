@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
-import {View, Text,  Alert,Image,TouchableOpacity,ActivityIndicator,ScrollView} from 'react-native';
+import {View, Text,TouchableOpacity,ActivityIndicator,ScrollView, SafeAreaView} from 'react-native';
 import styles from '../Disclaimer/styles';
-import ToolbarAndroid from '@react-native-community/toolbar-android';
+//import ToolbarAndroid from '@react-native-community/toolbar-android';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -11,7 +11,7 @@ import {
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
@@ -48,25 +48,17 @@ export default class Difficult_Situations extends Component {
               },
             )
             .then((response) => {
-              console.log(
-                'Disclaimer response ',
-                'response get details:==> ' + JSON.stringify(response.data),
-              );
-
-              this.setState({content: response.data.data.description});
+             
+              this.setState({ isHidden: false });
 
               if (response.data.status == 200) {
-                console.log(JSON.stringify( response.data));
-                this.setState({ isHidden: false });
-
-              }
-              else {
-                console.log(response.data.message);
-                this.setState({ isHidden: false });
+                this.setState({content: response.data.data.description});
+            
               }
             })
             .catch((error) => {
-              console.log('reactNativeDemo axios error:', error);
+             
+              Toast.show('There was some error. Please try again');
               this.setState({ isHidden: false });
 
             });
@@ -76,7 +68,8 @@ export default class Difficult_Situations extends Component {
 
             const {content,isHidden} = this.state;
 
-    return (
+    return ( 
+    <SafeAreaView style={{flex: 1,}}>
         <View
         style={{
           flex: 1,
@@ -109,7 +102,7 @@ export default class Difficult_Situations extends Component {
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -121,7 +114,7 @@ export default class Difficult_Situations extends Component {
 <ScrollView>
             <View style={{ flex: 1, marginTop: blockMarginHalf * 2}}>
     <Text style={{ color: '#202020',
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: scalable(14),
       marginTop: blockMarginHalf * 3,
       marginLeft: blockMarginHalf * 3,
@@ -148,7 +141,7 @@ export default class Difficult_Situations extends Component {
           ) : null}
        </View>
        </View>
-
+</SafeAreaView>
     );
   }
 }

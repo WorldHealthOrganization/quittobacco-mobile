@@ -15,23 +15,25 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   ActivityIndicator,
-  Alert,
-  Platform,
+  Platform, SafeAreaView, Keyboard,TouchableWithoutFeedback, TouchableOpacityBase
 } from 'react-native';
 import { Header } from 'react-navigation-stack';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 import { LoginManager, GraphRequest, AccessToken, GraphRequestManager } from 'react-native-fbsdk';
 // FCM Import
-import firebase from 'react-native-firebase';
+import messaging, { firebase }  from '@react-native-firebase/messaging';
 import ImgToBase64 from 'react-native-image-base64';
-import Sample from '../Sample';
+
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 import { GoogleSignin, statusCodes } from 'react-native-google-signin';
-
+import appleAuth, {
+  AppleAuthRequestOperation,
+  AppleAuthRequestScope,
+} from '@invertase/react-native-apple-authentication';
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -40,9 +42,13 @@ import {
 import CountryPicker from 'react-native-country-picker-modal';
 
 
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { blockMargin, blockMarginHalf } from '../ui/common/responsive';
 
 //  const MESSAGE_SHOW = 'COMMON/MESSAGE_SHOW';
  const MESSAGE_HIDE = 'COMMON/MESSAGE_HIDE';
+
+import BuildConfig from 'react-native-build-config';
 
 export default class Login extends Component {
 
@@ -52,7 +58,7 @@ export default class Login extends Component {
     this.state = {  hidePassword: true,
                     email_or_phone: '',
                     password: '',
-                    fcm_token: '',
+                    fcm_token: 'fcm_token',
                     country_code: 91,
                     items:'',
                     name: '',
@@ -74,16 +80,55 @@ export default class Login extends Component {
 
     GoogleSignin.configure({
       scopes: ['email', 'profile'],
-      androidClientId:'765623951630-k55s09rpbstbkk2j7h8dho544fnet453.apps.googleusercontent.com',
+      androidClientId:'741641003248-9qnciheeudiiqk7ds5l8kl91u5ah7uko.apps.googleusercontent.com',
       //webClientId: '765623951630-eai1iuu5c3b90r8eimbukjov3b52tcms.apps.googleusercontent.com', // client ID of type WEB for your server(needed to verify user ID and offline access)
       //offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
       forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
     });
+
+    if (this.isSupported()) {
+      appleAuth.onCredentialRevoked(async () => {
+        console.warn(
+          'If this function executes, User Credentials have been Revoked',
+        );
+      });
+    }
+
   }
+
+  isSupported = () => {
+    const majorVersionIOS = parseInt(Platform.Version, 10);
+    return majorVersionIOS >= 13 && Platform.OS === 'ios' ? true : false;
+  };
+
+  appleLogin = async () => {
+    const appleAuthRequestResponse = await appleAuth.performRequest({
+      requestedOperation: appleAuth.Operation.LOGIN,
+      requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+    });
+    const credentialState = await appleAuth.getCredentialStateForUser(
+      appleAuthRequestResponse.user,
+    );
+
+    // use credentialState response to ensure the user is authenticated
+    if (credentialState === appleAuth.State.AUTHORIZED) {
+      // user is authenticated
+    }
+
+    this.onSocialLogin({
+      name: appleAuthRequestResponse.fullName.givenName+' '+appleAuthRequestResponse.fullName.familyName,
+      // profile_image: 'data:image/jpeg;base64, ' + base64String,
+      socialid: appleAuthRequestResponse.user,
+      email: appleAuthRequestResponse.email,
+      mobile: '',
+      type: 1,
+    } 
+  )
+
+  };
 
   fcmToken = async () => {
     
-    console.log('Tooooken');
     const enabled = await firebase.messaging().hasPermission();
     if (enabled) {
       firebase
@@ -91,29 +136,29 @@ export default class Login extends Component {
         .getToken()
         .then(fcmToken => {
           if (fcmToken) {
-            console.log('Received Token ' + fcmToken);
+          
             this.setState({
               fcm_token: fcmToken,
             });
           } else {
-            console.log('Received Token Error');
+            console.log('Received Token Reason');
           }
         });
     } else {
-      //alert("No Permission for FCM Notification");
+      console.log("No Permission for FCM Notification");
     }
   }
 
   setUser = async () => {
     try {
-      let emailid = await AsyncStorage.getItem('UserEmailId');
+      //let emailid = await AsyncStorage.getItem('UserEmailId');
       let jwt_token = await AsyncStorage.getItem('JwtToken');
       let userid = await AsyncStorage.getItem('UserId');
       this.setState({User_Id: userid});
-      this.setState({Email_Id: emailid});
+      //this.setState({Email_Id: emailid});
       this.setState({jwt_token: jwt_token});
     } catch (error) {
-      alert(error);
+      console.log(error);
     }
   };
 
@@ -127,16 +172,15 @@ export default class Login extends Component {
           const accessToken = data.accessToken;
           const responseInfoCallback = (error, result) => {
             if (error) {
-              console.log(error);
-              console.log('Error fetching data=', error.toString());
+              console.log('FB fetching Reason');
             } else {
-              console.log('FB Data Success fetching data=', JSON.stringify(result));
+              
           //     let fbEmail = result.email;
           //     let fbmobile = result.mobile;
           //     if (fbEmail != null && fbEmail != '') {
           //       this.onSocialLogin({ first_name: result.first_name, last_name:result.last_name, profile_image: result.picture.data.url, socialid: result.id, email: result.email, mobile: ' ',  type:2 });
           //     } else {
-          //       console.log('FB Data Success Email not here');
+          //       
           //       this.setState({
           //         visible: true, first_name: result.first_name, last_name: result.last_name,
           //         socialid: result.id,
@@ -152,7 +196,7 @@ export default class Login extends Component {
           this.setState({isHidden: true});
                 ImgToBase64.getBase64String(result.picture.data.url)
                   .then((base64String) =>
-                    //console.log('base64String ====> ' + base64String),
+                  
                     // this.setState({
                     //   base64Image: 'data:image/jpeg;base64, ' + base64String,
                     // }),
@@ -165,17 +209,36 @@ export default class Login extends Component {
                       type: 2,
                     }),
                   )
-                  .catch((err) => alert(err));
+                  .catch((err) => console.log(err));
                   LoginManager.logOut();
                   }
 
                   else {
-                          console.log('FB Data Success Email not here');
+                          console.log('Email not here');
                           this.setState({
                             name: result.name, 
                             socialid: result.id,
                             // socialProfileImg: result.picture.data.url,
                           });
+
+                          this.setState({isHidden: true});
+                          ImgToBase64.getBase64String(result.picture.data.url)
+                            .then((base64String) =>
+                           
+                              // this.setState({
+                              //   base64Image: 'data:image/jpeg;base64, ' + base64String,
+                              // }),
+                              this.onSocialLogin({
+                                name : result.name,
+                                // profile_image: 'data:image/jpeg;base64, ' + base64String,
+                                socialid: result.id,
+                                email: result.email,
+                                mobile: result.mobile,
+                                type: 2,
+                              }),
+                            )
+                            .catch((err) => console.log(err));
+                            LoginManager.logOut();
                         }
             }
           };
@@ -203,13 +266,12 @@ export default class Login extends Component {
       await GoogleSignin.hasPlayServices();
       const info = await GoogleSignin.signIn();
       // this.setState({ info });
-      console.log('Google Data' + JSON.stringify(info) + '--' + info.user.name);
-console.log(JSON.stringify(info.user.name));
+     
 
 if (info.user.mobile != '' && info.user.mobile != null) {
   ImgToBase64.getBase64String(info.user.photo)
     .then((base64String) =>
-      //console.log('base64String ====> ' + base64String),
+     
       // this.setState({
       //   base64Image: 'data:image/jpeg;base64, ' + base64String,
       // }),
@@ -219,7 +281,7 @@ if (info.user.mobile != '' && info.user.mobile != null) {
         socialid: info.user.id,
         email: info.user.email,
         mobile: info.user.mobile,
-        type: 2,
+        type: 3,
       }
       ),
     )
@@ -231,7 +293,7 @@ if (info.user.mobile != '' && info.user.mobile != null) {
     socialid: info.user.id,
     email: info.user.email,
     mobile: '',
-    type: 2,
+    type: 3,
   }
   );
 }
@@ -255,8 +317,7 @@ await GoogleSignin.signOut();
     // let mobile = await AsyncStorage.getItem('UserMobileNo');
     // let Password = await AsyncStorage.getItem('UserPassword');
      const {fcm_token,jwt_token} = this.state;
-    console.log('login input ==> ' +  name + email + mobile + socialid + ' ' + type + jwt_token );
-    this.setState({isHidden: true});
+      this.setState({isHidden: true});
           axios
             .post(
               ApiName.registerSocialMedia,
@@ -275,13 +336,10 @@ await GoogleSignin.signOut();
               },
             )
             .then((response) => {
-              console.log(
-                'login response ',
-                'response get details:==> ' + JSON.stringify(response.data),
-              );
+             
+              console.log(JSON.stringify(response))
               this.setState({isHidden: false});
 
-              // alert(response.data.message);
               if (response.data.status == 200) {
                 // AsyncStorage.setItem('LoginStatus', 'true');
                 // AsyncStorage.setItem('Fb_Name', response.data.data.name);
@@ -294,34 +352,45 @@ await GoogleSignin.signOut();
 
                 AsyncStorage.setItem('LoginStatus', 'true');
                 AsyncStorage.setItem('QuestionarieStatus', response.data.data.questionarie_status + '');
-                AsyncStorage.setItem('UserId',response.data.data.social_media_id);
-                AsyncStorage.setItem('UserName',response.data.data.name);
-                AsyncStorage.setItem('UserMobileNo',response.data.data.mobile);
-                AsyncStorage.setItem('UserEmailId', response.data.data.email);
-                AsyncStorage.setItem('UserProfileImage', response.data.data.profile_image);
+                AsyncStorage.setItem('UserId',response.data.data.social_media_id + '');
+
+                if(response.data.data.name != null && response.data.data.name != ''){
+                  AsyncStorage.setItem('UserName', response.data.data.name);
+                 }
+              
+                if(response.data.data.mobile != null && response.data.data.fcm_token != ''){
+                  AsyncStorage.setItem('UserMobileNo',response.data.data.mobile);
+                }
+                
+                //AsyncStorage.setItem('UserEmailId', response.data.data.email);
+               // AsyncStorage.setItem('UserProfileImage', response.data.data.profile_image);
+
+               if(response.data.data.fcm_token != null && response.data.data.fcm_token != ''){
                 AsyncStorage.setItem('UserFCM', response.data.data.fcm_token);
+               }
+              //  }else{
+              //   AsyncStorage.setItem('UserFCM', fcm_token);
+              //  }
+                
                 AsyncStorage.setItem('Login_JwtToken','Bearer ' + response.data.jwt_token);
 
                 Toast.show(response.data.message);
 
+               
                 if (response.data.data.questionarie_status == 1){
                   this.props.navigation.navigate('UserHome');
                 } else {
                   this.props.navigation.navigate('QuestionareStack');
                 }
-              this.setState({isHidden: false});
-                // Toast.show(response.data.message);
               }
               else {
-                Toast.show(response.message);
-                this.setState({isHidden: false});
-
+                Toast.show(response.data.message);
               }
             })
             .catch((error) => {
               this.setState({isHidden: false});
-              console.log('reactNativeDemo axios error:', error);
-              this.setState({isHidden: false});
+             
+              Toast.show('There was some error. Please try again')
 
             });
   }
@@ -339,9 +408,8 @@ await GoogleSignin.signOut();
   async login() {
 
     const {email_or_phone, password, fcm_token, jwt_token} = this.state;
-    console.log('login input ==> ' + email_or_phone + ' ' + password + '==' + fcm_token);
     if (email_or_phone.length >= 8 ) {
-        if (password.length >= 6 ) {
+        // if (password.length >= 6 ) {
           this.setState({isHidden: true});
           axios
             .post(
@@ -359,84 +427,135 @@ await GoogleSignin.signOut();
               },
             )
             .then((response) => {
-              console.log(
-                'login response ',
-                'response get details:==> ' + JSON.stringify(response.data)
-              );
 
-              Toast.show(response.data.message);
               this.setState({isHidden: false});
 
               if (response.data.status == 200) {
                 AsyncStorage.setItem('LoginStatus', 'true');
                 AsyncStorage.setItem('QuestionarieStatus', response.data.data.questionarie_status + '');
-                AsyncStorage.setItem('UserId',response.data.data.id);
-                AsyncStorage.setItem('UserName',response.data.data.name);
-                AsyncStorage.setItem('UserMobileNo',response.data.data.mobile);
-                AsyncStorage.setItem('UserEmailId', response.data.data.email);
-                AsyncStorage.setItem('UserProfileImage', response.data.data.profile_image);
-                AsyncStorage.setItem('UserFCM', response.data.data.fcm_token);
+                AsyncStorage.setItem('UserId',response.data.data.id + '');
+               if(response.data.data.name != null && response.data.data.name != ''){
+                  AsyncStorage.setItem('UserName', response.data.data.name);
+                 }
+              
+                if(response.data.data.mobile != null && response.data.data.fcm_token != ''){
+                  AsyncStorage.setItem('UserMobileNo',response.data.data.mobile);
+                }
+                
+                if(response.data.data.fcm_token != null && response.data.data.fcm_token != ''){
+                 AsyncStorage.setItem('UserFCM', response.data.data.fcm_token);
+                } // }else{
+                //  AsyncStorage.setItem('UserFCM', fcm_token);
+                // }
                 AsyncStorage.setItem('Login_JwtToken','Bearer ' + response.data.jwt_token);
 
                 Toast.show(response.data.message);
+
 
                 if (response.data.data.questionarie_status == 1){
                   this.props.navigation.navigate('UserHome');
                 } else {
                   this.props.navigation.navigate('QuestionareStack');
                 }
-              this.setState({isHidden: false});
-
-                // this.props.navigation.navigate('Navigation');
+              
               } else if (response.data.status == 401) {
-                AsyncStorage.setItem('MobileNumber', response.data.mobile);
 
-                AsyncStorage.setItem('UserPassword', response.data.password);
-                AsyncStorage.setItem(
-                  'JwtToken',
-                  'Bearer ' + response.data.jwt_token,
-                );
                 Toast.show(response.data.message);
-                this.setState({isHidden: false});
+               
               }
               else {
                 Toast.show(response.data.message);
-                this.setState({isHidden: false});
+             
               }
             })
             .catch((error) => {
               this.setState({isHidden: false});
-              console.log('reactNativeDemo axios error:', error);
+              Toast.show('There was some error. Please try again')
+             
             });
-        } else {
-          Toast.show('Enter Password');
-        }
+        
     } else {
       Toast.show('Enter Mobile Number');
     }
   }
 
 
+  
+  Update_Notifications = async ({user_id,jwt_token,questionarie_status}) => {
+  
+    this.setState({isHidden: true});
+  
+    axios
+      .post(
+        ApiName.update_notifications,
+        {
+          diary_remainder:'1',
+          diary_remainder_time:'18:30',
+          mission_remainder:'1',
+          mission_remainder_time:'08:00',
+          badge:'1',
+          general_alert:'1',
+        },
+        {
+          headers: {
+            Authorization: 'Bearer '+jwt_token,
+          },
+        },
+      )
+      .then((response) => {
+      
+        this.setState({isHidden: false});
+        if (response.data.status == 200) {
+        
+          if (questionarie_status == 1){
+            this.props.navigation.navigate('UserHome');
+          } else {
+            this.props.navigation.navigate('QuestionareStack');
+          }
+        } else {
+       
+          console.log("Notification Reason");
+        }
+      })
+      .catch((error) => {
+        this.setState({isHidden: false});
+        Toast.show('There was some error. Please try again')
+       
+      });
+  };
+
+
   render() {
     return (
+        <SafeAreaView style={{flex:1}}>
               <View style={styles.container}>
+             
         <View style={styles.view}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ImageBackground
             source={require('../../images/shape.png')}
-            style={{width: responsiveWidth(100), height: responsiveHeight(37), resizemode: 'contain'}}>
-            <Image source={require('../../images/WHO_Logo.png')} style={styles.logo} />
+       
+            style={{width: '100%', height: responsiveHeight(42), resizemode: 'contain'}}>
+<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <Image source={require('../../images/WHO_Logo.png')} resizeMode={'contain'} style={styles.logo} /></TouchableWithoutFeedback>
           </ImageBackground>
-
-          <KeyboardAvoidingView
+</TouchableWithoutFeedback>
+          {/* <KeyboardAvoidingView
   keyboardVerticalOffset = {Header.HEIGHT + 0} // adjust the value here if you need more padding
   style = {{ flex: 1.5 }}
   behavior = "padding" >
     <ScrollView style={styles.scrollview}
-     keyboardShouldPersistTaps={'handled'}>
+     keyboardShouldPersistTaps={'handled'}
+     contentContainerStyle={{flexGrow: 1}}> */}
+     <KeyboardAwareScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.view1}>
           <Text style={styles.text}>Phone Number</Text>
           <View
-                  style={{flexDirection: 'row', flex: 1}}>
+                  style={{flexDirection: 'row', flex: 1,justifyContent:'center',alignItems:'center'}}>
           <View style={styles.textBackground3}>
                     <TouchableOpacity
                       onPress={() => this.setState({visible: true})}
@@ -444,7 +563,7 @@ await GoogleSignin.signOut();
                         flex: 1,
                         flexDirection: 'row',
                         marginStart: responsiveWidth(1),
-                        marginTop:responsiveHeight(1),
+                       
                       }}>
           <CountryPicker style={{marginTop: responsiveHeight(0)}}
                         onChangeText={(value) => this.setState({email_or_phone: value})} value={this.state.email_or_phone}
@@ -455,7 +574,7 @@ await GoogleSignin.signOut();
                         onClose={() => this.setState({visible: false})}
                         visible={this.state.visible}
                         theme={{
-                          fontFamily: 'SF Display',
+                          fontFamily: 'SFCompactDisplay-Regular',
                         }}
                         placeholder={''}
                         onSelect={(country) => {
@@ -475,9 +594,9 @@ await GoogleSignin.signOut();
                         style={{
                           marginLeft: responsiveWidth(2),
                           // alignSelf: 'center',
-                          marginTop: responsiveHeight(0),
-                          // fontFamily: 'Lato-Regular',
-                          fontSize: responsiveFontSize(2),
+                         justifyContent:'center',alignSelf:'center',
+                         fontFamily: 'SFCompactDisplay-Medium',
+                          fontSize: 15,
                           color: '#131313',
                         }}>
                         +{this.state.country_code}
@@ -490,31 +609,41 @@ await GoogleSignin.signOut();
                     ref={this.input1}
                     style={styles.textBackground4}
                     keyboardType="numeric"
-                    placeholder="Mobile Number"
+                    placeholder="Phone Number"
+                    placeholderTextColor='#B6C0CB'
                     onChangeText={(value) => this.setState({email_or_phone: value})}
                     value={this.state.email_or_phone}
                     underlineColorAndroid="transparent"
+                    returnKeyType="done" 
+                     // onSubmitEditing={() => this.refs.password.focus()}
+
                       />
                 </View>
                 <View style={styles.view4} />
-          <View style = { styles.textBoxBtnHolder }>
-          <TextInput ref={this.input2} placeholder="Password" onChangeText={(value) => this.setState({password: value})} value={this.state.password} placeholderTextColor="#B6C0CB" underlineColorAndroid = "transparent" secureTextEntry = { this.state.hidePassword } style = { styles.textBox }/>
+          {/* <View style = { styles.textBoxBtnHolder }>
+          <TextInput 
+         
+          ref='password'
+          placeholder="Password" 
+          onChangeText={(value) => this.setState({password: value})} 
+          value={this.state.password} 
+          placeholderTextColor="#B6C0CB" 
+          underlineColorAndroid = "transparent" 
+          secureTextEntry = { this.state.hidePassword } 
+          returnKeyType="done" 
+          style = { styles.textBox }/>
           <View style={styles.view3} />
           <TouchableOpacity activeOpacity = { 0.5 } style = { styles.visibilityBtn } onPress = { this.managePasswordVisibility }>
             <Image source = { ( this.state.hidePassword ) ? require('../../images/eye-off.png') : require('../../images/eye_1.png') } style = { styles.btnImage } />
           </TouchableOpacity>
-        </View>
+        </View> */}
 
-        </View>
-        </ScrollView>
-        </KeyboardAvoidingView>
-
-          <View style={{backgroundColor: '#FFFFFF',
+        {/* <View style={{backgroundColor: '#FFFFFF',
         marginTop: responsiveHeight(3),
         alignItems:'center',
         height: '100%',flex:0.4}}>
           <Text style={styles.forgotpwd} onPress={() => this.props.navigation.navigate('forgot_pwd')}>Forgot Password?</Text>
-          </View>
+          </View> */}
           <View><Text style={styles.login}>Login via</Text></View>
 
 
@@ -525,30 +654,49 @@ await GoogleSignin.signOut();
             <TouchableOpacity onPress={() => this.signIn()}>
              <Image source={require('../../images/google+.png')} style={styles.gplus_logo} />
              </TouchableOpacity>
-             { Platform.OS == 'ios' &&
-             <TouchableOpacity onPress={() => alert('Apple Login')}>
+             {this.isSupported() && 
+             <TouchableOpacity 
+             onPress={() => this.appleLogin()}
+             >
             <Image source={require('../../images/apple.png')} style={styles.apple_logo} />
             </TouchableOpacity>}
           </View>
           <View style={styles.view2}>
-          <TouchableHighlight onPress={() => this.login()}
+          <TouchableOpacity onPress={() => this.login()}
             style={[styles.buttonContainer, styles.loginButton]}
            >
             <Text style={styles.loginText}>Login</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
           </View>
-          <View
+         
+          {/* <View
             style={{
               flex: 1,
               width: '100%',
               flexDirection: 'row',
-              marginLeft: responsiveWidth(34),
-              marginTop: responsiveHeight(5),
+             justifyContent:'center',
+              marginTop: blockMargin * 2,
+            marginBottom: blockMargin * 1.5
             }}>
             <Text style={styles.newuser}>New User?</Text>
             <Text style={styles.signup} onPress={() => this.props.navigation.navigate('CreateAccount')}>Signup</Text>
-          </View>
-      </View>
+          </View> */}
+      
+
+        </View>
+        </TouchableWithoutFeedback>
+        </KeyboardAwareScrollView>
+        {/* </ScrollView>
+        
+        </KeyboardAvoidingView> */}
+        
+        
+       {Platform.OS == 'ios' && <View style={{height:blockMarginHalf,
+    backgroundColor: '#FFFFFF',
+    alignItems:'center'}}></View> } 
+        </View>
+     
+
       {this.state.isHidden ? (
             <View style={styles.box2}>
               <ActivityIndicator
@@ -560,6 +708,7 @@ await GoogleSignin.signOut();
             </View>
           ) : null}
       </View>
+  </SafeAreaView>
     );
   }
 }

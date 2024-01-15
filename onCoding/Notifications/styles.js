@@ -5,6 +5,8 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+
+import { blockMargin } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
@@ -23,7 +25,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         height:responsiveHeight(10),
@@ -31,15 +33,24 @@ export default StyleSheet.create({
         marginTop: responsiveHeight(1.75),
       },
       switch: {
-        marginLeft: responsiveWidth(5),
         marginTop: responsiveHeight(4.5),
+        alignItems:'flex-end',
+
+      },
+      img: {
+        resizeMode: 'contain',
+        marginTop: responsiveHeight(4.5),
+        alignItems:'flex-end',
+        width: 18,
+        height: 18
       },
       text: {
         color: '#202020',
         fontSize:responsiveFontSize(2.10),
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         marginTop: responsiveHeight(4.5),
         marginLeft: responsiveWidth(5),
+        width: '100%',
       },
       trackOnStyle: {
          color: 'red',
@@ -47,7 +58,7 @@ export default StyleSheet.create({
       text2: {
         color: '#202020',
         fontSize:responsiveFontSize(2),
-        fontFamily: 'SF-Regular',
+        fontFamily: 'SFCompactDisplay-Regular',
         marginTop: responsiveHeight(4.5),
         marginLeft: responsiveWidth(5),
       },
@@ -57,5 +68,27 @@ export default StyleSheet.create({
         marginLeft: responsiveWidth(6),
         marginTop: responsiveHeight(1.5),
         resizeMode: 'contain',
+      }, buttonContainer: {
+        height: responsiveHeight(6.5),
+        justifyContent: 'center',
+        alignItems: 'center',
+        // marginTop: responsiveHeight(0),
+       
+        width: responsiveWidth(60),
+        borderRadius: 30,
       },
+      submitbutton: {
+        backgroundColor: '#0072BB',
+      },
+      submittext: {
+        color: '#FFFFFF',
+        fontFamily: 'SFCompactDisplay-Medium',
+        fontSize: responsiveFontSize(2),
+      }, view2: {
+        justifyContent:'center',alignItems:'center',alignSelf:'center',
+         backgroundColor: '#FFFFFF',
+         // marginTop: responsiveHeight(2),
+         marginTop: blockMargin * 2,
+         marginBottom: blockMargin*2
+       },
     });

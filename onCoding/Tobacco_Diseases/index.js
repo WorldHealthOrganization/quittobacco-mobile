@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
-import {View, Text,  Alert,Image,TouchableOpacity,ActivityIndicator,ScrollView} from 'react-native';
+import {View, Text,Image,TouchableOpacity,ActivityIndicator,ScrollView, SafeAreaView, Dimensions} from 'react-native';
 import styles from '../Disclaimer/styles';
-import ToolbarAndroid from '@react-native-community/toolbar-android';
+//import ToolbarAndroid from '@react-native-community/toolbar-android';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -11,13 +11,15 @@ import {
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 import Navigation from '../Navigation/Navigation';
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
 import ImageViewer from 'react-native-image-zoom-viewer';
+import { tr } from 'date-fns/locale';
+const {width, height} = Dimensions.get('window')
 
 export default class Tobacco_Diseases extends Component {
 
@@ -59,25 +61,17 @@ export default class Tobacco_Diseases extends Component {
               },
             )
             .then((response) => {
-              console.log(
-                'Disclaimer response ',
-                'response get details:==> ' + JSON.stringify(response.data),
-              );
-
-              this.setState({content: response.data.data.content});
+            
+              this.setState({ isHidden: false });
 
               if (response.data.status == 200) {
-                console.log(JSON.stringify( response.data));
-                this.setState({ isHidden: false });
-
-              }
-              else {
-                console.log(response.data.message);
-                this.setState({ isHidden: false });
+                this.setState({content: response.data.data.content});
+               
               }
             })
             .catch((error) => {
-              console.log('reactNativeDemo axios error:', error);
+              Toast.show('There was some error. Please try again')
+             
               this.setState({ isHidden: false });
 
             });
@@ -90,6 +84,7 @@ export default class Tobacco_Diseases extends Component {
             const {content,isHidden} = this.state;
 
     return (
+      <SafeAreaView style={{flex: 1,}}>
         <View
         style={{
           height: '100%',
@@ -122,7 +117,7 @@ export default class Tobacco_Diseases extends Component {
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -131,36 +126,14 @@ export default class Tobacco_Diseases extends Component {
            
             </View>
             </View>
-            <View style={{flex:1,backgroundColor:'#FFFFFF'}} >
+            <View style={{flex:1,backgroundColor:'#FFFFFF'}}>
       <ImageViewer
-      backgroundColor={'#FFFFFF'}
-      index={0}
-        imageUrls={[
-                  {
-                    url: 'http://whoapp.dci.in/uploads/files/' + '110340Image%205@2x.png',
-                  },
-                ]}>
-            {/* <Image
-                                  source={
-                                    content === '' || content === null
-                                      ? require('../../images/heart.png')
-                                      : {
-                                        uri: 'http://whoapp.dci.in/uploads/files/' + '110340Image%205@2x.png',
-                                        cache: 'force-cache',
-                                      }
-                                  }
-
-                                  defaultSource={require('../../images/heart.png')}
-                                  resizeMode=''
-
-                                  style={{
-                                    width: deviceWidth,
-                                    height: '100%',
-                                    resizeMode: 'contain',
-
-                                  }}
-                                /> */}
-                                </ImageViewer>
+        footerContainerStyle={{bottom:150, position:'absolute'}}
+        backgroundColor={'#EEEEEE'}
+        height={200}
+        index={0}
+        imageUrls={[{url: ApiName.baseLink+'110340Image%205@2x.png',}]}>
+      </ImageViewer>
        </View>
        {isHidden ? (
             <View style={{
@@ -181,7 +154,7 @@ export default class Tobacco_Diseases extends Component {
           ) : null}
        </View>
        </View>
-
+</SafeAreaView>
     );
   }
 }

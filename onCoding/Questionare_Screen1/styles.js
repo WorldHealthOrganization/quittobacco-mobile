@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {StyleSheet} from 'react-native';
+import {StyleSheet,Platform} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -13,6 +13,7 @@ export default StyleSheet.create({
         alignItems: 'center',
         height: responsiveHeight(100),
         width: responsiveWidth(100),
+        paddingBottom:Platform.OS == 'ios' ? 20 : 5
       },
       view: {
         backgroundColor: '#FFFFFF',
@@ -30,17 +31,20 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignSelf: 'center',
         marginLeft: responsiveWidth(37),
-        marginTop: responsiveHeight(0.5),
+        marginTop: responsiveHeight(1),
       },
       content: {
-         marginLeft: responsiveWidth(6.5),
+        
          color: '#B6C0CB',
+         marginLeft:blockMargin *2,
+         marginRight: blockMargin *2,
          marginTop:responsiveHeight(1),
-         fontFamily: 'SF-Regular',
+         fontFamily: 'SFCompactDisplay-Regular',
+         fontSize:14, textAlign:'center'
       },
       textStyle:{
         margin: responsiveWidth(6),
@@ -56,44 +60,45 @@ export default StyleSheet.create({
         marginTop: responsiveHeight(1),
     },
     text_ques:{
-      marginLeft: responsiveWidth(11),
+     width:'90%',
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
-      fontSize: responsiveFontSize(1.5),
-      marginTop: responsiveHeight(1.5),
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 16,
+      marginBottom: 10,
+      marginTop: 15,justifyContent:'center',alignSelf:'center'
     },
     text_ques1:{
       marginLeft: responsiveWidth(6),
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
+      fontFamily: 'SFCompactDisplay-Regular',
       fontSize: responsiveFontSize(1.75),
       marginTop: responsiveHeight(2),
     },
     text_ques2:{
-      marginLeft: responsiveWidth(8.5),
+      width:'90%',
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
+      fontFamily: 'SFCompactDisplay-Regular',
       fontSize: responsiveFontSize(1.75),
-      marginTop: responsiveHeight(0),
+      marginTop: responsiveHeight(0),alignSelf:'center',justifyContent:'center'
     },
     text_ques3:{
-      marginLeft: responsiveWidth(8),
+      width:'90%',
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
-      fontSize: responsiveFontSize(1.5),
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 14,justifyContent:'center',alignSelf:'center',
       marginTop: responsiveHeight(2.75),
     },
     text_ques4:{
       marginLeft: responsiveWidth(8.5),
       color: '#B6C0CB',
-      fontFamily: 'SF-Regular',
+      fontFamily: 'SFCompactDisplay-Regular',
       fontSize: responsiveFontSize(1.5),
       marginTop: responsiveHeight(2),
     },
     text:{
       color: '#202020',
       fontSize: responsiveFontSize(1.75),
-      fontFamily: 'SF-Regular',
+      fontFamily: 'SFCompactDisplay-Regular',
       marginLeft: responsiveWidth(0),
       width: responsiveWidth(88),
       marginTop: responsiveHeight(0),
@@ -104,6 +109,10 @@ export default StyleSheet.create({
   {
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 0,
+    width:'85%',
+    paddingBottom:0,
+    color:'black'
+    
   },
   view3: {
     borderBottomWidth: responsiveWidth(0.45),
@@ -118,24 +127,26 @@ export default StyleSheet.create({
     marginHorizontal: responsiveWidth(8.5), 
     marginLeft: responsiveWidth(11.5),
     width: responsiveWidth(83),
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     // height: responsiveHeight(7),
 },
 textInput: {
-  fontSize: responsiveFontSize(1.50),
-  // height: responsiveHeight(5.5),
+  fontSize: 14,
   marginTop: responsiveHeight(0),
-  fontFamily: 'SF-Medium',
-  marginLeft:responsiveWidth(8),
-  marginBottom: blockMarginHalf,
+  fontFamily: 'SFCompactDisplay-Medium',
+ width:'90%',alignSelf:'center',justifyContent:'center',
+  height:45,
+  color:'black'
 },
 textInput2: {
-  fontSize: responsiveFontSize(1.50),
+  fontSize: 14,
   // height: responsiveHeight(5.5),
-  marginTop: responsiveHeight(-1),
-  fontFamily: 'SF-Medium',
-  marginLeft:blockMarginHalf * 6,
-  marginBottom: blockMarginHalf,
+  marginTop: responsiveHeight(0),
+  width:'90%',
+  fontFamily: 'SFCompactDisplay-Medium',
+  alignSelf:'center',justifyContent:'center',
+  height:45,
+  color:'black'
 },
 inputLayout1: {
   marginTop: responsiveHeight(1.0),
@@ -148,7 +159,7 @@ textInput1: {
 fontSize: responsiveFontSize(1.50),
 height: responsiveHeight(4),
 marginTop: responsiveHeight(0.5),
-fontFamily: 'SF-Medium',
+fontFamily: 'SFCompactDisplay-Medium',
 },
 backarrow: {
   width: responsiveWidth(3),
@@ -175,28 +186,36 @@ view4: {
   borderBottomWidth: responsiveWidth(0.22),
   marginTop: responsiveHeight(0),
   borderBottomColor: '#B6C0CB',
-  width: responsiveWidth(82.5),
-  marginLeft:responsiveWidth(11),
+  width: responsiveWidth(90),justifyContent:'center',alignSelf:'center'
+ 
 },
 view5: {
   borderBottomWidth: responsiveWidth(0.22),
   marginTop: responsiveHeight(0),
   borderBottomColor: '#B6C0CB',
-  width: responsiveWidth(83.5),
-  marginLeft:responsiveWidth(8.5),
+  width: responsiveWidth(90),justifyContent:'center',alignSelf:'center'
+ 
 },
 view6: {
   borderBottomWidth: responsiveWidth(0.22),
-  marginTop: responsiveHeight(-2.5),
+  marginTop: responsiveHeight(0),
   borderBottomColor: '#B6C0CB',
-  width: responsiveWidth(83.5),
-  marginLeft:responsiveWidth(8.5),
+  width: responsiveWidth(90),justifyContent:'center',alignSelf:'center'
 },
 view7: {
   borderBottomWidth: responsiveWidth(0.22),
-  marginTop: responsiveHeight(-2.5),
+  marginTop: responsiveHeight(0),
   borderBottomColor: '#B6C0CB',
-  width: responsiveWidth(83.5),
-  marginLeft:blockMarginHalf * 6,
+  width: responsiveWidth(90),justifyContent:'center',alignSelf:'center',
+  marginBottom:20,
+},
+pickerContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor:'red'
+},
+pickerLabel: {
+  fontSize: 18,
+  marginRight: 10,
 },
 });

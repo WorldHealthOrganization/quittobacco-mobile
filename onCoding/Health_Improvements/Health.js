@@ -7,7 +7,6 @@ import {
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 import ImgToBase64 from 'react-native-image-base64';
-import { CircularProgressbar } from 'react-circular-progressbar';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import ProgressCircle from 'react-native-progress-circle'
 
@@ -19,18 +18,14 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
   Platform,
-  Share, ActivityIndicator
+  Share, ActivityIndicator, SafeAreaView
 } from 'react-native';
 
-import ImagePicker from 'react-native-image-picker';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
-import {check, request, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import { Header } from 'react-navigation-stack';
 import Toast from 'react-native-simple-toast';
 
@@ -58,7 +53,7 @@ export default class Health extends Component {
       CarbonMonoxideLevel: 0,
          
     //ShareMyhealthImproveLink
-    uniqueShareMyhealthImproveLink:'https://whotobaccoapp.page.link/6SuK',
+    uniqueShareMyhealthImproveLink:'https://tobacco.page.link/Sohr',
         };
       }
 
@@ -103,7 +98,7 @@ export default class Health extends Component {
         token: token,
       });
    
-      this.getHealthImprovement() 
+     // this.getHealthImprovement() 
     }
   };
   
@@ -111,8 +106,7 @@ export default class Health extends Component {
   getHealthImprovement = async () => {
     const {token} = this.state
     this.setState({isHidden: true})
-      console.log(
-        'Improvement response token',token);
+     
       axios
         .post(
           ApiName.health_improve, {},
@@ -123,13 +117,10 @@ export default class Health extends Component {
           },
         )
         .then((response) => {
-          console.log(
-            'Health Improvement response ',
-             JSON.stringify(response.data),
-          );
-  
+      
+          this.setState({isHidden: false})
           if (response.data.status == 200) {
-            // AsyncStorage.setItem('MoneySaved', response.data.data.money.saved);
+            
             this.setState({isHidden: false})
             this.setState({
                //healthImprovementChart
@@ -138,15 +129,12 @@ export default class Health extends Component {
                CarbonMonoxideLevel: response.data.data.carbon_monoxide_level ,
            
           })}
-          else {
-            this.setState({isHidden: false})
-            console.log(response.data.message);
-          }
+        
         })
         .catch((error) => {
           this.setState({isHidden: false})
           Toast.show('There was some error. Please try again')
-          console.log('reactNativeDemo axios error:', error);
+         
         });
     }
     
@@ -157,14 +145,18 @@ export default class Health extends Component {
         if(type == 2){ 
             Share.share(
               {
-                subject: 'WHO My Health Improvement Link' ,
-                message: 'My Health Improve without using tobacco :- \n OxygenLevels - '+OxygenLevels+'\n Lungs - '+ Lungs +'\n CarbonMonoxideLevel - '+ CarbonMonoxideLevel+'\n Click to download the app \n'+uniqueShareMyhealthImproveLink,
-                title: 'WHO My Health Improvement Link',
+                subject: 'Quit Tobacco My Health Improvement Link',
+                message:
+                  'My Health Improvements without using tobacco :- \n Lungs capacity increases by 30% after a few weeks without tobacco usage!' +
+                 
+                  '\n Click to download the app \n' +
+                  uniqueShareMyhealthImproveLink,
+                title: 'Quit Tobacco My Health Improvement Link',
               },
               {
-                dialogTitle: 'WHO My Health Improvement Link' ,// Android
-                subject: 'WHO My Health Improvement Link' ,// iOS
-              }).then(success => console.log(success), reason => console.log(reason))
+                dialogTitle: 'Quit Tobacco My Health Improvement Link' ,// Android
+                subject: 'Quit Tobacco My Health Improvement Link' ,// iOS
+              }).then(success => console.log("success"), reason => console.log("DeepLink Reason"))
       
       
           }
@@ -176,60 +168,62 @@ render () {
     const {isHidden,Lungs,CarbonMonoxideLevel,OxygenLevels} = this.state
 
     return (
-        <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+       
         <View style={styles.view}>
       
+        <View style={{
+            flexDirection: 'row', width: '100%', height: '12%',
+            backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', alignContent: 'center', alignSelf: 'center', }}>
+
+              <TouchableOpacity style={{
+
+                alignItems: 'center',
+              }} onPress={() => this.props.navigation.goBack()}>
+
+                <Image style={{
+                  width: responsiveWidth(3),
+                  height: responsiveHeight(4),
+
+                  resizeMode: 'contain'
+                }} source={require('../../images/back_arrow.png')} />
+
+              </TouchableOpacity>
+
+            </View>
+            <View style={{ width: '76%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontFamily: 'SFCompactDisplay-Medium',
+                fontSize: scalable(18),
+                justifyContent: 'center',
+                textAlign: 'center',
+
+              }}>Health Improvements</Text>
+            </View>
+            <View style={{ width: '12%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center', marginRight: blockMarginHalf }}>
+
+              <TouchableOpacity style={{
+
+                alignItems: 'center',
+              }} onPress={() => this.shareApp({ type: 2 })}>
+
+                <Image style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: '#fff',
+                  resizeMode: 'contain'
+                }} source={require('../../images/share.png')} />
+
+              </TouchableOpacity>
+            </View>
+          </View>
+
        
-        <View style={{ flexDirection: 'row', width: '100%', height: responsiveHeight(10), backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center' }}>
-
-          <TouchableOpacity style={{
-            width: '12%',left:0,
-            height: responsiveHeight(4), alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSelf: 'center',
-          }} onPress={() => this.props.navigation.goBack()}>
-
-            <Image style={{
-              width: responsiveWidth(3),
-              height: responsiveHeight(4),
-alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSelf: 'center',
-              resizeMode: 'contain'
-            }} source={require('../../images/back_arrow.png')} />
-
-          </TouchableOpacity>
-
-          <Text style={{
-            width: '76%', color: '#FFFFFF',
-            fontFamily: 'SF-Medium',
-            fontSize: scalable(18),
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}>Health Improvements</Text>
-
-<TouchableOpacity
-                onPress= { () => this.shareApp({type: 2})}
-                style={{
-    width: '12%',
-    height: 30,
-    justifyContent:'flex-end'
   
-   }} >
-              
-                <Image style={{resizeMode: 'contain',
-    width: 20,
-    height: 20,
-    justifyContent:'flex-end',
-    tintColor:'#fff'
-  
-   }} source={require('../../images/share.png')} />
-   </TouchableOpacity>
-
-        
-
-
-        </View>
-
-
-  
-        <ScrollView style={{   height:responsiveHeight(88), width: '100%',flexDirection: 'column', backgroundColor: '#FFFFFF' }}
+        <ScrollView style={{   height: '88%', width: '100%',flexDirection: 'column', backgroundColor: '#FFFFFF' }}
               keyboardShouldPersistTaps={'handled'}>
 
    <View style={{
@@ -246,8 +240,11 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
          backgroundColor: '#FFFFFF',
          width: responsiveWidth(100),
         }}>
-
-<ProgressCircle
+ <Image style={{ height: responsiveHeight(20),
+     
+     marginTop: responsiveHeight(0.60),
+     resizeMode: 'contain',}} source={require('../../images/Lungs_health.png')} ></Image>
+{/* <ProgressCircle
             percent={Lungs}
             radius={50}
             borderWidth={15}
@@ -256,7 +253,10 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
             bgColor="#FFFFFF"
         >
             <Text style={{ fontSize: responsiveFontSize(2) }}>{Lungs+'%'}</Text>
-        </ProgressCircle>
+        </ProgressCircle> */}
+
+
+
         </View>
         <View style={styles.viewtext}>
             <Text style={styles.pulse}>LUNGS</Text>
@@ -268,7 +268,12 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
          width: responsiveWidth(100),
         }}>
 
-<ProgressCircle
+
+<Image style={{ height: responsiveHeight(20),
+     
+     marginTop: responsiveHeight(0.60),
+     resizeMode: 'contain',}} source={require('../../images/CarbonMonoxide.png')} ></Image>
+{/* <ProgressCircle
             percent={CarbonMonoxideLevel}
             radius={50}
             borderWidth={15}
@@ -277,7 +282,7 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
             bgColor="#FFFFFF"
         >
             <Text style={{ fontSize: responsiveFontSize(2) }}>{CarbonMonoxideLevel+'%'}</Text>
-        </ProgressCircle>
+        </ProgressCircle> */}
         </View>
         <View style={styles.viewtext}>
             <Text style={styles.pulse}>CARBON MONOXIDE LEVEL</Text>
@@ -289,7 +294,13 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
          width: responsiveWidth(100),
        }}>
 
-<ProgressCircle
+         
+ <Image style={{ height: responsiveHeight(20),
+     
+     marginTop: responsiveHeight(0.60),
+     resizeMode: 'contain',}} source={require('../../images/Oxygen.png')} ></Image>
+
+{/* <ProgressCircle
             percent={OxygenLevels}
             radius={50}
             borderWidth={15}
@@ -298,7 +309,7 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
             bgColor="#FFFFFF"
         >
             <Text style={{ fontSize: responsiveFontSize(2) }}>{OxygenLevels+'%'}</Text>
-        </ProgressCircle>
+        </ProgressCircle> */}
         </View>
         <View style={styles.viewtext}>
             <Text style={styles.pulse}>OXYGEN LEVEL</Text>
@@ -326,7 +337,8 @@ alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSel
                 ) : null}
 
             </View>
-            </View>
+          
+            </SafeAreaView>
     );
 }
 }

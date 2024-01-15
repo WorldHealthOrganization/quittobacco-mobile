@@ -6,7 +6,7 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import ToolbarAndroid from '@react-native-community/toolbar-android';
+//import ToolbarAndroid from '@react-native-community/toolbar-android';
 import CardView from 'react-native-cardview';
 
 import {
@@ -14,13 +14,12 @@ import {
   ImageBackground,
   Image,
   Text,
-  Alert,
-  TouchableOpacity,Share,ActivityIndicator
+  TouchableOpacity,Share,ActivityIndicator, SafeAreaView
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
@@ -39,13 +38,13 @@ export default class Money_Saved extends Component {
            profile_image:'',
            fcm:'',
            token:'',
-           per_day:'$0',
-           per_week:'$0',
-           per_month:'$0',
-          moneySaved: '$0',
-          moneySavedPerYear: '$0',
+           per_day:'0',
+           per_week:'0',
+           per_month:'0',
+          moneySaved: '0',
+          moneySavedPerYear: '0',
    //ShareSavedMoneyLink
-   uniqueShareSavedMoneyLink:'https://whotobaccoapp.page.link/6SuK',
+   uniqueShareSavedMoneyLink:'https://tobacco.page.link/Sohr',
         };
     }
 
@@ -96,8 +95,7 @@ getUser = async () => {
 getSavings = async () => {
   const {token} = this.state
   this.setState({isHidden: true})
-    console.log(
-      'Saving response token',token);
+  
     axios
       .post(
         ApiName.savings, {},
@@ -108,14 +106,10 @@ getSavings = async () => {
         },
       )
       .then((response) => {
-        console.log(
-          'Saving response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
 
+        this.setState({isHidden: false})
         if (response.data.status == 200) {
-          // AsyncStorage.setItem('MoneySaved', response.data.data.money.saved);
-          this.setState({isHidden: false})
+         
           this.setState({
             
             per_day:response.data.data.per_day,
@@ -127,15 +121,12 @@ getSavings = async () => {
           })
          
         }
-        else {
-          this.setState({isHidden: false})
-          console.log(response.data.message);
-        }
+        
       })
       .catch((error) => {
         this.setState({isHidden: false})
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
   
@@ -146,14 +137,14 @@ getSavings = async () => {
       if(type == 1){ 
         Share.share(
           {
-            subject: 'WHO Saved Money Link' ,
+            subject: 'Quit Tobacco Saved Money Link' ,
             message: 'My Saved Money '+ moneySaved +' Money spend/year '+moneySavedPerYear +' Click to download the app \n'+uniqueShareSavedMoneyLink,
-            title: 'WHO Saved Money Link',
+            title: 'Quit Tobacco Saved Money Link',
           },
           {
-            dialogTitle: 'WHO Saved Money Link' ,// Android
-            subject: 'WHO Saved Money Link' ,// iOS
-          }).then(success => console.log(success), reason => console.log(reason))
+            dialogTitle: 'Quit Tobacco Saved Money Link' ,// Android
+            subject: 'Quit Tobacco Saved Money Link' ,// iOS
+          }).then(success => console.log("success"), reason => console.log("DeepLink reason"))
   
       }
       
@@ -162,6 +153,7 @@ getSavings = async () => {
 render() {
     const {isHidden,moneySavedPerYear,moneySaved,per_year,per_week,per_month,per_day,uniqueShareSavedMoneyLink} = this.state;
     return (
+      <SafeAreaView style={{flex:1}}>
         <View style={styles.container}>
         <View style={styles.view}>
         <View style={styles.view2}>
@@ -192,12 +184,12 @@ render() {
        </View>
        <Text style={styles.money}>TOTAL MONEY SAVED</Text>
        <Text style={{  color: '#FFFFFF',
-        fontFamily: 'SF-Bold',
+        fontFamily: 'SFCompactDisplay-Semibold',
         fontSize: responsiveFontSize(3.5),
       
        justifyContent:'center',
        alignSelf:'center',margin: responsiveWidth(3),
-        fontWeight: 'bold',}}>{moneySaved}</Text>
+       }}>{moneySaved}</Text>
         </View>
         
         <View style={{ width: '90%', alignSelf: 'center', justifyContent: 'center', flexDirection: 'row',marginTop: blockMargin }}>
@@ -217,7 +209,7 @@ render() {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(16),
                           textAlign: 'left'
                         }}>
@@ -227,7 +219,7 @@ render() {
                         <Text style={{
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(20),
                           textAlign: 'left'
                         }}>
@@ -254,7 +246,7 @@ render() {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(16),
                           textAlign: 'left'
                         }}>
@@ -265,7 +257,7 @@ render() {
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
 
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(20),
                           textAlign: 'left'
                         }}>
@@ -296,7 +288,7 @@ render() {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(16),
                           textAlign: 'left'
                         }}>
@@ -306,7 +298,7 @@ render() {
                         <Text style={{
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(20),
                           textAlign: 'left'
                         }}>
@@ -333,7 +325,7 @@ render() {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(16),
                           textAlign: 'left'
                         }}>
@@ -344,7 +336,7 @@ render() {
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
 
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(20),
                           textAlign: 'left'
                         }}>
@@ -379,6 +371,7 @@ render() {
                   </View>
                 ) : null}
         </View>
+    </SafeAreaView>
     );
 }
 }

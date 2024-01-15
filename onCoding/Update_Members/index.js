@@ -15,23 +15,22 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
-  TextInput,
-  Platform, ActivityIndicator
+  TextInput,Modal,
+  Platform, ActivityIndicator, SafeAreaView, TouchableWithoutFeedback, Keyboard
 } from 'react-native';
-import ImagePicker from 'react-native-image-picker';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+// import ImagePicker from 'react-native-image-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Header } from 'react-navigation-stack';
 import Toast from 'react-native-simple-toast';
 
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive'
-
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default class Update_Members extends Component {
 
@@ -58,7 +57,7 @@ export default class Update_Members extends Component {
       memberImageurl: '',
       memberImage: '',
 
-      memberbase64Image: '',
+      memberbase64Image: null,
 
       member_id: '',
 
@@ -66,12 +65,20 @@ export default class Update_Members extends Component {
       relation: '',
       mobnum: '',
 
+      email: '',
+      emailValid: false,
+      emailEmpty: false,
+      selectedImage: null,
+      isModalVisible: false,
     };
   }
 
 
+  componentWillUnmount() {
+  {  console.log("image====>",this.state.selectedImage)}
+  {  console.log("imageurl====>",this.state.memberImageurl)}
 
-  componentWillUnmount() { }
+   }
 
 
   componentDidMount = () => {
@@ -83,7 +90,7 @@ export default class Update_Members extends Component {
   }
 
   getUser = async () => {
-    const{navigation} = this.props
+    const { navigation } = this.props
     const user_id = await AsyncStorage.getItem('UserId');
     const user_name = await AsyncStorage.getItem('UserName');
     const mobile_no = await AsyncStorage.getItem('UserMobileNo');
@@ -92,7 +99,7 @@ export default class Update_Members extends Component {
     const fcm = await AsyncStorage.getItem('UserFCM');
     const token = await AsyncStorage.getItem('Login_JwtToken');
     const member_id = navigation.getParam('MembersId', 'ID');
-
+console.log("token==3=>", token)
     if (token !== '' && member_id !== '') {
       this.setState({
 
@@ -106,12 +113,13 @@ export default class Update_Members extends Component {
   };
 
   getMemberData = async () => {
-   
-    const { token,member_id } = this.state
+
+    const { token, member_id } = this.state
+    console.log("member id===>", member_id)
     this.setState({ isHidden: true })
     axios
       .post(
-       ApiName.updateMember+member_id+'/show', {},
+        ApiName.updateMember + member_id + '/show', {},
         {
           headers: {
             'Authorization': token,
@@ -119,47 +127,56 @@ export default class Update_Members extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'get Member response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
 
           this.setState({
             name: response.data.data.name,
             relation: response.data.data.relationship,
-            mobnum: response.data.data.mobile,
+            email: response.data.data.email,
             memberImageurl: response.data.data.image
           });
 
-       
           this.setState({ isHidden: false })
         }
         else {
           this.setState({ isHidden: false })
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({ isHidden: false })
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+
       });
   }
 
+
+
+  validate = (text) => {
+
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    if (reg.test(text) === false) {
+      console.log('Email is Not Correct');
+      this.setState({ email: text });
+      return false;
+    } else {
+      this.setState({ email: text });
+      return true;
+    }
+  }
+
+
+
   inputValidation = async () => {
     const {
-     
       name,
       relation,
       mobnum,
-      memberImage,  memberImageurl,numberValidLength, relationValid, numberValid, nameValidLength, nameValid
+      memberImage, numberValidLength, relationValid, numberValid, nameValidLength, nameValid,
+      emailValid, email, memberImageurl,
+      emailEmpty, memberbase64Image
     } = this.state;
-
-   if (name.trim() == '' || relation.trim() == '' || mobnum.trim() == '') {
+console.log("member image==>",JSON.stringify (memberbase64Image))
+    if (name.trim() == '' || relation.trim() == '' || email.trim() == '') {
 
       if (name.trim() != '') {
         if (name.length > 0) {
@@ -181,57 +198,59 @@ export default class Update_Members extends Component {
       if (relation.trim() == '') {
         this.setState({ relationValid: true })
       }
-      if (mobnum.trim() != '') {
-        if (mobnum.length > 0) {
-          this.setState({ numberValid: false })
-          if (mobnum.length >= 8) {
-            this.setState({ numberValidLength: false })
-          } else {
-            this.setState({ numberValidLength: true })
-          }
-        } else {
-          this.setState({ numberValid: true })
+
+
+      if (email.trim() != '') {
+        if (this.validate(email)) {
+          this.setState({ emailValid: false });
         }
+        else {
+
+          this.setState({ emailValid: true });
+
+        }
+
       } else {
 
-        this.setState({ numberValid: true })
+        this.setState({ emailEmpty: true })
+        this.setState({ emailValid: false });
 
       }
 
     } else {
       if (numberValidLength || relationValid || numberValid || nameValidLength || nameValid) {
         Toast.show('Please enter the mandatory field');
-      } else{
-    
-        if( memberImageurl.trim() != ''){
+      } else {
+
+        if (memberbase64Image == '') {
           this.addMemberData();
-        }else if(memberImage.trim() == '' || memberImage.trim() == null){
-            Toast.show('Please select a Image')
-        }else{
+        }
+        else {
           this.addMemberDataWithImage();
         }
-        
+
       }
+
     }
 
   }
 
+  
 
   addMemberData = async () => {
 
-    const { name, relation, mobnum, memberbase64Image, token,member_id } = this.state;
+    const { name, relation, mobnum, memberbase64Image, email, token, member_id } = this.state;
     this.setState({ isHidden: true });
-    console.log('input ==> ' + token + ' ' + name + ' ' + relation + ' ' + mobnum +   ApiName.updateMember+member_id+'/update');
+
+
 
     axios
       .post(
-        ApiName.updateMember+member_id+'/update',
+        ApiName.updateMember + member_id + '/update',
         {
           name: name,
           relationship: relation,
-          mobile: mobnum,
-          image: '',
-
+          email: email,
         },
         {
           headers: {
@@ -240,48 +259,46 @@ export default class Update_Members extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Update without Image Member response ',
-          JSON.stringify(response.data),
-        );
 
-        // Toast.show(response.data.message);
-
+        this.setState({ isHidden: false });
         if (response.data.status == 200) {
-          this.setState({ isHidden: false });
+
           Toast.show(response.data.message)
+
           this.props.navigation.goBack();
         }
         else {
-          console.log(response.data.message);
+          Toast.show(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({ isHidden: false });
+        console.log(error)
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+
       });
   }
 
 
 
-  
+
   addMemberDataWithImage = async () => {
-
-    const { name, relation, mobnum, memberbase64Image, token,member_id } = this.state;
+    console.log("update member url  "+ ApiName.updateMember + member_id + '/update')
+    console.log("member id",member_id)
+    console.log("member base64",memberbase64Image)
+    console.log()
+    const { name, relation, mobnum, email, memberbase64Image, token, member_id } = this.state;
     this.setState({ isHidden: true });
-    console.log('Image ==> ' + JSON.stringify(this.state.memberImage) + ' -- ' + this.state.memberbase64Image);
 
-    console.log('input with image==> ' + token + ' ' + name + ' ' + relation + ' ' + mobnum +   ApiName.updateMember+member_id+'/update');
 
     axios
       .post(
-        ApiName.updateMember+member_id+'/update',
+        ApiName.updateMember + member_id + '/update',
         {
           name: name,
           relationship: relation,
-          mobile: mobnum,
-          image: 'data:image/jpeg;base64, ' + memberbase64Image,
+          email: email,
+          image: memberbase64Image != '' ? 'data:image/jpeg;base64, ' + memberbase64Image : '',
 
         },
         {
@@ -291,26 +308,22 @@ export default class Update_Members extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Updated Member response ',
-          JSON.stringify(response.data),
-        );
 
-        // Toast.show(response.data.message);
-
+        console.log("update url :" + ApiName.updateMember + member_id + '/update')
+        console.log("updated data :")
+        this.setState({ isHidden: false });
         if (response.data.status == 200) {
-          this.setState({ isHidden: false });
           Toast.show(response.data.message)
           this.props.navigation.goBack();
         }
         else {
-          console.log(response.data.message);
+          Toast.show(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({ isHidden: false });
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+
       });
   }
 
@@ -345,246 +358,442 @@ export default class Update_Members extends Component {
 
 
 
-  chooseFile = () => {
-    
+  // chooseFile = () => {
+  //   this.permissionChk();
+  //   ImagePicker.openPicker({
+  //     cropping: true,
+  //     includeBase64:true,
+  //     freeStyleCropEnabled: true,
+  //     mediaType: 'photo',
+  //   })
+  //     .then(image => {
+  //       // Set the selected image and base64 representation in the state
+  //       this.setState(
+  //         {
+  //           memberImage: image.path,
+  //           memberbase64Image: image.data,
+  //         },
+  //         () => {
+  //           console.log('Selected Image Path:', this.state.memberImage);
+  //           console.log('Base64 Image:', this.state.memberbase64Image);
+  //         }
+  //       );
+  //     })
+  //     .catch(error => {
+  //       console.log('ImagePicker Error: ', error);
+  //     });
+  // };
+
+  toggleModal = () => {
+    this.setState({ isModalVisible: !this.state.isModalVisible });
+  };
+  selectFromGallery = () => {
     this.permissionChk();
-    var options = {
-      title: 'Select Image',
-      noData: true,
-      allowsEditing: true,
-      storageOptions: {
-        skipBackup: true,
-        path: 'images',
-      },
-    };
-    ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      }
-      else {
-        // let source = response;
-        console.log('filePath ==> ' + JSON.stringify(response.path));
-
+    ImagePicker.openPicker({
+      cropping: true,
+      includeBase64: true,
+      freeStyleCropEnabled: true,
+      mediaType: 'photo',
+    })
+      .then(image => {
         this.setState({
-          memberImageurl:'',
-          memberImage: response.uri,
+          memberImage: image.path,
+          memberbase64Image: image.data,
+        },
+        () => {
+          console.log('Selected Image Path:', this.state.memberImage);
+          console.log('Base64 Image:', this.state.memberbase64Image);
+    this.toggleModal();
+
+        }
+        );
+      })
+      .catch(error => {
+        console.log('ImagePicker Error: ', error);
+      });
+  };
+
+  takePhoto = () => {
+    this.permissionChk();
+    ImagePicker.openCamera({
+      cropping: true,
+      includeBase64: true,
+      freeStyleCropEnabled: true,
+      mediaType: 'photo',
+    })
+      .then(image => {
+        this.setState({
+          memberImage: image.path,
+          memberbase64Image: image.data,
         });
+    this.toggleModal();
 
-        ImgToBase64.getBase64String(response.uri)
-          .then((base64String) => {
-            console.log('memberImage ==> ' + base64String)
-            this.setState({
-              memberbase64Image: base64String,
-            });
-          }
-          )
-          // eslint-disable-next-line no-undef
-          .catch((err) => doSomethingWith(err));
+      })
+      .catch(error => {
+        console.log('ImagePicker Error: ', error);
+      });
+  };
 
-        // alert(this.state.wishImage);
-        console.log('memberImage ==> ' + JSON.stringify(this.state.memberImage) + ' -- ' + this.state.memberbase64Image);
-      }
-    });
+  
+
+  getExtensionFormat = (filename) => {
+
+    if (filename.split('.').pop() === 'png' || filename.split('.').pop() === 'jpg' || filename.split('.').pop() === 'jpeg') {
+      return false
+    }
+    return true
   };
 
   render() {
-    const { isHidden, nameValid, relationValid, numberValid, nameValidLength, numberValidLength } = this.state;
+    const { isHidden, nameValid, relationValid, numberValid, nameValidLength, numberValidLength, email, emailEmpty, emailValid } = this.state;
+    const { memberImage, isModalVisible } = this.state;
+
     return (
-      <View style={styles.container}>
-        <View style={styles.view}>
-          <View style={styles.view2}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.view}>
             <View style={{
-              flexDirection: 'row', width: '100%', marginTop: responsiveHeight(2),
+              flexDirection: 'row', width: '100%', height: '12%',
+              backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center'
             }}>
-              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                <Image style={styles.arrow} source={require('../../images/back_arrow.png')} />
-              </TouchableOpacity>
-              <Text style={styles.text_prg}>Edit Members</Text>
-              {/* <Image style={styles.share_img2} source={require('../../images/share.png')}/> */}
+              <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', alignContent: 'center', alignSelf: 'center', }}>
+
+                <TouchableOpacity style={{
+
+                  alignItems: 'center',
+                }} onPress={() => this.props.navigation.goBack()}>
+
+                  <Image style={{
+                    width: responsiveWidth(3),
+                    height: responsiveHeight(4),
+
+                    resizeMode: 'contain'
+                  }} source={require('../../images/back_arrow.png')} />
+
+                </TouchableOpacity>
+
+              </View>
+              <View style={{ width: '76%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{
+                  color: '#FFFFFF',
+                  fontFamily: 'SFCompactDisplay-Medium',
+                  fontSize: scalable(18),
+                  justifyContent: 'center',
+                  textAlign: 'center',
+
+                }}>Supporters</Text>
+              </View>
+              <View style={{ width: '12%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center', marginRight: blockMarginHalf }}>
+
+
+                <Image style={{
+                  width: 0,
+                  height: 0,
+                  tintColor: '#fff',
+                  resizeMode: 'contain'
+                }} source={require('../../images/share.png')} />
+
+
+              </View>
             </View>
 
-            <View style={{flex: 1, marginTop: responsiveHeight(35)}}>
-         {this.state.memberImage != ''  ?
+        <View style={{ height: '35%', width: '100%' }}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+
+            <View style={styles.view2}>
+
+              <View style={{ marginTop: 0,  }}>
+                {this.state.memberImage != '' ?
 
 
-       <View style={styles.square}>
-                <TouchableOpacity style={styles.square2} onPress={this.chooseFile.bind(this)}>
+                  <View style={styles.square}>
+                    <TouchableOpacity style={styles.square2} onPress={this.toggleModal}>
+                     <Image source={{ uri: this.state.memberImage }} style={styles.img} />
 
-             <Image  source={{ uri: this.state.memberImage, cache: 'force-cache' }} style={styles.img} />
-             </TouchableOpacity>
-       </View>
+                      {/* <Image source={{ uri: this.state.memberImage, cache: 'force-cache' }} style={styles.img} /> */}
+                    </TouchableOpacity>
+                  </View>
 
-       : this.state.memberImageurl != '' ?
+                  : this.state.memberImageurl != '' ?
 
-       <View style={styles.square}>
-       <TouchableOpacity style={styles.square2} onPress={this.chooseFile.bind(this)}>
+                    <View style={styles.square}>
+                      <TouchableOpacity style={styles.square2} onPress={this.toggleModal}>
 
-    <Image  source={{ uri: 'http://whoapp.dci.in/uploads/files/' + this.state.memberImageurl, cache: 'force-cache' }} style={styles.img} />
-    </TouchableOpacity>
-</View> :  <View style={styles.square}>
-
-<TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
-     <Text style={styles.text_fab}>+</Text>
-   </TouchableOpacity>
-   <Text style={styles.text}>TAP TO ADD IMAGE</Text>
-</View>
+                        <Image source={this.state.memberImageurl === '' || this.state.memberImageurl === null || this.getExtensionFormat(this.state.memberImageurl)
+                          ? require('../../images/placeholder.png')
+                          : { uri: ApiName.baseLink + this.state.memberImageurl, cache: 'force-cache' }} style={styles.img} />
+                      </TouchableOpacity>
+                    </View> :
 
 
-    }
+            <View style={styles.square}>
+              <TouchableOpacity style={{ marginBottom: 0 }} onPress={this.toggleModal}>
+                <View style={{
+                  width: 50,
+                  height: 50,
+                  borderStyle: 'dotted',
+                  borderRadius: 100 / 2,
+                  backgroundColor: '#0072bb',
+                  opacity: 100,
+                  borderWidth: 2,
+                  borderColor: '#FFFFFF',
+                  margin: blockMarginHalf, justifyContent: 'center', alignSelf: 'center'
+                }}>
+                  <Image
 
-       </View>
+                    resizeMode='contain'
+                    tintColor={'#FFFFFF'}
+                    source={require('../../images/add.png')}
+                    style={{
+                      width: 15,
+                      height: 15,
+                      resizeMode: 'contain',
+                      justifyContent: 'center',
+                      alignSelf: 'center',
+                      borderRadius: 100 / 2,
+                      tintColor: '#FFFFFF'
+                    }}
+                  />
+                </View>
+              </TouchableOpacity>
+              {/* <TouchableOpacity style={styles.fab} onPress={this.chooseFile.bind(this)}>
+        <Text style={styles.text_fab}>+</Text>
+      </TouchableOpacity> */}
+              <Text style={styles.text}>TAP TO ADD IMAGE</Text>
+            </View>
 
-          </View>
-          <View style={styles.view1}>
-            <TextInput style={styles.text2}
-              placeholder="Name"
-              placeholderTextColor="#B6C0CB"
-              autoCorrect={false}
-              returnKeyType="next"
-              underlineColorAndroid="#B6C0CB"
-              onChangeText={(name) => {
-                this.setState({ name })
-                if (name.trim() != '') {
-                  if (name.length > 0) {
-                    this.setState({ nameValid: false })
-                    if (name.length >= 3) {
-                      this.setState({ nameValidLength: false })
-                    } else {
-                      this.setState({ nameValidLength: true })
-                    }
-                  } else {
-                    this.setState({ nameValid: true })
-                  }
-                } else {
-
-                  this.setState({ nameValid: true })
-                  this.setState({ nameValidLength: false })
-
-                }
-              }} value={this.state.name}
-              onSubmitEditing={() => this.relation.focus()}
-            />
-            {nameValid && <Text style={{
-              color: 'red', textAlign: 'left',
-
-              fontFamily: 'SF-Medium',
-              fontSize: scalable(9)
-            }}>Please Enter the name</Text>}
-            {nameValidLength && <Text style={{
-              color: 'red', textAlign: 'left',
-
-              fontFamily: 'SF-Medium',
-              fontSize: scalable(9),
-            }}>Please Enter atleast 3 characters</Text>}
-
-            <TextInput style={styles.text2}
-              ref={(input) => this.relation = input}
-              placeholder="Relation"
-              placeholderTextColor="#B6C0CB"
-              autoCorrect={false}
-              returnKeyType="next"
-              underlineColorAndroid="#B6C0CB"
-              onChangeText={(relation) => {
-                this.setState({ relation })
-                if (relation.trim() != '') {
-
-                  this.setState({ relationValid: false })
-
-                } else {
-
-                  this.setState({ relationValid: true })
 
                 }
 
-              }
-              } value={this.state.relation}
-              onSubmitEditing={() => this.mobnum.focus()}
-            />
-            {relationValid && <Text style={{
-              color: 'red', textAlign: 'left',
+              </View>
 
-              fontFamily: 'SF-Medium',
-              fontSize: scalable(9),
-            }}>Please Enter the Relationship</Text>}
-            <TextInput style={styles.text2}
-              ref={(input) => this.mobnum = input}
-              placeholder="Mobile Number"
-              keyboardType="numeric"
-              placeholderTextColor="#B6C0CB"
-              autoCorrect={false}
-              returnKeyType="done"
-              underlineColorAndroid="#B6C0CB"
-              onChangeText={(mobnum) => {
-                this.setState({ mobnum })
-                if (mobnum.trim() != '') {
-                  if (mobnum.length > 0) {
-                    this.setState({ numberValid: false })
-                    if (mobnum.length >= 8) {
-                      this.setState({ numberValidLength: false })
-                    } else {
-                      this.setState({ numberValidLength: true })
-                    }
-                  } else {
-                    this.setState({ numberValid: true })
-                  }
-                } else {
-
-
-                  this.setState({ numberValid: true })
-                  this.setState({ numberValidLength: false })
-
-                }
-              }
-
-              } value={this.state.mobnum}
-            />
-            {numberValid && <Text style={{
-              color: 'red', textAlign: 'left',
-
-              fontFamily: 'SF-Medium',
-              fontSize: scalable(9),
-            }}>Please Enter the Mobile Number</Text>}
-            {numberValidLength && <Text style={{
-              color: 'red', textAlign: 'left',
-
-              fontFamily: 'SF-Medium',
-              fontSize: scalable(9),
-            }}>Please Enter valid number</Text>}
-          </View>
-
-
-          <View style={{ flex: 0.5 }}>
-            <TouchableOpacity
-              style={[styles.buttonContainer, styles.confirmbutton]}
-              onPress={() => this.inputValidation()}>
-              <Text style={styles.confirmtext}>Update</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
 
-        {isHidden ? (
-          <View style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            justifyContent: 'center',
-            alignContent: 'center',
-            alignSelf: 'center',
-            backgroundColor:'transparent'
-          }}>
-            <ActivityIndicator
-              size={40}
-              color="#0072bb"
-              animating={true}
-              backgroundColor={'transparent'}
-            />
+        <Modal visible={isModalVisible} animationType="slide" transparent>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity style={styles.modalButton} onPress={this.selectFromGallery}>
+              <Text style={styles.modalButtonText}>Select from Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={this.takePhoto}>
+              <Text style={styles.modalButtonText}>Take Photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={this.toggleModal}>
+              <Text style={styles.modalButtonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
-        ) : null}
-      </View>
+        </Modal>
+
+            <KeyboardAwareScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ flexGrow: 1, }}
+            >
+
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <View style={{ flexDirection: 'column' }}>
+
+                  <View style={styles.view1}>
+                    <TextInput style={styles.text2}
+                      placeholder="Name"
+                      placeholderTextColor="#B6C0CB"
+                      keyboardType={Platform.OS === 'android' ? 'email-address' : 'ascii-capable'}
+                      returnKeyType="next"
+                      underlineColorAndroid="transparent"
+                      onChangeText={(name) => {
+                        this.setState({ name })
+                        if (name.trim() != '') {
+                          if (name.length > 0) {
+                            this.setState({ nameValid: false })
+                            if (name.length >= 3) {
+                              this.setState({ nameValidLength: false })
+                            } else {
+                              this.setState({ nameValidLength: true })
+                            }
+                          } else {
+                            this.setState({ nameValid: true })
+                          }
+                        } else {
+
+                          this.setState({ nameValid: true })
+                          this.setState({ nameValidLength: false })
+
+                        }
+                      }} value={this.state.name}
+                      onSubmitEditing={() => this.relation.focus()}
+                    />
+
+                    <View style={{
+                      borderBottomWidth: responsiveWidth(0.30),
+                      marginTop: responsiveHeight(0),
+                      borderBottomColor: '#B6C0CB',
+                      width: '100%',
+                    }} />
+
+
+                    {nameValid && <Text style={{
+                      color: 'red', textAlign: 'left',
+
+                      fontFamily: 'SFCompactDisplay-Medium',
+                      fontSize: scalable(9)
+                    }}>Please Enter the name</Text>}
+                    {nameValidLength && <Text style={{
+                      color: 'red', textAlign: 'left',
+
+                      fontFamily: 'SFCompactDisplay-Medium',
+                      fontSize: scalable(9),
+                    }}>Please Enter atleast 3 characters</Text>}
+
+                    <TextInput style={styles.text2}
+                      ref={(input) => this.relation = input}
+                      placeholder="Relation"
+                      placeholderTextColor="#B6C0CB"
+                      keyboardType={Platform.OS === 'android' ? 'email-address' : 'ascii-capable'}
+                      returnKeyType="next"
+                      underlineColorAndroid="transparent"
+                      onChangeText={(relation) => {
+                        this.setState({ relation })
+                        if (relation.trim() != '') {
+
+                          this.setState({ relationValid: false })
+
+                        } else {
+
+                          this.setState({ relationValid: true })
+
+                        }
+
+                      }
+                      } value={this.state.relation}
+                      onSubmitEditing={() => this.mobnum.focus()}
+                    />
+
+                    <View style={{
+                      borderBottomWidth: responsiveWidth(0.30),
+                      marginTop: responsiveHeight(0),
+                      borderBottomColor: '#B6C0CB',
+                      width: '100%',
+                    }} />
+
+
+                    {relationValid && <Text style={{
+                      color: 'red', textAlign: 'left',
+
+                      fontFamily: 'SFCompactDisplay-Medium',
+                      fontSize: scalable(9),
+                    }}>Please Enter the Relationship</Text>}
+
+
+
+                    <TextInput style={styles.text2}
+                      ref={(input) => this.mobnum = input}
+                      placeholder="Email"
+                      keyboardType={Platform.OS === 'android' ? 'email-address' : 'ascii-capable'}
+                      placeholderTextColor="#B6C0CB"
+
+                      returnKeyType="done"
+                      underlineColorAndroid="transparent"
+                      // onChangeText={(mobnum) => {
+                      //   this.setState({ mobnum })
+                      //   if (mobnum.trim() != '') {
+                      //     if (mobnum.length > 0) {
+                      //       this.setState({ numberValid: false })
+                      //       if (mobnum.length >= 8) {
+                      //         this.setState({ numberValidLength: false })
+                      //       } else {
+                      //         this.setState({ numberValidLength: true })
+                      //       }
+                      //     } else {
+                      //       this.setState({ numberValid: true })
+                      //     }
+                      //   } else {
+
+
+                      //     this.setState({ numberValid: true })
+                      //     this.setState({ numberValidLength: false })
+
+                      //   }
+                      // }
+
+                      // } 
+
+                      onChangeText={(email) => {
+                        this.setState({ email })
+                        if (email.trim() != '') {
+                          if (this.validate(email)) {
+                            this.setState({ emailValid: false });
+                          } else {
+                            this.setState({ emailValid: true });
+                            this.setState({ emailEmpty: false });
+                          }
+                        } else {
+
+                          this.setState({ emailEmpty: false });
+                          this.setState({ emailValid: true });
+
+                        }
+                      }}
+
+
+                      value={this.state.email}
+                    />
+
+                    <View style={{
+                      borderBottomWidth: responsiveWidth(0.30),
+                      marginTop: responsiveHeight(0),
+                      borderBottomColor: '#B6C0CB',
+                      width: '100%',
+                    }} />
+
+
+                    {emailEmpty && <Text style={{
+                      color: 'red', textAlign: 'left',
+                      marginTop: blockMarginHalf,
+                      fontFamily: 'SFCompactDisplay-Medium',
+                      fontSize: scalable(9)
+                    }}>Please Enter the email</Text>}
+                    {emailValid && <Text style={{
+                      color: 'red', textAlign: 'left',
+                      marginTop: blockMarginHalf,
+                      fontFamily: 'SFCompactDisplay-Medium',
+                      fontSize: scalable(12)
+                    }}>Please Enter Valid email</Text>}
+                  </View>
+
+
+                  <View style={{ flex: 0.5 }}>
+                    <TouchableOpacity
+                      style={[styles.buttonContainer, styles.confirmbutton]}
+                      onPress={() => this.inputValidation()}>
+                      <Text style={styles.confirmtext}>Update</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                </View>
+              </TouchableWithoutFeedback>
+            </KeyboardAwareScrollView>
+          </View>
+
+          {isHidden ? (
+            <View style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignSelf: 'center',
+              backgroundColor: 'transparent'
+            }}>
+              <ActivityIndicator
+                size={40}
+                color="#0072bb"
+                animating={true}
+                backgroundColor={'transparent'}
+              />
+            </View>
+          ) : null}
+        </View>
+      </SafeAreaView>
     );
   }
 

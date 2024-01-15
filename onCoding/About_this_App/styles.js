@@ -35,7 +35,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         marginLeft: responsiveWidth(16),
@@ -43,7 +43,7 @@ export default StyleSheet.create({
       },
     text:{
       color: '#202020',
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: responsiveFontSize(2.25),
       marginTop: blockMarginHalf * 3,
       marginLeft: blockMarginHalf * 3,
@@ -52,12 +52,14 @@ export default StyleSheet.create({
     },
     text2:{
         color: '#0072BB',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.25),
         marginTop: blockMarginHalf * 3,
         marginLeft: blockMarginHalf * 3,
         lineHeight: deviceHeight / 20,
         // marginRight: responsiveWidth(3),
+
+        width:'80%',
       },
       buttonContainer: {
         height: responsiveHeight(4),
@@ -74,9 +76,9 @@ export default StyleSheet.create({
   },
   submittext: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
-    fontSize: scalable(14),
-    fontWeight: 'bold',
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: scalable(13),marginTop:blockMarginHalf/2,marginBottom:blockMarginHalf/2,marginLeft: blockMargin,marginRight: blockMargin
+    
   },
 
   img: {
@@ -91,10 +93,10 @@ export default StyleSheet.create({
   },
   img2: {
     resizeMode: 'contain',
-    marginLeft: blockMargin * 14,
-    marginTop: blockMarginHalf * 4.5,
-    height: 15,
-    width: 12,
+    marginTop: responsiveHeight(4),
+    alignItems:'flex-end',
+    width:18,
+    height:18,
   },
   img3: {
     resizeMode: 'contain',

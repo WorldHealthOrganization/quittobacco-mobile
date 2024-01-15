@@ -22,7 +22,7 @@ export default StyleSheet.create({
   },
   text_prg: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2.5),
     marginTop: responsiveHeight(1),
     marginLeft: responsiveWidth(34),
@@ -36,7 +36,8 @@ export default StyleSheet.create({
   },
   cardview: {
     backgroundColor: '#CBE2F1',
-    marginTop: responsiveHeight(2),
+    marginTop: responsiveHeight(1),
+    marginBottom: responsiveHeight(1),
     marginLeft: responsiveWidth(5.5),
     width: responsiveWidth(90),
   },
@@ -59,13 +60,12 @@ export default StyleSheet.create({
     padding: 0,
     margin: 10,
     color: '#0072BB',
-    fontFamily: 'SF-Bold',
     marginLeft: responsiveWidth(3),
   },
   card_text2: {
     color: '#202020',
     fontSize: responsiveFontSize(2),
-    fontFamily: 'SF-Regular',
+    fontFamily: 'SFCompactDisplay-Regular',
     marginLeft: responsiveWidth(3),
     marginTop: responsiveHeight(0),
     width: responsiveWidth(50),
@@ -73,10 +73,10 @@ export default StyleSheet.create({
   card_text3: {
     color: '#202020',
     fontSize: responsiveFontSize(2),
-    fontFamily: 'SF-Bold',
+    fontFamily: 'SFCompactDisplay-Bold',
     marginLeft: responsiveWidth(3),
     marginTop: responsiveHeight(1),
-    fontWeight: 'bold',
+   
   },
   square: {
     width: responsiveWidth(22),
@@ -111,7 +111,7 @@ export default StyleSheet.create({
   },
   loginText: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   container2: {

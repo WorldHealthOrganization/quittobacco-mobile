@@ -11,10 +11,9 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   TouchableOpacity,
-  ActivityIndicator,
-  Alert,
+  ActivityIndicator,SafeAreaView,Keyboard,TouchableWithoutFeedback
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+
 import {
   responsiveHeight,
   responsiveWidth,
@@ -23,13 +22,16 @@ import {
 import { Header } from 'react-navigation-stack';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import CountryPicker from 'react-native-country-picker-modal';
 import Toast from 'react-native-simple-toast';
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 import Change_pwd from '../Change_pwd/Change_pwd';
 import OTP_Verification from '../OTP/OTP_Verification';
+
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { blockMargin,blockMarginHalf } from '../ui/common/responsive';
 
  export default class forgot_pwd extends Component {
   constructor(props) {
@@ -68,12 +70,7 @@ import OTP_Verification from '../OTP/OTP_Verification';
             },
           )
           .then((response) => {
-            console.log(
-              'forgot response ',
-              'response get details:==> ' + JSON.stringify(response.data),
-            );
-            // Toast.show(response.data.message);
-            
+          
           this.setState({isHidden: false});
  
             if (response.data.status == 200) {
@@ -92,9 +89,12 @@ import OTP_Verification from '../OTP/OTP_Verification';
     
              
               this.setState({isHidden: false});
-this.props.navigation.navigate('OTP_Verification',{
-              UserId:  response.data.id+'', MobileNumber: mobile+'', CountryCode: country_code+''
-          });
+              this.props.navigation.navigate('Change_pwd',{UserId:  response.data.data+''});
+
+      
+// this.props.navigation.navigate('OTP_Verification',{
+//               UserId:  response.data.id+'', MobileNumber: mobile+'', CountryCode: country_code+''
+//           });
           Toast.show(response.data.message);
             }
             else if (response.data.status == 400) {
@@ -110,7 +110,7 @@ this.props.navigation.navigate('OTP_Verification',{
           })
           .catch((error) => {
             Toast.show('There was some error. Please try again')
-            console.log('reactNativeDemo axios error:', error);
+           
             this.setState({isHidden: false});
           });
       } else {
@@ -125,30 +125,38 @@ this.props.navigation.navigate('OTP_Verification',{
   render() {
 
     return (
+      <SafeAreaView style={{flex: 1}}>
       <View style={styles.container}>
+
         <View style={styles.view}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ImageBackground
             source={require('../../images/shape.png')}
-            style={{width: responsiveWidth(100), height: responsiveHeight(36)}}>
+            style={{width: responsiveWidth(100), height: responsiveHeight(42)}}>
               <TouchableOpacity onPress={() => this.props.navigation.navigate('Login')}>
-              <Image source={require('../../images/back_arrow.png')} style={styles.back_arrow}/>
+              <Image source={require('../../images/back_arrow.png')} resizeMode={'contain'} style={styles.back_arrow}/>
               </TouchableOpacity>
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
               <Text style={styles.pwd}>Forgot Password</Text>
+              </TouchableWithoutFeedback>
           </ImageBackground>
-
-<ScrollView style={styles.scrollview}>
-<KeyboardAvoidingView
-  keyboardVerticalOffset = {Header.HEIGHT + 68} // adjust the value here if you need more padding
-  style = {{ flex: 1 }}
+          </TouchableWithoutFeedback>
+{/* <KeyboardAvoidingView
+  keyboardVerticalOffset = {Header.HEIGHT + 0} // adjust the value here if you need more padding
+  style = {{ flex: 1.5 }}
   behavior = "padding" >
-        <View style={styles.view1}>
+<ScrollView style={styles.scrollview}> */}
+  <KeyboardAwareScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
+<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.view1}> 
           <Text style={styles.text}>
-             Enter your registered mobile number to reset {'\n'}the password. we
-            will send you a 6-digit code to {'\n'}reset the password
+             Enter your registered mobile number to reset the password.
           </Text>
           <Text style={styles.text2}>Phone Number</Text>
           <View
-                  style={{flexDirection: 'row', flex: 1}}>
+                  style={{flexDirection: 'row', flex: 1,justifyContent:'center',alignItems:'center'}}>
           <View style={styles.textBackground3}>
                     <TouchableOpacity
                       onPress={() => this.setState({visible: true})}
@@ -156,7 +164,7 @@ this.props.navigation.navigate('OTP_Verification',{
                         flex: 1,
                         flexDirection: 'row',
                         marginStart: responsiveWidth(1),
-                        marginTop:responsiveHeight(1),
+                        
                       }}>
           <CountryPicker style={{marginTop: responsiveHeight(0)}}
                         // containerButtonStyle={{fontFamily: 'Prompt-Regular'}}
@@ -168,7 +176,7 @@ this.props.navigation.navigate('OTP_Verification',{
                         onClose={() => this.setState({visible: false})}
                         visible={this.state.visible}
                         theme={{
-                          fontFamily: 'SF-Regular',
+                          fontFamily: 'SFCompactDisplay-Regular',
                         }}
                         placeholder={''}
                         onSelect={(country) => {
@@ -186,10 +194,10 @@ this.props.navigation.navigate('OTP_Verification',{
                       />
                        <Text
                         style={{
-                          marginLeft: responsiveWidth(4),
+                          marginLeft: responsiveWidth(5),
                           // alignSelf: 'center',
-                          marginTop: responsiveHeight(0),
-                          // fontFamily: 'Lato-Regular',
+                          justifyContent:'center',alignSelf:'center',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                           color: '#131313',
                         }}>
@@ -201,7 +209,8 @@ this.props.navigation.navigate('OTP_Verification',{
           <TextInput
                     style={styles.textBackground4}
                     keyboardType="numeric"
-                    placeholder="Mobile Number"
+                    placeholder="Phone Number"
+                    placeholderTextColor='#B6C0CB'
                     onChangeText={(value) => this.setState({mobile: value})}
                     value={this.state.mobile}
                     underlineColorAndroid="transparent"
@@ -218,16 +227,27 @@ this.props.navigation.navigate('OTP_Verification',{
               flex: 1,
               width: '100%',
               flexDirection: 'row',
-              marginLeft: responsiveWidth(32),
-              marginTop: responsiveHeight(4),
+             justifyContent:'center',
+              marginTop: blockMargin * 2,
+            marginBottom: blockMargin * 1.5
             }}>
             <Text style={styles.newuser}>New User?</Text>
             <Text style={styles.signup} onPress={() => this.props.navigation.navigate('CreateAccount')}>Signup</Text>
           </View>
+        
         </View>
-        </KeyboardAvoidingView>
-        </ScrollView>
+       </TouchableWithoutFeedback>
+       {/* </ScrollView>
+        </KeyboardAvoidingView> */}
+        </KeyboardAwareScrollView>
+        
+        {Platform.OS == 'ios' && <View style={{height:blockMarginHalf,
+    backgroundColor: '#FFFFFF',
+    alignItems:'center'}}></View> } 
+
+        
         </View>
+    
         {this.state.isHidden ? (
             <View style={styles.box2}>
               <ActivityIndicator
@@ -239,6 +259,7 @@ this.props.navigation.navigate('OTP_Verification',{
             </View>
           ) : null}
       </View>
+    </SafeAreaView>
     );
   }
 }

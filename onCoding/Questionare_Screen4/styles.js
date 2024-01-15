@@ -5,20 +5,22 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMargin } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height:'100%',
+        width: '100%'
       },
       view: {
         flex:1,
+        width:'100%',
         backgroundColor: '#FFFFFF',
       },
       view1: {
-        flex:0.55,
-        backgroundColor: '#FFFFFF',
+        flex:1,
+        backgroundColor: '#FFFFFF',marginTop: blockMargin
       },
       view2: {
         backgroundColor: '#FFFFFF',
@@ -26,16 +28,16 @@ export default StyleSheet.create({
         alignItems:'center',
       },
       view3:{
-        flex:0.40,
-        backgroundColor: '#FFFFFF',
+       marginBottom:blockMargin *2,
+        alignSelf:'center',
+        justifyContent:'center',
+        backgroundColor: '#FFFFFF',alignSelf:'center',alignItems:'center',justifyContent:'center'
       },
       view4: {
-        marginTop: responsiveHeight(0),
         borderBottomWidth: responsiveWidth(0.22),
+        marginTop: responsiveHeight(0),
         borderBottomColor: '#B6C0CB',
-        width: responsiveWidth(85),
-        marginLeft: responsiveWidth(6),
-
+        width: responsiveWidth(90),justifyContent:'center',alignSelf:'center'
       },
       containerToolbar: {
         justifyContent: 'center',
@@ -50,17 +52,17 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         marginLeft: responsiveWidth(37.5),
         marginTop: responsiveHeight(1.75),
       },
       content: {
-         marginLeft: responsiveWidth(6.5),
+         width:'90%',
          color: '#B6C0CB',
          marginTop:responsiveHeight(1),
-         fontFamily: 'SF-Regular',
+         fontFamily: 'SFCompactDisplay-Semibold',alignSelf:'center',justifyContent:'center',marginBottom:7
       },
       textStyle:{
         margin: responsiveWidth(6),
@@ -77,8 +79,8 @@ export default StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: responsiveHeight(2),
-    marginLeft: responsiveHeight(0),
-    width: responsiveWidth(70),
+  
+    width: responsiveWidth(60),
     borderRadius: 30,
   },
   contbutton: {
@@ -86,7 +88,7 @@ export default StyleSheet.create({
   },
   nexttext: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
   },
   pickerStyle1:{

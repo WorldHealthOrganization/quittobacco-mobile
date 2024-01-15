@@ -1,25 +1,46 @@
-import React, { Component } from 'react';
-import { View, Text, Image, TouchableHighlight, TouchableOpacity, ActivityIndicator, FlatList, ScrollView } from 'react-native';
+import React, {Component} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableHighlight,
+  TouchableOpacity,
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  SafeAreaView,
+  AppState,
+} from 'react-native';
 
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   responsiveHeight,
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
 
-import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../../ui/common/responsive';
-import { Container, Tab, Tabs } from 'native-base';
+import {
+  scalable,
+  deviceWidth,
+  deviceHeight,
+  itemRadius,
+  itemRadiusHalf,
+  blockMarginHalf,
+  blockMargin,
+  blockPadding,
+  blockPaddingHalf,
+} from '../../ui/common/responsive';
+import {Container, Tab, Tabs} from 'native-base';
 
-import Craving_Graphs from '../Analyse_Craving/CravingTabs/Craving_Graphs'
-import Craving_List from '../Analyse_Craving/CravingTabs/Craving_List'
-import Craving_Triggers from '../Analyse_Craving/CravingTabs/Craving_Triggers'
-import { borderRadius } from 'react-select/src/theme';
+import Craving_Graphs from '../Analyse_Craving/CravingTabs/Craving_Graphs';
+import Craving_List from '../Analyse_Craving/CravingTabs/Craving_List';
+import Craving_Triggers from '../Analyse_Craving/CravingTabs/Craving_Triggers';
+
 import PureChart from 'react-native-pure-chart';
-import { it } from 'date-fns/locale';
+import {it} from 'date-fns/locale';
 import Toast from 'react-native-simple-toast';
 import dateFormat from 'date-fns/format';
 
@@ -101,8 +122,7 @@ const ListHeader = () => {
         borderTopLeftRadius: blockMargin,
         borderTopRightRadius: blockMargin,
         backgroundColor: '#CBE2F1',
-        alignSelf: 'center'
-
+        alignSelf: 'center',
       }}>
       <View
         style={{
@@ -111,19 +131,16 @@ const ListHeader = () => {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-
-
         }}>
         <Text
           numberOfLines={1}
           style={{
             width: '30%',
             color: '#0072BB',
-            fontFamily: 'SF-Medium',
+            fontFamily: 'SFCompactDisplay-Medium',
             textAlign: 'center',
             fontSize: 14,
           }}>
-
           {'DATE'}
         </Text>
         <Text
@@ -131,11 +148,10 @@ const ListHeader = () => {
           style={{
             width: '30%',
             color: '#0072BB',
-            fontFamily: 'SF-Medium',
+            fontFamily: 'SFCompactDisplay-Medium',
             textAlign: 'center',
             fontSize: 14,
           }}>
-
           {'TRIGGERS'}
         </Text>
         <Text
@@ -143,18 +159,16 @@ const ListHeader = () => {
           style={{
             width: '40%',
             color: '#0072BB',
-            fontFamily: 'SF-Medium',
+            fontFamily: 'SFCompactDisplay-Medium',
             textAlign: 'center',
             fontSize: 14,
           }}>
-
           {'CRAVINGS LEVEL'}
         </Text>
       </View>
     </View>
   );
 };
-
 
 const ListHeaderDouble = () => {
   //View to set in Header
@@ -167,8 +181,7 @@ const ListHeaderDouble = () => {
         borderTopLeftRadius: blockMargin,
         borderTopRightRadius: blockMargin,
         backgroundColor: '#CBE2F1',
-        alignSelf: 'center'
-
+        alignSelf: 'center',
       }}>
       <View
         style={{
@@ -177,19 +190,16 @@ const ListHeaderDouble = () => {
           flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
-
-
         }}>
         <Text
           numberOfLines={1}
           style={{
             width: '50%',
             color: '#0072BB',
-            fontFamily: 'SF-Medium',
+            fontFamily: 'SFCompactDisplay-Medium',
             textAlign: 'center',
             fontSize: 14,
           }}>
-
           {'DATE'}
         </Text>
 
@@ -198,11 +208,10 @@ const ListHeaderDouble = () => {
           style={{
             width: '50%',
             color: '#0072BB',
-            fontFamily: 'SF-Medium',
+            fontFamily: 'SFCompactDisplay-Medium',
             textAlign: 'center',
             fontSize: 14,
           }}>
-
           {'CRAVINGS LEVEL'}
         </Text>
       </View>
@@ -210,8 +219,7 @@ const ListHeaderDouble = () => {
   );
 };
 
-
-const EmptyListMessage = ({ item }) => {
+const EmptyListMessage = ({item}) => {
   return (
     // Flat List Item
     <View
@@ -229,7 +237,7 @@ const EmptyListMessage = ({ item }) => {
         numberOfLines={1}
         style={{
           width: '100%',
-          fontFamily: 'SF-Medium',
+          fontFamily: 'SFCompactDisplay-Medium',
           textAlign: 'center',
           color: '#ededed',
           fontSize: 16,
@@ -241,7 +249,7 @@ const EmptyListMessage = ({ item }) => {
   );
 };
 
-const ItemView = ({ item }) => {
+const ItemView = ({item}) => {
   return (
     // Flat List
     <View
@@ -252,7 +260,7 @@ const ItemView = ({ item }) => {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#0072BB',
-        paddingTop: blockMargin
+        paddingTop: blockMargin,
       }}>
       <Text
         numberOfLines={1}
@@ -260,12 +268,11 @@ const ItemView = ({ item }) => {
           width: '30%',
           textAlign: 'left',
           color: '#ffffff',
-          fontFamily: 'SF-Regular',
+          fontFamily: 'SFCompactDisplay-Regular',
           textAlign: 'center',
           fontSize: 14,
         }}>
-       {getDateTime(item.created_at)
-        }
+        {getDateTime(item.created_at)}
       </Text>
       <Text
         numberOfLines={1}
@@ -273,7 +280,7 @@ const ItemView = ({ item }) => {
           width: '30%',
           textAlign: 'center',
           color: '#ffffff',
-          fontFamily: 'SF-Regular',
+          fontFamily: 'SFCompactDisplay-Regular',
           textAlign: 'center',
           fontSize: 14,
         }}>
@@ -285,11 +292,15 @@ const ItemView = ({ item }) => {
           width: '40%',
           textAlign: 'center',
           color: '#ffffff',
-          fontFamily: 'SF-Regular',
+          fontFamily: 'SFCompactDisplay-Regular',
           textAlign: 'center',
           fontSize: 14,
         }}>
-         {item.tobacco_rating == 0 ? 'LOW' : item.tobacco_rating == 1 ? 'MODERATE' : 'HIGH'}
+        {item.tobacco_rating == 0
+          ? 'LOW'
+          : item.tobacco_rating == 2
+          ? 'MODERATE'
+          : 'HIGH'}
       </Text>
     </View>
   );
@@ -297,9 +308,9 @@ const ItemView = ({ item }) => {
 
 const getDateTime = (daaa) => {
   let ddd = daaa;
-        console.log('dateeeeee ==> '+dateFormat(new Date(ddd*1000),'dd MMM yyyy'));
-        return dateFormat(new Date(ddd*1000),'dd MMM yyyy');
-}
+
+  return dateFormat(new Date(ddd * 1000), 'dd MMM yyyy');
+};
 
 const ItemSeparatorView = () => {
   return (
@@ -314,10 +325,7 @@ const ItemSeparatorView = () => {
   );
 };
 
-
-
-
-const ItemViewDouble = ({ item }) => {
+const ItemViewDouble = ({item}) => {
   return (
     // Flat List
     <View
@@ -328,7 +336,7 @@ const ItemViewDouble = ({ item }) => {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#0072BB',
-        paddingTop: blockMarginHalf
+        paddingTop: blockMarginHalf,
       }}>
       <Text
         numberOfLines={1}
@@ -336,12 +344,11 @@ const ItemViewDouble = ({ item }) => {
           width: '50%',
           textAlign: 'left',
           color: '#ffffff',
-          fontFamily: 'SF-Regular',
+          fontFamily: 'SFCompactDisplay-Regular',
           textAlign: 'center',
           fontSize: 14,
         }}>
-        {getDateTime(item.date)
-        }
+        {getDateTime(item.date)}
       </Text>
 
       <Text
@@ -350,18 +357,21 @@ const ItemViewDouble = ({ item }) => {
           width: '50%',
           textAlign: 'center',
           color: '#ffffff',
-          fontFamily: 'SF-Regular',
+          fontFamily: 'SFCompactDisplay-Regular',
           textAlign: 'center',
           fontSize: 14,
         }}>
-        {item.tobacco_rating == 0 ? 'LOW' : item.tobacco_rating == 1 ? 'MODERATE' : 'HIGH'}
+        {item.tobacco_rating == 0
+          ? 'LOW'
+          : item.tobacco_rating == 1
+          ? 'MODERATE'
+          : 'HIGH'}
       </Text>
     </View>
   );
 };
 
 export default class Analyse_Cravings extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -370,17 +380,29 @@ export default class Analyse_Cravings extends Component {
       isSelected: 0,
       listCraving: [],
       triggerCraving: [],
-       cravingGraphData : []
+      cravingGraphData: [],
     };
   }
 
-  componentDidMount = () => {
+  componentWillUnmount() {
+    // Remove the event listener before removing the screen from the stack
+    //AppState.removeEventListener('change', this._handleAppStateChange);
+    this.focusListener.remove();
+    //BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    clearTimeout(this.t);
+  }
 
-    this.getUser();
+  componentDidMount = () => {
+    // AppState.addEventListener('change', this._handleAppStateChange);
+    const {navigation} = this.props;
+    // BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+    this.focusListener = navigation.addListener('didFocus', () => {
+      this.getUser();
+      this.setState({count: 0});
+    });
   };
 
   getUser = async () => {
-
     const user_id = await AsyncStorage.getItem('UserId');
     const user_name = await AsyncStorage.getItem('UserName');
     const mobile_no = await AsyncStorage.getItem('UserMobileNo');
@@ -391,166 +413,113 @@ export default class Analyse_Cravings extends Component {
 
     if (token !== '') {
       this.setState({
-
         token: token,
       });
 
-      this.CravingGraph()
-      this.Cravinglist()
-      this.CravingTriggerlist()
+      this.CravingGraph();
+      this.Cravinglist();
+      this.CravingTriggerlist();
     }
   };
 
-  
   CravingGraph = async () => {
- 
-    const { token } = this.state
-    console.log('input ==> ' + token  + ' ' + ApiName.graph_craving);
-    
-    this.setState({ isHidden: true })
+    const {token} = this.state;
+
+    this.setState({isHidden: true});
     axios
       .post(
-        ApiName.graph_craving, {},
+        ApiName.graph_craving,
+        {},
         {
           headers: {
-            'Authorization': token,
+            Authorization: token,
           },
         },
       )
       .then((response) => {
-        console.log(
-          'Craving Graph response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
+        this.setState({isHidden: false});
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-let obj = [];
-          for (var i=0;i<response.data.data.length;i++) {
+          let obj = [];
+          for (var i = 0; i < response.data.data.length; i++) {
             obj.push({
-              x:getDateTime(response.data.data[i].date),y:response.data.data[i].y
-            })
+              x: getDateTime(response.data.data[i].date),
+              y: response.data.data[i].y,
+            });
           }
           this.setState({
-           cravingGraphData: obj,
-           
+            cravingGraphData: obj,
           });
-
-         
-          this.setState({ isHidden: false })
-        }
-        else {
-          this.setState({ isHidden: false })
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
-        this.setState({ isHidden: false })
-        Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+        this.setState({isHidden: false});
+        Toast.show('There was some error. Please try again');
       });
-  }
-  
+  };
+
   Cravinglist = async () => {
- 
-    const { token } = this.state
-    console.log('input ==> ' + token  + ' ' + ApiName.list_craving);
-    
-    this.setState({ isHidden: true })
+    const {token} = this.state;
+
+    this.setState({isHidden: true});
     axios
       .post(
-        ApiName.list_craving, {},
+        ApiName.list_craving,
+        {},
         {
           headers: {
-            'Authorization': token,
+            Authorization: token,
           },
         },
       )
       .then((response) => {
-        console.log(
-          'Craving List High response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
+        this.setState({isHidden: false});
 
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-
           this.setState({
-            
-           listCraving:response.data.data
-      
+            listCraving: response.data.data,
           });
-
-         
-          this.setState({ isHidden: false })
-        }
-        else {
-          this.setState({ isHidden: false })
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
-        this.setState({ isHidden: false })
-        Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+        this.setState({isHidden: false});
+        Toast.show('There was some error. Please try again');
       });
-  }
+  };
 
   CravingTriggerlist = async () => {
- 
-    const { token } = this.state
-    console.log('input ==> ' + token  + ' ' + ApiName.trigger_craving);
-    
-    this.setState({ isHidden: true })
+    const {token} = this.state;
+
+    this.setState({isHidden: true});
     axios
       .post(
-        ApiName.trigger_craving, {},
+        ApiName.trigger_craving,
+        {},
         {
           headers: {
-            'Authorization': token,
+            Authorization: token,
           },
         },
       )
       .then((response) => {
-        console.log(
-          'Craving Trigger response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
+        this.setState({isHidden: false});
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-
           this.setState({
             triggerCraving: response.data.data,
-           
-      
           });
-
-         
-          this.setState({ isHidden: false })
-        }
-        else {
-          this.setState({ isHidden: false })
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
-        this.setState({ isHidden: false })
-        Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+        this.setState({isHidden: false});
+        Toast.show('There was some error. Please try again');
       });
-  }
+  };
 
   render() {
-
-    const { isHidden } = this.state;
+    const {isHidden} = this.state;
 
     const ListFooter = () => {
       //View to set in Header
-      if(this.state.listCraving.length > 0){
+      if (this.state.listCraving.length > 0) {
         return (
           <View
             style={{
@@ -560,8 +529,7 @@ let obj = [];
               borderBottomLeftRadius: blockMargin,
               borderBottomRightRadius: blockMargin,
               backgroundColor: '#0072BB',
-              alignSelf: 'center'
-      
+              alignSelf: 'center',
             }}>
             <View
               style={{
@@ -570,22 +538,18 @@ let obj = [];
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-      
-      
-              }} />
-      
+              }}
+            />
           </View>
         );
-      }else{
-        return (
-          <View></View>
-          );
+      } else {
+        return <View></View>;
       }
     };
 
     const TriggerListFooter = () => {
       //View to set in Header
-      if(this.state.triggerCraving.length > 0){
+      if (this.state.triggerCraving.length > 0) {
         return (
           <View
             style={{
@@ -595,8 +559,7 @@ let obj = [];
               borderBottomLeftRadius: blockMargin,
               borderBottomRightRadius: blockMargin,
               backgroundColor: '#0072BB',
-              alignSelf: 'center'
-      
+              alignSelf: 'center',
             }}>
             <View
               style={{
@@ -605,317 +568,343 @@ let obj = [];
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignItems: 'center',
-      
-      
-              }} />
-      
+              }}
+            />
           </View>
         );
-      }else{
-        return (
-          <View></View>
-          );
+      } else {
+        return <View></View>;
       }
     };
     return (
-      <View
-        style={{
-          flex: 1,
-          height: deviceHeight,
-          width: deviceWidth,
-          flexDirection: 'column',
-        }}>
-
-        <View style={{ flexDirection: 'row', width: '100%', height: responsiveHeight(10), backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center' }}>
-
-
-          <Text style={{
-            width: '100%', color: '#FFFFFF',
-            fontFamily: 'SF-Medium',
-            fontSize: scalable(18),
-            justifyContent: 'center',
-            textAlign: 'center',
-          }}>Analyse Cravings</Text>
-
-
-          <TouchableOpacity style={{
-            width: '12%', left: 0, position: 'absolute',
-            height: responsiveHeight(4), alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSelf: 'center',
-          }} onPress={() => this.props.navigation.goBack()}>
-
-            <Image style={{
-              width: responsiveWidth(3),
-              height: responsiveHeight(4),
-
-              alignItems: 'center', justifyContent: 'center', alignContent: 'center', alignSelf: 'center',
-              resizeMode: 'contain'
-            }} source={require('../../../images/back_arrow.png')} />
-
-          </TouchableOpacity>
-
-
-        </View>
-
-
-        <View style={{ flexDirection: 'row', backgroundColor: '#0072BB', height: 45, alignItems: 'center', justifyContent: 'center', paddingBottom: blockMarginHalf }}>
-
-
-          <View style={{ flexDirection: 'column', width: '34%' }}>
-            <TouchableOpacity
-              onPress={() => this.setState({ isSelected: 0 })}
-              style={{ flexDirection: 'column' }}>
-              <Text
-                style={{
-                  color:
-                    this.state.isSelected == 0 ? '#FFFFFF' : '#BBBBBB',
-                  fontSize: 15,
-                  fontFamily: 'SF-Medium',
-                  textAlign: 'center',
-                }}>
-                GRAPH
-                      </Text>
-
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ flexDirection: 'column', width: '33%' }}>
-            <TouchableOpacity
-              onPress={() => this.setState({ isSelected: 1 })}
-              style={{ flexDirection: 'column' }}>
-              <Text
-                style={{
-                  color:
-                    this.state.isSelected == 1 ? '#FFFFFF' : '#BBBBBB',
-                  fontSize: 15,
-                  fontFamily: 'SF-Medium',
-                  textAlign: 'center',
-                }}>
-                LIST
-                      </Text>
-
-            </TouchableOpacity>
-          </View>
-
-
-
-          <View style={{ flexDirection: 'column', width: '33%' }}>
-            <TouchableOpacity
-              onPress={() => this.setState({ isSelected: 2 })}
-              style={{ flexDirection: 'column' }}>
-              <Text
-                style={{
-                  color:
-                    this.state.isSelected == 2 ? '#FFFFFF' : '#BBBBBB',
-                  fontSize: 15,
-                  fontFamily: 'SF-Medium',
-                  textAlign: 'center',
-                }}>
-                TRIGGERS
-                      </Text>
-
-            </TouchableOpacity>
-          </View>
-        </View>
-
-
-        <ScrollView  style={{marginTop:blockMarginHalf}} keyboardShouldPersistTaps={'handled'}>
-              <View style={{ justifyContent: 'center' }}>
-
-              {this.state.isSelected == 0 &&
-          <View
-            style={{
-              width: '100%',
-              margin: blockMargin * 2,
-
-              alignSelf: 'center',
-            }}>
-       
-
-       <View >
-         
-       <View style={{
-                    flexDirection: 'row',
-                    height: 250,
-                    width: '80%',
-                  
-                    alignSelf:'center', 
-                   justifyContent:'center'
-                  }}>
-
-                    {this.state.cravingGraphData.length > 0 ?   <PureChart data={ this.state.cravingGraphData}
-                 type='line'   
-                color={'#0072bb'}
-                numberOfYAxisGuideLine={5}
-  height={200} 
-  /> : 
-  <View style={{width:'80%',
-  height : 200, alignSelf:'center',
-  alignItems:'center',
-  justifyContent:'center',}}><Text
-  style={{
-    
-    color: '#222222',
-    fontSize: 15,
-    fontFamily: 'SF-Semibold',
-    textAlign: 'center',
-   
-  
-  }}>{isHidden ? '' : ' No Analysis Yet' }
- 
-          </Text></View>
-}
-              
-         
-  </View>
-           
-
-<View style={{
-            flexDirection: 'row', top: 0,end:0 ,position:'absolute',
-            alignItems: 'center', justifyContent: 'center',  alignSelf: 'center',marginRight:blockMargin
+      <SafeAreaView style={{flex: 1}}>
+        <View
+          style={{
+            flex: 1,
+            height: deviceHeight,
+            width: deviceWidth,
+            flexDirection: 'column',
           }}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Add_Cravings')}>
-              <View style={{
-                width: 50,
-                height: 50,
-                borderStyle: 'dotted',
-                borderRadius: 100 / 2,
-                backgroundColor: '#FFFFFF',
-                opacity: 100,
-                borderWidth: 2,
-                borderColor: '#0072bb',
-                justifyContent: 'center'
-              }}>
-                <Image
-
-                  resizeMode='contain'
-                  source={require('../../../images/add.png')}
-                  style={{
-                    width: 18,
-                    height: 18,
-                    resizeMode: 'contain',
-
-                    justifyContent: 'center',
-
-                    alignSelf: 'center',
-                    borderRadius: 100 / 2,
-                  }}
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
-      </View>
-<View
-              style={{
-                marginTop: blockMargin,
-                width: '70%',
-                height: 50,
-                backgroundColor:'#0072BB',
-                alignSelf:'center',
-                justifyContent:'center',
-                alignItems:'center',
-                borderRadius: 25
-              }}>
-              <TouchableOpacity
-                onPress={() => this.props.navigation.navigate('Add_Diary')}>
-               
-                <Text style={{color: '#FFFFFF',textAlign:'center',
-    fontFamily: 'SF-Medium',
-    fontSize: scalable(15),}}>Add Diary</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        }
-
-        {this.state.isSelected == 2 &&
           <View
             style={{
-              width: '90%',
-              margin: blockMargin * 2,
-
-              alignSelf: 'center',
-            }}>
-            <FlatList
-              style={{ width: '100%' }}
-              data={this.state.triggerCraving}
-              keyExtractor={(item, index) => index.toString()}
-              ItemSeparatorComponent={ItemSeparatorView}
-              //Header to show above listview
-              ListHeaderComponent={ListHeader}
-              //Footer to show below listview
-              ListFooterComponent={TriggerListFooter}
-              renderItem={ItemView}
-              ListEmptyComponent={EmptyListMessage}
-            />
-          </View>
-        }
-
-
-        {this.state.isSelected == 1  &&
-          <View
-            style={{
+              flexDirection: 'row',
               width: '100%',
-              margin: blockMargin * 1.5,
-
-              alignSelf: 'center',
+              height: responsiveHeight(10),
+              backgroundColor: '#0072BB',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
             <Text
               style={{
-                color: '#222222',
-                fontSize: 15,
-                fontFamily: 'SF-Semibold',
+                width: '100%',
+                color: '#FFFFFF',
+                fontFamily: 'SFCompactDisplay-Medium',
+                fontSize: scalable(18),
+                justifyContent: 'center',
                 textAlign: 'center',
               }}>
-              Days when your cravings were high
-                      </Text>
+              Analyse Cravings
+            </Text>
 
-            <View
+            <TouchableOpacity
               style={{
-                width: '90%',
-                margin: blockMargin * 1.5,
-
+                width: '12%',
+                left: 0,
+                position: 'absolute',
+                height: responsiveHeight(4),
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignContent: 'center',
                 alignSelf: 'center',
-              }}>
-              <FlatList
-                style={{ width: '100%' }}
-                data={this.state.listCraving}
-                keyExtractor={(item, index) => index.toString()}
-                ItemSeparatorComponent={ItemSeparatorView}
-                //Header to show above listview
-                ListHeaderComponent={ListHeaderDouble}
-                //Footer to show below listview
-                ListFooterComponent={ListFooter}
-                renderItem={ItemViewDouble}
-                ListEmptyComponent={EmptyListMessage}
-              />
-            </View>
-          </View>}
-     
-     </View>
+              }}
+              onPress={() => this.props.navigation.goBack()}>
+              <Image
+                style={{
+                  width: responsiveWidth(3),
+                  height: responsiveHeight(4),
 
-     {isHidden ? (
-            <View style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignSelf: 'center',
+                  resizeMode: 'contain',
+                }}
+                source={require('../../../images/back_arrow.png')}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              backgroundColor: '#0072BB',
+              height: 45,
+              alignItems: 'center',
               justifyContent: 'center',
-              alignContent: 'center',
-              alignSelf: 'center',
-              backgroundColor: 'transparent'
+              paddingBottom: blockMarginHalf,
             }}>
-              <ActivityIndicator
-                size={40}
-                color="#0072bb"
-                animating={true}
-                backgroundColor={'transparent'}
-              />
+            <View style={{flexDirection: 'column', width: '34%'}}>
+              <TouchableOpacity
+                onPress={() => this.setState({isSelected: 0})}
+                style={{flexDirection: 'column'}}>
+                <Text
+                  style={{
+                    color: this.state.isSelected == 0 ? '#FFFFFF' : '#BBBBBB',
+                    fontSize: 15,
+                    fontFamily: 'SFCompactDisplay-Medium',
+                    textAlign: 'center',
+                  }}>
+                  GRAPH
+                </Text>
+              </TouchableOpacity>
             </View>
-          ) : null}
-     </ScrollView>
-      </View>
 
+            <View style={{flexDirection: 'column', width: '33%'}}>
+              <TouchableOpacity
+                onPress={() => this.setState({isSelected: 1})}
+                style={{flexDirection: 'column'}}>
+                <Text
+                  style={{
+                    color: this.state.isSelected == 1 ? '#FFFFFF' : '#BBBBBB',
+                    fontSize: 15,
+                    fontFamily: 'SFCompactDisplay-Medium',
+                    textAlign: 'center',
+                  }}>
+                  LIST
+                </Text>
+              </TouchableOpacity>
+            </View>
 
+            <View style={{flexDirection: 'column', width: '33%'}}>
+              <TouchableOpacity
+                onPress={() => this.setState({isSelected: 2})}
+                style={{flexDirection: 'column'}}>
+                <Text
+                  style={{
+                    color: this.state.isSelected == 2 ? '#FFFFFF' : '#BBBBBB',
+                    fontSize: 15,
+                    fontFamily: 'SFCompactDisplay-Medium',
+                    textAlign: 'center',
+                  }}>
+                  TRIGGERS
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <ScrollView
+            style={{marginTop: blockMarginHalf}}
+            keyboardShouldPersistTaps={'handled'}>
+            <View style={{justifyContent: 'center'}}>
+              {this.state.isSelected == 0 && (
+                <View
+                  style={{
+                    width: '100%',
+                    margin: blockMargin * 2,
+
+                    alignSelf: 'center',
+                  }}>
+                  <View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        height: 250,
+                        width: '80%',
+
+                        alignSelf: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      {this.state.cravingGraphData.length > 0 ? (
+                        <PureChart
+                          data={this.state.cravingGraphData}
+                          type="line"
+                          color={'#0072bb'}
+                          numberOfYAxisGuideLine={5}
+                          height={200}
+                        />
+                      ) : (
+                        <View
+                          style={{
+                            width: '80%',
+                            height: 200,
+                            alignSelf: 'center',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#222222',
+                              fontSize: 15,
+                              fontFamily: 'SFCompactDisplay-Medium',
+                              textAlign: 'center',
+                            }}>
+                            {isHidden ? '' : ' No Analysis Yet'}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        top: 0,
+                        end: 0,
+                        position: 'absolute',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'center',
+                        marginRight: blockMargin,
+                      }}>
+                      <TouchableOpacity
+                        onPress={() =>
+                          this.props.navigation.navigate('Add_Cravings')
+                        }>
+                        <View
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderStyle: 'dotted',
+                            borderRadius: 100 / 2,
+                            backgroundColor: '#FFFFFF',
+                            opacity: 100,
+                            borderWidth: 2,
+                            borderColor: '#0072bb',
+                            justifyContent: 'center',
+                          }}>
+                          <Image
+                            resizeMode="contain"
+                            source={require('../../../images/add.png')}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: 'contain',
+
+                              justifyContent: 'center',
+
+                              alignSelf: 'center',
+                              borderRadius: 100 / 2,
+                            }}
+                          />
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View
+                    style={{
+                      marginTop: blockMargin,
+                      width: '70%',
+                      height: 50,
+                      backgroundColor: '#0072BB',
+                      alignSelf: 'center',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      borderRadius: 25,
+                    }}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        this.props.navigation.navigate('Add_Diary')
+                      }>
+                      <Text
+                        style={{
+                          color: '#FFFFFF',
+                          textAlign: 'center',
+                          fontFamily: 'SFCompactDisplay-Medium',
+                          fontSize: scalable(15),
+                        }}>
+                        Add Diary
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+              {this.state.isSelected == 2 && (
+                <View
+                  style={{
+                    width: '90%',
+                    margin: blockMargin * 2,
+
+                    alignSelf: 'center',
+                  }}>
+                  <FlatList
+                    style={{width: '100%'}}
+                    data={this.state.triggerCraving}
+                    keyExtractor={(item, index) => index.toString()}
+                    ItemSeparatorComponent={ItemSeparatorView}
+                    //Header to show above listview
+                    ListHeaderComponent={ListHeader}
+                    //Footer to show below listview
+                    ListFooterComponent={TriggerListFooter}
+                    renderItem={ItemView}
+                    ListEmptyComponent={EmptyListMessage}
+                  />
+                </View>
+              )}
+
+              {this.state.isSelected == 1 && (
+                <View
+                  style={{
+                    width: '100%',
+                    margin: blockMargin * 1.5,
+
+                    alignSelf: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: '#222222',
+                      fontSize: 15,
+                      fontFamily: 'SFCompactDisplay-Semibold',
+                      textAlign: 'center',
+                    }}>
+                    Days when your cravings were high
+                  </Text>
+
+                  <View
+                    style={{
+                      width: '90%',
+                      margin: blockMargin * 1.5,
+
+                      alignSelf: 'center',
+                    }}>
+                    <FlatList
+                      style={{width: '100%'}}
+                      data={this.state.listCraving}
+                      keyExtractor={(item, index) => index.toString()}
+                      ItemSeparatorComponent={ItemSeparatorView}
+                      //Header to show above listview
+                      ListHeaderComponent={ListHeaderDouble}
+                      //Footer to show below listview
+                      ListFooterComponent={ListFooter}
+                      renderItem={ItemViewDouble}
+                      ListEmptyComponent={EmptyListMessage}
+                    />
+                  </View>
+                </View>
+              )}
+            </View>
+
+            {isHidden ? (
+              <View
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  position: 'absolute',
+                  justifyContent: 'center',
+                  alignContent: 'center',
+                  alignSelf: 'center',
+                  backgroundColor: 'transparent',
+                }}>
+                <ActivityIndicator
+                  size={40}
+                  color="#0072bb"
+                  animating={true}
+                  backgroundColor={'transparent'}
+                />
+              </View>
+            ) : null}
+          </ScrollView>
+        </View>
+      </SafeAreaView>
     );
   }
 }
-
-

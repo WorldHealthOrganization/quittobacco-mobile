@@ -11,7 +11,8 @@ import Walkthrough1 from '../../Walkthrough_Screen1/Walkthrough_screen_1';
 import Walkthrough2 from '../../Walkthrough_Screen2/Walkthrough_screen_2';
 import Walkthrough3 from '../../Walkthrough_Screen3/Walkthrough_screen_3';
 
-import Login from '../../login/Login';
+//import Login from '../../login/Login';
+import Questionare_Notifications from '../../Notifications/Questionare_Notifications';
 import CreateAccount from '../../CreateAccount/CreateAccount';
 import OTP_Verification from '../../OTP/OTP_Verification';
 import forgot_pwd from '../../forgot_password/forgot_pwd';
@@ -53,9 +54,9 @@ const OnBoardStack = createStackNavigator(
 
 const LoginStack = createStackNavigator(
   {
-    Login: {
-      screen: Login,
-    },
+    // Login: {
+    //   screen: Login,
+    // },
     CreateAccount: {
       screen: CreateAccount,
     },
@@ -81,6 +82,9 @@ const QuestionareStack = createStackNavigator(
   {
     Questionare_Screen1: {
       screen: Questionare_Screen1,
+    },
+    Questionare_Notifications: {
+      screen: Questionare_Notifications,
     },
     Welcome: {
       screen: Welcome,
@@ -110,7 +114,7 @@ const AppNavigator = createSwitchNavigator(
   {
     Splash: Splash,
     OnBoardStack: OnBoardStack,
-    LoginStack: LoginStack,
+   // LoginStack: LoginStack,
     QuestionareStack: QuestionareStack,
     UserHome: UserHome,
   },

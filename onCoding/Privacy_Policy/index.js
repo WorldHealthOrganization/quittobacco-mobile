@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
-import {View, Text,  Alert,Image,TouchableOpacity,ActivityIndicator,ScrollView} from 'react-native';
+import {View, Text, StyleSheet,Image,TouchableOpacity,ActivityIndicator,ScrollView,SafeAreaView} from 'react-native';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -9,7 +9,7 @@ import {
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import HTMLView from 'react-native-htmlview';
 
 
@@ -44,27 +44,19 @@ export default class Privacy_Policy extends Component {
               },
             )
             .then((response) => {
-              console.log(
-                'Disclaimer response ',
-                'response get details:==> ' + JSON.stringify(response.data),
-              );
-
-              this.setState({content: response.data.data.description});
-
+             
+              this.setState({ isHidden: false })
               if (response.data.status == 200) {
-                console.log(JSON.stringify( response.data));
-                this.setState({ isHidden: false })
+               
+                this.setState({content: response.data.data.description});
 
-                          // Toast.show(response.data.message);
+               
               }
-              else {
-                console.log(response.data.message);
-                this.setState({ isHidden: false })
-
-              }
+            
             })
             .catch((error) => {
-              console.log('reactNativeDemo axios error:', error);
+             
+              Toast.show('There was some error. Please try again');
               this.setState({ isHidden: false })
 
             });
@@ -75,6 +67,7 @@ export default class Privacy_Policy extends Component {
             const {content,isHidden} = this.state;
 
     return (
+      <SafeAreaView style={{flex: 1}}>
         <View
         style={{
           flex: 1,
@@ -107,7 +100,7 @@ export default class Privacy_Policy extends Component {
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -119,7 +112,7 @@ export default class Privacy_Policy extends Component {
 <ScrollView>
             <View style={{ flex: 1, marginTop: blockMarginHalf * 2}}>
     {/* <Text style={{ color: '#202020',
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: scalable(14),
       marginTop: blockMarginHalf * 3,
       marginLeft: blockMarginHalf * 3,
@@ -127,12 +120,12 @@ export default class Privacy_Policy extends Component {
 
 <HTMLView
    style={{ 
-   marginTop: blockMarginHalf * 3,
+   marginTop: blockMargin,
    marginLeft: blockMarginHalf * 2,
    marginRight: blockMarginHalf * 1,
    }}
-                value={content}
-                // stylesheet={styles}
+   value={`<body>${content}</body>`}
+                stylesheet={styless}
               />
       
        </View>
@@ -156,8 +149,16 @@ export default class Privacy_Policy extends Component {
           ) : null}
        </View>
        </View>
-
+       </SafeAreaView>
     );
   }
 }
 
+const styless = StyleSheet.create({
+  p: {
+    color: '#000000',
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: 15,
+    lineHeight: 20
+  },
+});

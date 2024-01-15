@@ -11,9 +11,12 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
-  ActivityIndicator,
+  ActivityIndicator, SafeAreaView,Keyboard,TouchableWithoutFeedback, TouchableOpacityBase
 } from 'react-native';
+
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { scalable, deviceWidth, deviceHeight, itemRadius, itemRadiusHalf, blockMarginHalf, blockMargin, blockPadding, blockPaddingHalf } from '../ui/common/responsive';
+import dateFormat from 'date-fns/format';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -22,15 +25,16 @@ import {
 import { Header } from 'react-navigation-stack';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 import CountryPicker from 'react-native-country-picker-modal';
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
 import OTP_Verification from '../OTP/OTP_Verification';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 // FCM Import
-import firebase from 'react-native-firebase';
+import messaging, { firebase }  from '@react-native-firebase/messaging';
 
  export default class CreateAccount extends Component {
   constructor()
@@ -45,6 +49,9 @@ import firebase from 'react-native-firebase';
     fcm_token: '',
     jwt_token:'',
     isHidden: false,
+    date_of_birth_api: '',
+    date_of_birth: '',
+    isDatePickerVisible: false,
 
   };
   }
@@ -58,7 +65,6 @@ import firebase from 'react-native-firebase';
 
   fcmToken = async () => {
     
-    console.log('SignUp');
     const enabled = await firebase.messaging().hasPermission();
     if (enabled) {
       firebase
@@ -66,16 +72,16 @@ import firebase from 'react-native-firebase';
         .getToken()
         .then(fcmToken => {
           if (fcmToken) {
-            console.log('SignUp Received Token ' + fcmToken);
+        
             this.setState({
               fcm_token: fcmToken,
             });
           } else {
-            console.log('Received Token Error');
+            console.log('Received Token Reason');
           }
         });
     } else {
-      //alert("No Permission for FCM Notification");
+      console.log("No Permission for FCM Notification");
     }
   }
 
@@ -89,7 +95,7 @@ import firebase from 'react-native-firebase';
       name,
       email,
       mobile,
-      password,
+      password,date_of_birth,date_of_birth_api
     } = this.state;
 
     if (name.trim() != '' && name.length >= 2) {
@@ -99,8 +105,13 @@ import firebase from 'react-native-firebase';
               if (this.validate(email)) {
               if (password.trim() != '') { 
                 if (password.length >= 6) {
-                this.setState({isHidden: true});
-                this.goForAxios();
+                  if(date_of_birth != ''  && date_of_birth_api != null){
+                    this.setState({isHidden: true});
+                    this.goForAxios();
+                  } else {
+                    Toast.show('Select Date of birth');
+                  }
+              
               }
             
             else {
@@ -131,7 +142,6 @@ import firebase from 'react-native-firebase';
   }
 
   validate = (text) => {
-    console.log(text);
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     if (reg.test(text) === false) {
       console.log('Email is Not Correct');
@@ -157,10 +167,9 @@ import firebase from 'react-native-firebase';
       password,
       fcm_token,
       jwt_token,
-      country_code,
+      country_code,date_of_birth_api
     } = this.state;
-    // console.log('error ==> ' + name);
-    //console.log('last_name ==> '+JSON.stringify(filePath.data));
+  
     this.setState({isHidden: true});
 
     axios
@@ -174,6 +183,7 @@ import firebase from 'react-native-firebase';
           fcm_token: fcm_token,
           jwt_token: jwt_token,
           country_code: country_code,
+          security_question: date_of_birth_api
         },
         {
           headers: {
@@ -186,6 +196,10 @@ import firebase from 'react-native-firebase';
         if (response.data.status == 200) {
           Toast.show(response.data.message);
           
+          AsyncStorage.setItem('LoginStatus', 'true');
+          
+        
+          AsyncStorage.setItem('QuestionarieStatus', response.data.data.questionarie_status+'');
 
             AsyncStorage.setItem('LoginId', response.data.data.id+'');
             AsyncStorage.setItem('CountryCode', country_code+'');
@@ -197,10 +211,17 @@ import firebase from 'react-native-firebase';
           AsyncStorage.setItem('UserFCM', response.data.data.fcm_token);
           AsyncStorage.setItem('UserName', response.data.data.name);
           AsyncStorage.setItem('OtpState', '0');
+          AsyncStorage.setItem('security_question', response.data.data.security_question);
+          
+          AsyncStorage.setItem('Login_JwtToken','Bearer ' + response.data.jwt_token);
+          
+
+         
+
+            this.Update_Notifications({user_id:response.data.data.id+'',jwt_token:response.data.jwt_token,questionarie_status: response.data.data.questionarie_status+''})
 
           this.setState({isHidden: false});
-          this.props.navigation.navigate('OTP_Verification',{
-            UserId:  response.data.data.id, MobileNumber: mobile, CountryCode: country_code, Password: password });
+        
           // this.props.navigation.navigate('Login');
         } 
         else if (response.data.status == 400) {
@@ -218,45 +239,128 @@ import firebase from 'react-native-firebase';
         }
        else {
         }
-        console.log(
-          'reactNativeDemo',
-          'response get details:' + JSON.stringify(response.data),
-        );
       })
       .catch((error) => {
-        console.log('reactNativeDemo axios error:', error);
+       
+        Toast.show('There was some error. Please try again')
         this.setState({isHidden: false});
 
       });
   }
 
 
+
+  
+  Update_Notifications = async ({user_id,jwt_token,questionarie_status}) => {
+   
+    this.setState({isHidden: true});
+  
+    axios
+      .post(
+        ApiName.update_notifications,
+        {
+          diary_remainder:'1',
+          diary_remainder_time:'18:30',
+          mission_remainder:'1',
+          mission_remainder_time:'08:00',
+          badge:'1',
+          general_alert:'1',
+        },
+        {
+          headers: {
+            Authorization: 'Bearer '+jwt_token,
+          },
+        },
+      )
+      .then((response) => {
+       
+        this.setState({isHidden: false});
+
+        if (response.data.status == 200) {
+        
+          // Toast.show('User Registered successfully')
+
+          if(questionarie_status == 1){
+            this.props.navigation.navigate('UserHome')
+          }else{
+            this.props.navigation.navigate('QuestionareStack');
+          }
+         
+          // this.props.navigation.navigate('OTP_Verification',{
+          //   UserId:  response.data.data.id, MobileNumber: mobile, CountryCode: country_code, Password: password });
+        
+        } else {
+         
+          Toast.show(response.data.message);
+        }
+      })
+      .catch((error) => {
+        this.setState({isHidden: false});
+        Toast.show('There was some error. Please try again')
+       
+      });
+  };
+
+
+showDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: true,
+  });
+  Keyboard.dismiss()
+};
+
+hideDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: false,
+  });
+};
+
+handleDateConfirm = (date) => {
+  let formatDate = dateFormat(date, 'dd MMM yyyy');
+  let formatValidDate = dateFormat(date, 'yyyy-MM-dd');
+
+  this.setState({date_of_birth: formatDate});
+  this.setState({date_of_birth_api: formatValidDate});
+  this.hideDatePicker();
+};
+
+
   render() {
     return (
+      <SafeAreaView style={{flex:1}}>
         <View style={styles.container}>
+      
         <View style={styles.view}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ImageBackground
             source={require('../../images/shape.png')}
-            style={{ width: responsiveWidth(100), height: responsiveHeight(35)}}>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate('Login')}>
-            <Image source={require('../../images/back_arrow.png')} style={styles.back_arrow}/>
+            style={{ width: responsiveWidth(100), height: responsiveHeight(42)}}>
+              <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+            <Image source={require('../../images/back_arrow.png')} resizeMode={'contain'} style={styles.back_arrow}/>
             </TouchableOpacity>
-           <Text style={styles.create_text}>Create Account</Text>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+           <Text style={styles.create_text}>Create Account</Text></TouchableWithoutFeedback>
           </ImageBackground>
-          <KeyboardAvoidingView
+          </TouchableWithoutFeedback>
+          {/* <KeyboardAvoidingView
   keyboardVerticalOffset = {Header.HEIGHT + 0} // adjust the value here if you need more padding
-  style = {{ flex: 1 }}
-  behavior = "padding" >
-    <ScrollView style={styles.scrollview}   keyboardShouldPersistTaps={'handled'}>
+  style = {{ flex: 1 }} >
+    <ScrollView style={styles.scrollview}   keyboardShouldPersistTaps={'handled'}> */}
+
+  <KeyboardAwareScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.view1}>
         <TextInput style={styles.text}
             placeholder="Name"
             placeholderTextColor="#B6C0CB"
             autoCorrect={false}
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(value) => this.setState({name: value})} value={this.state.name}
             returnKeyType="next" onSubmitEditing={()=>this.input1.focus()}
-          />
+          />  
+          <View style={styles.view3} />
             <View
                   style={{flexDirection: 'row', flex: 1}}>
           <View style={styles.textBackground3}>
@@ -265,7 +369,7 @@ import firebase from 'react-native-firebase';
                       style={{
                         flex: 1,
                         flexDirection: 'row',
-                        marginStart: responsiveWidth(1),
+                      
                         marginTop:responsiveHeight(1),
                       }}>
           <CountryPicker style={{marginTop: responsiveHeight(0)}}
@@ -277,7 +381,7 @@ import firebase from 'react-native-firebase';
                         onClose={() => this.setState({visible: false})}
                         visible={this.state.visible}
                         theme={{
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(1.65),
 
                         }}
@@ -297,11 +401,11 @@ import firebase from 'react-native-firebase';
                       />
                        <Text
                         style={{
-                          marginLeft: responsiveWidth(0),
+                          
                           // alignSelf: 'center',
                           marginTop: responsiveHeight(0.75),
-                          fontFamily: 'SF-Medium',
-                          fontSize: responsiveFontSize(1.65),
+                          fontFamily: 'SFCompactDisplay-Medium',
+                          fontSize: 16,
                           color: '#202020',
                         }}>
                         +{this.state.country_code}
@@ -330,42 +434,79 @@ import firebase from 'react-native-firebase';
             placeholder="Email"
             placeholderTextColor="#B6C0CB"
             autoCorrect={false}
-            underlineColorAndroid="#B6C0CB"
+            underlineColorAndroid="transparent"
             onChangeText={(value) => this.setState({email: value})} value={this.state.email}
             returnKeyType="next" onSubmitEditing={()=>this.pwd.focus()}
           />
+            <View style={styles.view3} />
        <View style = { styles.textBoxBtnHolder }>
-          <TextInput ref={(input)=>this.pwd = input} style={styles.text} placeholder="Password" placeholderTextColor="#B6C0CB" underlineColorAndroid = "transparent" secureTextEntry = { this.state.hidePassword }  onChangeText={(value) => this.setState({password: value})} value={this.state.password}  returnKeyType="done" />
+          <TextInput ref={(input)=>this.pwd = input} style={styles.text} placeholder="Password" autoCorrect={false} placeholderTextColor="#B6C0CB" underlineColorAndroid = "transparent" secureTextEntry = { this.state.hidePassword }  onChangeText={(value) => this.setState({password: value})} value={this.state.password}  returnKeyType="done" />
           <View style={styles.view3} />
           <TouchableOpacity activeOpacity = { 0.5 } style = { styles.visibilityBtn } onPress = { this.managePasswordVisibility }>
             <Image source = { ( this.state.hidePassword ) ? require('../../images/eye-off.png') : require('../../images/eye_1.png') } style = { styles.btnImage } />
           </TouchableOpacity>
         </View>
-        </View>
-        </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{flex:0.5, flexDirection:'column', backgroundColor: '#FFFFFF'}}>
-                <View style={styles.view2}>
-          <TouchableHighlight
+
+        <TouchableOpacity onPress={()=> this.showDatePicker()}>
+                  <View style={{flexDirection:'row', width:'100%', alignItems:'center',justifyContent:'center', marginTop:blockMargin * 1.5, marginBottom:blockMarginHalf}}>
+                <Text style={{
+                width:'90%',
+      color: '#000',
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 14}} >{this.state.date_of_birth != '' ? this.state.date_of_birth : 'Date of Birth'}</Text>
+                <Image source={require('../../images/calendar_theme.png')}
+                resizeMode={'contain'}
+                style={{width:15,height:15, }}/>
+                </View></TouchableOpacity>
+                
+                <DateTimePickerModal
+                        isVisible={this.state.isDatePickerVisible}
+                        mode="date"
+                        maximumDate={new Date()}
+                        onConfirm={this.handleDateConfirm}
+                        onCancel={this.hideDatePicker}
+                      />
+
+<View style={styles.view3} />
+<View style={{flexDirection:'row', width:'100%', alignItems:'center',justifyContent:'center', marginTop: blockMarginHalf/2, marginBottom:blockMarginHalf}}>
+                <Text style={{
+                width:'98%',
+      color: '#B6C0CB',
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 10}} >{'Register your Date of birth for security question'}</Text>
+      </View>
+       
+        <View style={styles.view2}>
+          <TouchableOpacity
             style={[styles.buttonContainer, styles.loginButton]}
             onPress={() => this.register()}
            >
             <Text style={styles.signuptext}>Sign Up</Text>
-          </TouchableHighlight>
+          </TouchableOpacity>
           </View>
           <View
             style={{
               width: '100%',
               flexDirection: 'row',
-              marginTop: responsiveHeight(2),
+              marginTop: blockMargin * 2,
               justifyContent: 'center',
+              marginBottom: blockMargin * 2
             }}>
             <Text style={styles.register_user}>Register User?</Text>
-            <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate('Login')}>
             <Text style={styles.login} >Login</Text></TouchableOpacity>
           </View>
+         
+       
+        </View>
+        </TouchableWithoutFeedback>
+        {/* </ScrollView>
+
+        </KeyboardAvoidingView> */}
+       </KeyboardAwareScrollView>
           </View>
-          </View>
+        
+
           {this.state.isHidden ? (
             <View style={styles.box2}>
               <ActivityIndicator
@@ -377,6 +518,7 @@ import firebase from 'react-native-firebase';
             </View>
           ) : null}
       </View>
+      </SafeAreaView>
     );
           }
         }

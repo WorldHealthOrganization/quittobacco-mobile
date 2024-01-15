@@ -27,7 +27,7 @@ import {  TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import { Header } from 'react-navigation-stack';
 import Toast from 'react-native-simple-toast';
 
@@ -53,9 +53,10 @@ export default class View_Wishlist extends Component {
       //savedMoney
       moneySaved: '0',
       moneySpent: '0',
+      Achieved_count:'0',
 
       //ShareWishListLink
-      uniqueShareWishListLink: 'https://whotobaccoapp.page.link/6SuK',
+      uniqueShareWishListLink: 'https://tobacco.page.link/Sohr',
       wishlist: [],
     };
   }
@@ -80,6 +81,7 @@ export default class View_Wishlist extends Component {
       this.getUser()
       this.setState({ count: 0 });
     });
+      this.getUser()
 
   }
 
@@ -142,35 +144,25 @@ export default class View_Wishlist extends Component {
         },
       )
       .then((response) => {
-        console.log(
-          'Wishh response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
-
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-
+        
           this.setState({
             wishlist: response.data.data.wish_lists,
             moneySpent: response.data.data.money.per_day,
-            moneySaved: response.data.data.money.total
+            moneySaved: response.data.data.money.total,
+            Achieved_count: response.data.data.achieved_count+''
           });
 
-          console.log(
-            'Wishh response ',
-            response.data.data.wish_lists);
           this.setState({ isHidden: false })
-        }
-        else {
+
+        }else {
           this.setState({ isHidden: false })
-          console.log(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({ isHidden: false })
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   }
 
@@ -181,18 +173,26 @@ export default class View_Wishlist extends Component {
     if (type == 2) {
       Share.share(
         {
-          subject: 'WHO My Wish List Link',
+          subject: 'Quit Tobacco My Wish List Link',
           message: 'My Wish List link  \n Click to download the app \n' + uniqueShareWishListLink,
-          title: 'WHO My Wish List Link',
+          title: 'Quit Tobacco My Wish List Link',
         },
         {
-          dialogTitle: 'WHO My Wish List Link',// Android
-          subject: 'WHO My Wish List Link',// iOS
-        }).then(success => console.log(success), reason => console.log(reason))
+          dialogTitle: 'Quit Tobacco My Wish List Link',// Android
+          subject: 'Quit Tobacco My Wish List Link',// iOS
+        }).then(success => console.log("success"), reason => console.log("Deeplink Reason"))
 
 
     }
 
+  };
+
+  getExtensionFormat = (filename) => {
+   
+    if(filename.split('.').pop() === 'png' || filename.split('.').pop() ==='jpg' || filename.split('.').pop() ==='jpeg'){
+      return false
+    }
+    return true
   };
 
 
@@ -205,7 +205,7 @@ export default class View_Wishlist extends Component {
           <View style={{ alignItems: 'center', justifyContent: 'center' }} >
             <Text numberOfLines={2} style={{
               color: '#555555',
-              fontFamily: 'SF-Medium',
+              fontFamily: 'SFCompactDisplay-Medium',
               fontSize: scalable(14), alignItems: 'center'
             }}>No WishList Yet</Text>
           </View>
@@ -226,6 +226,7 @@ export default class View_Wishlist extends Component {
   render() {
     const { wishlist, isHidden, moneySaved, moneySpent } = this.state;
     return (
+    <SafeAreaView style={{flex:1}}>
       <View
         style={{
           flex: 1,
@@ -259,7 +260,7 @@ export default class View_Wishlist extends Component {
             <View style={{ width: '76%', height: responsiveHeight(12), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -306,17 +307,17 @@ export default class View_Wishlist extends Component {
                     <Text numberOfLines={2} style={{
                       marginLeft: blockMarginHalf,
                       color: '#000',
-                      fontFamily: 'SF-Medium',
+                      fontFamily: 'SFCompactDisplay-Medium',
                       fontSize: scalable(20),
                       textAlign: 'center'
                     }}>
-                      {'0/' + wishlist.length}
+                      {this.state.Achieved_count+'/' + wishlist.length}
                     </Text>
 
                     <Text numberOfLines={2} style={{
                       marginTop: blockMarginHalf / 6, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
                       color: '#0072BB',
-                      fontFamily: 'SF-Medium',
+                      fontFamily: 'SFCompactDisplay-Medium',
                       fontSize: scalable(15),
                       textAlign: 'center'
                     }}>
@@ -345,7 +346,7 @@ export default class View_Wishlist extends Component {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(14),
                           textAlign: 'center'
                         }}>
@@ -355,7 +356,7 @@ export default class View_Wishlist extends Component {
                         <Text style={{
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(18),
                           textAlign: 'center'
                         }}>
@@ -382,7 +383,7 @@ export default class View_Wishlist extends Component {
                         <Text numberOfLines={2} style={{
                           marginLeft: blockMarginHalf,
                           color: '#0072BB',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(14),
                           textAlign: 'center'
                         }}>
@@ -393,7 +394,7 @@ export default class View_Wishlist extends Component {
                           marginTop: blockMarginHalf / 4, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
 
                           color: '#000',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: scalable(18),
                           textAlign: 'center'
                         }}>
@@ -428,7 +429,7 @@ export default class View_Wishlist extends Component {
                           cardMaxElevation={5}
                           cornerRadius={blockMargin}>
 
-                          <TouchableOpacity onPress={() => this.editWish(item.id)}> 
+                          <TouchableOpacity onPress={() => this.editWish(item.code)}> 
                             <View style={{ width: '100%', flexDirection: 'row', padding: blockMarginHalf }}>
                               <View style={{ width: '25%', flexDirection: 'column' }}>
 
@@ -442,21 +443,21 @@ export default class View_Wishlist extends Component {
                                 }}>
                                   <Image
                                     source={
-                                      item.image === '' || item.image === null
-                                        ? require('../../images/heart.png')
+                                      item.image === '' || item.image === null || this.getExtensionFormat(item.image)
+                                        ? require('../../images/placeholder.png')
                                         : {
-                                          uri: 'http://whoapp.dci.in/uploads/files/' + item.image,
+                                          uri: ApiName.baseLink + item.image,
                                           cache: 'force-cache',
                                         }
                                     }
 
-                                    defaultSource={require('../../images/heart.png')}
-                                    resizeMode='contain'
+                                    defaultSource={require('../../images/placeholder.png')}
+                                    resizeMode='cover'
 
                                     style={{
                                       width: 50,
                                       height: 50,
-                                      resizeMode: 'contain',
+                                      resizeMode: 'cover',
 
                                       justifyContent: 'center',
 
@@ -471,7 +472,7 @@ export default class View_Wishlist extends Component {
                                 <Text numberOfLines={2} style={{
                                   marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 4,
                                   color: '#0072BB',
-                                  fontFamily: 'SF-Medium',
+                                  fontFamily: 'SFCompactDisplay-Medium',
                                   fontSize: scalable(15),
                                 }}>
                                   {item.name}
@@ -479,20 +480,26 @@ export default class View_Wishlist extends Component {
                                 <Text style={{
                                   color: '#202020',
                                   fontSize: scalable(14),
-                                  fontFamily: 'SF-Regular', marginLeft: blockMarginHalf
+                                  fontFamily: 'SFCompactDisplay-Regular', marginLeft: blockMarginHalf,marginTop: blockMarginHalf/2
                                 }}>{item.notes}</Text>
-
-
-
-                                <Text numberOfLines={2} style={{
+ <Text numberOfLines={2} style={{
                                   marginTop: blockMarginHalf / 2, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
-                                  color: '#0072BB',
-                                  fontFamily: 'SF-Medium',
-                                  fontSize: scalable(16),
+                                  color: '#222222',
+                                  fontFamily: 'SFCompactDisplay-Semibold',
+                                  fontSize: scalable(18),
                                 }}>
                                   {item.currency + item.price}
                                 </Text>
 
+                                <Text numberOfLines={2} style={{
+                                   marginLeft: blockMarginHalf,
+                                  color: '#0072BB',
+                                  textAlign:'left',
+                                  fontFamily: 'SFCompactDisplay-Medium',
+                                  fontSize: scalable(12),
+                                }}>
+                                 {item.status === 1 ? 'Completed' :'remaining time: '+ item.remaining_time }
+                                </Text>
 
                                 
                               </View>
@@ -513,13 +520,13 @@ export default class View_Wishlist extends Component {
                           cardMaxElevation={5}
                           cornerRadius={blockMargin}>
 
-                        <TouchableOpacity onPress={() => this.editWish(item.id)}> 
+                        <TouchableOpacity onPress={() => this.editWish(item.code)}> 
                             <View style={{ width: '100%', flexDirection: 'row', padding: blockMarginHalf }}>
                               <View style={{ width: '75%', flexDirection: 'column', justifyContent: 'center' }}>
                                 <Text numberOfLines={2} style={{
                                   marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 4,
                                   color: '#0072BB',
-                                  fontFamily: 'SF-Medium',
+                                  fontFamily: 'SFCompactDisplay-Medium',
                                   fontSize: scalable(15),
                                 }}>
                                   {item.name}
@@ -527,19 +534,31 @@ export default class View_Wishlist extends Component {
                                 <Text style={{
                                   color: '#202020',
                                   fontSize: scalable(14),
-                                  fontFamily: 'SF-Regular', marginLeft: blockMarginHalf
+                                  fontFamily: 'SFCompactDisplay-Regular', marginLeft: blockMarginHalf,marginTop: blockMarginHalf/2
                                 }}>{item.notes}</Text>
 
 
 
                                 <Text numberOfLines={2} style={{
                                   marginTop: blockMarginHalf / 2, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
-                                  color: '#0072BB',
-                                  fontFamily: 'SF-Medium',
-                                  fontSize: scalable(16),
+                                  color: '#222222',
+                                  fontFamily: 'SFCompactDisplay-Semibold',
+                                  fontSize: scalable(18),
                                 }}>
                                   {item.currency + item.price}
                                 </Text>
+
+                                <Text numberOfLines={2} style={{
+                                   marginLeft: blockMarginHalf,
+                                  color: '#0072BB',
+                                  textAlign:'left',
+                                  fontFamily: 'SFCompactDisplay-Medium',
+                                  fontSize: scalable(12),
+                                }}>
+                               {item.status === 1 ? 'Completed' :'remaining time: '+ item.remaining_time }
+                                </Text>
+
+
                               </View>
 
                               <View style={{ width: '25%', flexDirection: 'column' }}>
@@ -554,21 +573,21 @@ export default class View_Wishlist extends Component {
                                 }}>
                                   <Image
                                     source={
-                                      item.image === '' || item.image === null
-                                        ? require('../../images/heart.png')
+                                      item.image === '' || item.image === null || this.getExtensionFormat(item.image)
+                                        ? require('../../images/placeholder.png')
                                         : {
-                                          uri: 'http://whoapp.dci.in/uploads/files/' + item.image,
+                                          uri: ApiName.baseLink + item.image,
                                           cache: 'force-cache',
                                         }
                                     }
 
-                                    defaultSource={require('../../images/heart.png')}
-                                    resizeMode='contain'
+                                    defaultSource={require('../../images/placeholder.png')}
+                                    resizeMode='cover'
 
                                     style={{
                                       width: 50,
                                       height: 50,
-                                      resizeMode: 'contain',
+                                      resizeMode: 'cover',
 
                                       justifyContent: 'center',
 
@@ -657,7 +676,7 @@ export default class View_Wishlist extends Component {
 
 
       </View>
-
+</SafeAreaView>
     );
    
   }

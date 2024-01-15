@@ -6,15 +6,15 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
-import DatePicker from 'react-native-datepicker';
-import Slider from 'react-native-slider';
+
 // import {
 //   StepProgressBar
 // } from 'react-native-step-progress-bar';
 import Counter from 'react-native-counters';
 import Feather from 'react-native-vector-icons/Feather';
 import dateFormat from 'date-fns/format';
-import SnapSlider  from 'react-native-snap-slider';
+// import SnapSlider  from 'react-native-snap-slider';
+import Slider from '@react-native-community/slider';
 
 import {
   View,
@@ -23,18 +23,16 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
-  TouchableHighlight,ActivityIndicator
+  TouchableHighlight,ActivityIndicator, SafeAreaView
 } from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
-import {SimpleStepper} from 'react-native-simple-stepper';
-import {Stepper} from 'react-form-stepper';
-import StepIndicator from 'react-native-step-indicator';
+
+
 import {
   scalable,
   deviceWidth,
@@ -46,6 +44,9 @@ import {
   blockPadding,
   blockPaddingHalf,
 } from '../ui/common/responsive';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const labels = ['Not At All', 'Moderate', 'Too Strong'];
 
@@ -71,7 +72,7 @@ const customStyles = {
   labelColor: '#202020',
   labelSize: responsiveFontSize(1.45),
   currentStepLabelColor: '#202020',
-  labelFontFamily: 'SF-Medium',
+  labelFontFamily: 'SFCompactDisplay-Medium',
   labelAlign: 'center',
 };
 
@@ -89,19 +90,19 @@ export default class Diary extends Component {
       isSeleted: 1,
       defaultItem: 0,
       desire:'',
+      isDatePickerVisible:false
     };
   }
   componentDidMount = () => {
     var dateTime = new Date();
     let formatDate = dateFormat(dateTime, 'dd MMM yyyy');
-    console.log('formatDate ==> ' + formatDate);
+   
     this.setState({
       diary_date: formatDate,
       inputDate: dateFormat(dateTime, 'yyyy-MM-dd'),
     });
   };
   onChange(number, type) {
-    console.log(number, type);
     this.setState({craving_count: number}); // 1, + or -
   }
 
@@ -113,14 +114,12 @@ export default class Diary extends Component {
   // }
   onPageChange(position) {
     this.setState({currentPosition: position});
-    console.log(position);
+    
   }
   slidingComplete = (itemSelected) => {
-    console.log("slidingComplete");
-    console.log("item selected " + this.refs.slider.state.item);
-    console.log("item selected(from callback)" + itemSelected);
+  
     this.setState({defaultItem: itemSelected})
-    // console.log("value " + this.sliderOptions[this.refs.slider.state.item].value);
+    
   }
 inputValidation(){
   const {
@@ -150,10 +149,6 @@ this.goForAxios()
       defaultItem,
     } = this.state;
 
-    console.log(
-      'input ==> diary' + inputDate + ' ' + notes + ' ' + craving_count + defaultItem,
-    );
-
     axios
       .post(
         ApiName.store_diary,
@@ -171,32 +166,28 @@ this.goForAxios()
         },
       )
       .then((response) => {
-        console.log(
-          'store_diary response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-
+        this.setState({isHidden: false});
         if (response.data.status == 200) {
-          this.setState({isHidden: false});
+         
           Toast.show(response.data.message);
         
           this.props.navigation.goBack();
         } else {
-          this.setState({isHidden: false});
+        
           Toast.show(response.data.message);
         }
       })
       .catch((error) => {
         this.setState({isHidden: false});
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
   };
 
   date(date) {
     var dateTime = new Date(date);
     let formatDate = dateFormat(dateTime, 'dd-MMM-yyyy');
-    console.log('formatDate ==> ' + formatDate);
+
     this.setState({
       diary_date: formatDate,
       inputDate: dateFormat(dateTime, 'yyyy-MM-dd'),
@@ -204,7 +195,7 @@ this.goForAxios()
   }
 
   lastEntry(clickState) {
-    //alert(clickState);
+   
     if (clickState == 1) {
       this.setState({isSeleted: 1});
     } else {
@@ -213,7 +204,7 @@ this.goForAxios()
   }
 
   lastEntry1(sss) {
-    alert(sss + 1);
+    
     if (this.state.isSeleted == 1) {
       this.setState({isSeleted: 0});
     } else {
@@ -221,9 +212,32 @@ this.goForAxios()
     }
   }
 
+
+showDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: true,
+  });
+};
+hideDatePicker = () => {
+  this.setState({
+    isDatePickerVisible: false,
+  });
+};
+handleDateConfirm = (date) => {
+  let formatDate = dateFormat(date, 'dd MMM yyyy');
+  let formatValidDate = dateFormat(date, 'yyyy-MM-dd');
+
+  this.setState({diary_date: formatDate});
+  this.setState({inputDate: formatValidDate});
+  this.hideDatePicker();
+};
+
   render() {
     const{isHidden} =this.state
+    const sliderValueLabels = ['Not at all', 'Medium', 'Strong'];
+
     return (
+      <SafeAreaView style={styles.container}>
       <View style={styles.container}>
         <View style={styles.view}>
     
@@ -267,7 +281,7 @@ this.goForAxios()
                 style={{
                   width: '88%',
                   color: '#FFFFFF',
-                  fontFamily: 'SF-Medium',
+                  fontFamily: 'SFCompactDisplay-Medium',
                   fontSize: scalable(18),
                   justifyContent: 'center',
                   textAlign: 'center',
@@ -276,12 +290,14 @@ this.goForAxios()
               </Text>
             </View>
           </View>
-          <ScrollView style={{height: 100,marginTop: 0}}  keyboardShouldPersistTaps={'handled'}>
+          <KeyboardAwareScrollView
+          style={{ flex: 1}}
+          contentContainerStyle={{ flexGrow: 1}}>
             <View>
               
               <View style={{marginTop: 5}}>
                 <Text style={styles.content}>Date</Text>
-                <DatePicker
+                {/* <DatePicker
                   style={{
                     width: responsiveWidth(95),
                     marginTop: responsiveHeight(0.25),
@@ -291,6 +307,8 @@ this.goForAxios()
                   mode="date" //The enum of date, datetime and time
                   placeholder="select date"
                   format="DD MMM YYYY"
+                  confirmBtnText="Confirm"
+                  cancelBtnText="Cancel"
                   iconSource={require('../../images/calendar_theme.png')}
                   minDate={new Date()}
                   customStyles={{
@@ -311,7 +329,27 @@ this.goForAxios()
                   onDateChange={(diary_date) => {
                     this.date(diary_date);
                   }}
-                />
+                /> */}
+                <TouchableOpacity onPress={()=> this.showDatePicker()}>
+                  <View style={{flexDirection:'row', width:'100%', alignItems:'center',
+                  justifyContent:'center', marginTop:blockMarginHalf, marginBottom:blockMarginHalf}}>
+                <Text style={{
+                width:'80%',
+      color: '#000',
+      fontFamily: 'SFCompactDisplay-Regular',
+      fontSize: 16,marginLeft:0}} >{this.state.diary_date != '' ? this.state.diary_date : 'Select Date'}</Text>
+                <Image source={require('../../images/calendar_theme.png')}
+                resizeMode={'contain'}
+                style={{width:18,height:18, }}/>
+                </View></TouchableOpacity>
+                
+                <DateTimePickerModal
+                        isVisible={this.state.isDatePickerVisible}
+                        mode="date"
+                        onConfirm={this.handleDateConfirm}
+                        onCancel={this.hideDatePicker}
+                      />
+
                 <View style={styles.view4} />
               </View>
               <View
@@ -345,7 +383,7 @@ this.goForAxios()
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         YES
@@ -371,7 +409,7 @@ this.goForAxios()
                       <Text
                         style={{
                           color: '#FFFFFF',
-                          fontFamily: 'SF-Medium',
+                          fontFamily: 'SFCompactDisplay-Medium',
                           fontSize: responsiveFontSize(2),
                         }}>
                         NO
@@ -395,7 +433,7 @@ this.goForAxios()
                     width: responsiveWidth(100),
                   }}>
                  
-        <SnapSlider ref="slider" containerStyle={styles.snapsliderContainer} style={styles.snapslider}
+        {/* <SnapSlider ref="slider" containerStyle={styles.snapsliderContainer} style={styles.snapslider}
                     itemWrapperStyle={styles.snapsliderItemWrapper}
                     itemStyle={styles.snapsliderItem}
                     items={[{value: 0, label: 'Not at All'},
@@ -404,7 +442,24 @@ this.goForAxios()
                     ]}
                     labelPosition="bottom"
                     defaultItem={this.state.defaultItem}
-                    onSlidingComplete={this.slidingComplete} />
+                    onSlidingComplete={this.slidingComplete} /> */}
+                    <Slider
+                        style={styles.snapslider}
+                        step={1}
+                        minimumValue={1}
+                        maximumValue={3}
+                        value={this.state.sliderValue}
+                        // onValueChange={(value) => this.setState({ sliderValue: value })}
+                        onValueChange={(value) => this.slidingComplete(value)}
+
+                      />
+                      <View style={styles.labelContainer}>
+                        {sliderValueLabels.map((label, index) => (
+                          <Text key={index} style={styles.label}>
+                            {label}
+                          </Text>
+                        ))}
+                      </View>
 
                 </View>
               </View>
@@ -429,12 +484,13 @@ this.goForAxios()
                       borderRadius: responsiveWidth(6),
                       borderColor: '#202020',
                       backgroundColor: '#CBE2F1',
+                      fontFamily:'SFCompactDisplay-Medium'
                     }}
                     buttonTextStyle={{
                       fontSize: responsiveFontSize(2.5),
-                      color: '#202020',
+                      color: '#202020',fontFamily:'SFCompactDisplay-Medium'
                     }}
-                    countTextStyle={{color: '#202020'}}
+                    countTextStyle={{color: '#202020',fontFamily:'SFCompactDisplay-Medium'}}
                     start={1}
                     onChange={this.onChange.bind(this)}
                     value={this.state.craving_count}
@@ -453,7 +509,7 @@ this.goForAxios()
                 <TextInput
                   style={styles.input}
                   onChangeText={(value) => this.setState({notes: value})}
-                  placeholder="Please write your experience that how did you manage your craving  (eg: what did I do & How did I manage cravings)"
+                  placeholder="Please write your experience and how you managed your craving(s)."
                   value={this.state.notes}
                   placeholderTextColor="#00000029" 
                   multiline={true}
@@ -493,9 +549,10 @@ this.goForAxios()
             </View>
           ) : null}
             </View>
-          </ScrollView>
+          </KeyboardAwareScrollView>
         </View>
       </View>
+      </SafeAreaView>
     );
   }
 }

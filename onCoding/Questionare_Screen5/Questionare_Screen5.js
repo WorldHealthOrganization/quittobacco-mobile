@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import React, {Component} from 'react';
-import {View, Text, Dimensions, Alert, Image, TouchableOpacity, Settings} from 'react-native';
+import {View, Text, Dimensions, Image, TouchableOpacity, Settings, SafeAreaView,ActivityIndicator} from 'react-native';
 import styles from '../Questionare_Screen5/styles';
-import ToolbarAndroid from '@react-native-community/toolbar-android';
+//import ToolbarAndroid from '@react-native-community/toolbar-android';
 import {
   responsiveHeight,
   responsiveWidth,
@@ -12,14 +12,24 @@ import SelectMultiple from 'react-native-select-multiple';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
-import CheckBox from 'react-native-checkbox-animated';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
+
 import Toast from 'react-native-simple-toast';
 //import Settings_Screen from '../Settings/Settings';
 
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
-import {createAppContainer} from 'react-navigation';
-
+import {createAppContainer,} from 'react-navigation';
+import {
+  scalable,
+  deviceWidth,
+  deviceHeight,
+  itemRadius,
+  itemRadiusHalf,
+  blockMarginHalf,
+  blockMargin,
+  blockPadding,
+  blockPaddingHalf,
+} from '../ui/common/responsive';
 import Disclaimer from '../Disclaimer/Disclaimer';
 
 const tobacco = [
@@ -48,21 +58,36 @@ constructor(props) {
     use: '',
     SettingState:'',
     transparency: false,
+    isHidden: false,
+
   };
 }
 
 onSelectionsChange = (reasons) => {
   // selectedFruits is array of { label, value }
-  this.setState({ reasons_value:reasons });
-  var use = 0;
+  // this.setState({ reasons_value:reasons });
+  // var use = 0;
 
-  if (reasons.length > 0) {
-    for (var i = 0; i < reasons.length; i++) {
-    use = use + reasons[i].label + ',';
-    }
-    console.log(use);
-    this.setState({use:use});
-  }
+  // if (reasons.length > 0) {
+  //   for (var i = 0; i < reasons.length; i++) {
+  //   use =  reasons[i].value + ',';
+  //   }
+  //   this.setState({use:use});
+  // }
+
+  this.setState({ reasons_value:reasons });
+  let use = []
+  let useId=[]
+ 
+   if (reasons.length > 0) {
+     for (var i = 0; i < reasons.length; i++) {
+      use.push(reasons[i].label);
+      useId.push(reasons[i].value);
+     }
+     this.setState({use:useId});
+   }else{
+     this.setState({use:''});
+   }
 
 }
 
@@ -80,7 +105,8 @@ quit_reason= async () => {
   // let Password = await AsyncStorage.getItem('UserPassword');
   let jwt_token = await AsyncStorage.getItem('Login_JwtToken');
 
- 
+  this.setState({isHidden: true});
+
 
         axios
           .post(
@@ -92,31 +118,26 @@ quit_reason= async () => {
             },
           )
           .then((response) => {
-            console.log(
-              'Quit Reason response ',
-              'response get details:==> ' + JSON.stringify(response.data),
-            );
-            const obj = [];
-
-            for (var i = 0; i < response.data.data.length; i++) {
-                obj.push({
-                value: response.data.data[i].id + '',
-                label: response.data.data[i].name,
-              });
-            }
-            this.setState({quitReason: obj});
-
+          
+            
+            this.setState({isHidden: false});
             if (response.data.status == 200) {
-              console.log(JSON.stringify( response.data));
-             
-              // Toast.show(response.data.message);
+              const obj = [];
+
+              for (var i = 0; i < response.data.data.length; i++) {
+                  obj.push({
+                  value: response.data.data[i].id + '',
+                  label: response.data.data[i].name,
+                });
+              }
+              this.setState({quitReason: obj});
             }
-            else {
-              console.log(response.data.message);
-            }
+           
           })
           .catch((error) => {
-            console.log('reactNativeDemo axios error:', error);
+            this.setState({isHidden: false});
+            Toast.show('There was some error. Please try again');
+           
           });
 }
 
@@ -125,13 +146,15 @@ update= async () => {
   // let mobile = await AsyncStorage.getItem('UserMobileNo');
   // let Password = await AsyncStorage.getItem('UserPassword');
 
+
   let jwt_token = await AsyncStorage.getItem('Login_JwtToken');
   let SettingState = await AsyncStorage.getItem('SettingState');
-  // alert(SettingState);
+  
   this.setState({SettingState: SettingState});
   const {use} = this.state;
-  console.log('screen input ==> ' + use + 'setting state' + SettingState);
+
 if (use != ''){
+  this.setState({isHidden: true});
         axios
           .post(
             ApiName.userInfoupdate,{
@@ -144,40 +167,24 @@ if (use != ''){
             },
           )
           .then((response) => {
-            console.log(
-              'Update Reason response ',
-              'response get details:==> ' + JSON.stringify(response.data),
-            );
-            // const obj = [];
-
-            // for (var i = 0; i < use.length; i++) {
-            //     obj.push({
-            //     value: use[i].label + '',
-            //     label: use[i].value,
-            //   });
-            // }
-            // this.setState({reasons_value: obj});
-
+           
+            this.setState({isHidden: false});
             if (response.data.status == 200) {
-              console.log(JSON.stringify( response.data));
+            
+
+            
               this.props.navigation.navigate('Disclaimer')
                Toast.show(response.data.message);
-            //   if (SettingState == 1) {
-            //   //  this.props.navigation.navigate('Settings_Screen')
-            //     Toast.show(response.data.message);
-            //     this.props.navigation.navigate('Settings')
-            //   }
-            //   else {
-            // this.props.navigation.navigate('Disclaimer')
-            //    Toast.show(response.data.message);
-            //   }
+            
             }
             else {
-              console.log(response.data.message);
+              Toast.show(response.data.message);
             }
           })
           .catch((error) => {
-            console.log('reactNativeDemo axios error:', error);
+            this.setState({isHidden: true});
+            Toast.show('There was some error. Please try again');
+           
           });
 }
 else {
@@ -188,31 +195,79 @@ else {
 
   render() {
 
-const {quitReason,reasons,transparency} = this.state;
+const {quitReason,reasons,transparency,isHidden} = this.state;
 
     return (
+      <SafeAreaView style={{flex:1}}>
       <View style={styles.container}>
         <View style={styles.view}>
-        <View style={{flexDirection: 'row', width: responsiveWidth(100),flex: 0.1,backgroundColor: '#0072BB'}}>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('Transparent_page')}>
-     <Text style={styles.toolbar_title}>Let's Do It</Text>
-     </TouchableOpacity>
-</View>
-    <View style={{ flex: 1, marginTop: responsiveHeight(2)}}>
-                    <Text style={styles.text_ques2}>Make a list of your reasons to quit tobacco</Text>
-                    <SelectMultiple rowStyle={styles.rowstyle} selectedCheckboxSource={require('../../images/tick_enabled.png')} checkboxSource={require('../../images/tick_disable.png')}
+        
+        <View style={{
+            flexDirection: 'row', width: '100%', 
+            backgroundColor: '#0072BB', alignItems: 'center', justifyContent: 'center'
+          }}>
+            <View style={{ width: '12%', height: responsiveHeight(10), justifyContent: 'center', 
+            alignContent: 'center', alignSelf: 'center', }}>
+
+              <TouchableOpacity style={{
+
+                alignItems: 'center',
+              }} onPress={() => this.props.navigation.navigate('Questionare_Screen4')}>
+
+                <Image style={{
+                  width: responsiveWidth(3),
+                  height: responsiveHeight(4),
+
+                  resizeMode: 'contain'
+                }} source={require('../../images/back_arrow.png')} />
+
+              </TouchableOpacity>
+
+            </View>
+            
+            <View style={{ width: '76%',  alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{
+                color: '#FFFFFF',
+                fontFamily: 'SFCompactDisplay-Medium',
+                fontSize: scalable(18),
+                justifyContent: 'center',
+                textAlign: 'center',
+
+              }}>Let's Do It</Text>
+            </View>
+            <View style={{ width: '12%', alignItems: 'center', justifyContent: 'center', marginRight: blockMarginHalf }}>
+
+
+                <Image style={{
+                  width: 0,
+                  height: 0,
+                  tintColor: '#0072bb',
+                  resizeMode: 'contain'
+                }} source={require('../../images/share.png')} />
+
+          
+            </View>
+          </View>
+    
+       
+    <View style={{height:'88%', width:'100%',}}>
+                    <Text style={styles.text_ques2}>Make a list of your reasons to quit tobacco use</Text>
+                    <SelectMultiple style={{marginTop:blockMarginHalf * 2}} labelStyle={{fontFamily: 'SFCompactDisplay-Regular',color:'black'}}  rowStyle={styles.rowstyle} selectedCheckboxSource={require('../../images/tick_enabled.png')} checkboxSource={require('../../images/tick_disable.png')}
           items={quitReason}
           value={reasons}
           selectedItems={this.state.reasons_value}
           onSelectionsChange={this.onSelectionsChange} />
-       </View>
-       <View style={styles.view2}>
+
+<View style={styles.view2}>
        <TouchableOpacity
             style={[styles.buttonContainer, styles.submitbutton]}
             onPress={() => this.update()}>
-            <Text style={styles.submittext}>Submit</Text>
+            <Text style={styles.submittext}>Continue</Text>
           </TouchableOpacity>
 </View>
+
+       </View>
+     
 {!transparency &&
       <View style={{flex:1,  height: '100%', width: '100%', position: 'absolute'}}>
       <TouchableOpacity onPress={() => this.setState({transparency: true})}>
@@ -237,8 +292,25 @@ const {quitReason,reasons,transparency} = this.state;
       </View>
   }
       </View>
-   
+      {this.state.isHidden ? (
+            <View style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              justifyContent: 'center',
+              alignContent: 'center',
+              alignSelf: 'center'
+            }}>
+              <ActivityIndicator
+                size={40}
+                color="#0072BB"
+                animating={true}
+                backgroundColor={'transparent'}
+              />
+            </View>
+          ) : null}
       </View>
+      </SafeAreaView>
     );
   }
 }

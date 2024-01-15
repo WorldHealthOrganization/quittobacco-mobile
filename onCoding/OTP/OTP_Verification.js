@@ -8,7 +8,7 @@ import {
 } from 'react-native-responsive-dimensions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 import {createStackNavigator, NavigationActions} from 'react-navigation-stack';
 import {createAppContainer} from 'react-navigation';
@@ -20,11 +20,9 @@ import {
   ImageBackground,
   Image,
   Text,
-  Alert,
-  TouchableOpacity,
-  ActivityIndicator,
+  TouchableOpacity,TouchableWithoutFeedback,
+  ActivityIndicator,SafeAreaView, SafeAreaViewBase,Keyboard,KeyboardAvoidingView
 } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 
 export default class OTP_Verification extends Component {
@@ -62,7 +60,7 @@ export default class OTP_Verification extends Component {
     let Password = await AsyncStorage.getItem('Password');
 
     // const MobileNumber = navigation.getParam('MobileNumber', 'MobileNumber');
-    //alert (LoginId+' - '+UserId+' - '+MobileNo);
+    
     this.setState({email_or_phone:MobileNo});
     this.setState({id:LoginId});
     this.setState({country_code:CountryCode});
@@ -71,9 +69,7 @@ export default class OTP_Verification extends Component {
 
       let otpState = await AsyncStorage.getItem('OtpState');
       this.setState({otpState: otpState});
-// alert(otpState);
 
-      //alert(parsed.email);
     } catch (error) {
       console.log(error);
     }
@@ -100,28 +96,24 @@ if(otpState == 1) {
     },
   )
   .then((response) => {
-    console.log(
-      'otp resend response ',
-      'response get details:==> ' + JSON.stringify(response.data),
-    );
-    // Toast.show(response.data.message);
+   
     this.setState({isHidden: false});
 
     if (response.data.status == 200) {
     
         Toast.show(response.data.message);
-        this.props.navigation.navigate('Change_pwd',{UserId:  id});
+        this.props.navigation.navigate('Change_pwd',{UserId:  id+''});
 
         
   } else {
     Toast.show(response.data.message);
-    this.setState({isHidden: false});
+    
   }
 
-    // this.clear();
   })
   .catch((error) => {
-    console.log('reactNativeDemo axios error:', error);
+    Toast.show('There was some error. Please try again')
+   
     this.setState({isHidden:false });
 
   });
@@ -142,11 +134,7 @@ if(otpState == 1) {
         },
       )
       .then((response) => {
-        console.log(
-          'otp resend response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-        // Toast.show(response.data.message);
+       
         this.setState({isHidden: false});
 
         if (response.data.status == 200) {
@@ -156,13 +144,13 @@ if(otpState == 1) {
         
           AsyncStorage.setItem('LoginStatus', 'true');
           AsyncStorage.setItem('QuestionarieStatus', response.data.data.questionarie_status+'');
-          AsyncStorage.setItem('UserId',response.data.data.id);
+          AsyncStorage.setItem('UserId',response.data.data.id+'');
           AsyncStorage.setItem('UserName',response.data.data.name);
           AsyncStorage.setItem('UserMobileNo',response.data.data.mobile);
           AsyncStorage.setItem('UserEmailId', response.data.data.email);
           AsyncStorage.setItem('UserProfileImage', response.data.data.profile_image);
           AsyncStorage.setItem('UserFCM', response.data.data.fcm_token);
-          AsyncStorage.setItem('Login_JwtToken','Bearer ' + response.data.jwt_token);
+          //AsyncStorage.setItem('Login_JwtToken','Bearer ' + response.data.jwt_token);
 
           Toast.show('User Registered succesfully')
 
@@ -172,17 +160,18 @@ if(otpState == 1) {
             this.props.navigation.navigate('QuestionareStack');
           }
          
-        this.setState({isHidden: false});
+        
         
       } else {
         Toast.show(response.data.message);
-        this.setState({isHidden: false});
+        
       }
 
-        // this.clear();
+        
       })
       .catch((error) => {
-        console.log('reactNativeDemo axios error:', error);
+        Toast.show('There was some error. Please try again')
+       
         this.setState({isHidden:false });
 
       });}
@@ -211,26 +200,17 @@ if(otpState == 1) {
         },
       )
       .then((response) => {
-        console.log(
-          'otp resend response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
-        // alert(response.data.message);
+       
         this.setState({isHidden: false});
 
         if (response.data.status == 200) {
           Toast.show(response.data.message);
-          this.setState({isHidden: false});
-      } else {
-        alert('Failed');
-        this.setState({isHidden: false});
-
       }
 
-        // this.clear();
       })
       .catch((error) => {
-        console.log('reactNativeDemo axios error:', error);
+        Toast.show('There was some error. Please try again')
+       
         this.setState({isHidden: false});
 
       });
@@ -238,21 +218,28 @@ if(otpState == 1) {
 
   render() {
     return (
+      <SafeAreaView style={styles.container}>
       <View style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.view}>
+        
           <ImageBackground
             source={require('../../images/shape.png')}
-            style={{width: responsiveWidth(100), height: responsiveHeight(37)}}>
+            style={{width: responsiveWidth(100), height: responsiveHeight(38)}}>
               <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-              <Image source={require('../../images/back_arrow.png')} style={styles.back_arrow}/>
+              <Image source={require('../../images/back_arrow.png')} resizeMode={'contain'} style={styles.back_arrow}/>
               </TouchableOpacity>
             <Text style={styles.OTP_text}>OTP Verification</Text>
           </ImageBackground>
+          
+        
           <View style={styles.view1}>
           <Text style={styles.text}>
           Enter the 4-digit code sent to you {'\n'}at <Text style= {styles.text_phnno}> (+ {this.state.country_code}) {this.state.email_or_phone}</Text>
           </Text>
           </View>
+         
+          
           <View style={styles.view2}>
           <OTPInputView
                   // eslint-disable-next-line react-native/no-inline-styles
@@ -277,15 +264,17 @@ if(otpState == 1) {
               flex: 1,
               width: '100%',
               flexDirection: 'row',
-              marginLeft: responsiveWidth(17),
-              marginTop: responsiveHeight(2),
-              marginBottom: responsiveHeight(1),
+              alignSelf:'center',
+              justifyContent:'center',
+              marginTop: responsiveHeight(1),
+              marginBottom: responsiveHeight(3),
             }}>
             <Text style={styles.OTP_text1}>Didn't receive the OTP?</Text>
             <Text style={styles.OTP_Resend} onPress={() =>  this.resendOTP()} >Resend OTP</Text>
           </View>
           </View>
         </View>
+        </TouchableWithoutFeedback>
         {this.state.isHidden ? (
             <View style={styles.box2}>
               <ActivityIndicator
@@ -297,6 +286,7 @@ if(otpState == 1) {
             </View>
           ) : null}
       </View>
+      </SafeAreaView>
     );
   }
 }

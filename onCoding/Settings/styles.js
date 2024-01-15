@@ -5,6 +5,7 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMargin, blockMarginHalf, scalable } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
@@ -34,7 +35,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
         marginLeft: responsiveWidth(28),
@@ -42,10 +43,11 @@ export default StyleSheet.create({
       },
     text:{
       color: '#202020',
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       fontSize: responsiveFontSize(2.25),
       marginTop: responsiveHeight(4),
       marginLeft: responsiveWidth(7),
+      width:'80%',
       // marginRight: responsiveWidth(3),
     },
   buttonContainer: {
@@ -63,8 +65,8 @@ export default StyleSheet.create({
   },
   submittext: {
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
-    fontSize: responsiveFontSize(2),
+    fontFamily: 'SFCompactDisplay-Medium',
+    fontSize: scalable(13),marginTop:blockMarginHalf/2,marginBottom:blockMarginHalf/2,marginLeft: blockMargin,marginRight: blockMargin
     
   },
   buttonContainer1: {
@@ -80,23 +82,31 @@ export default StyleSheet.create({
   },
   img: {
     resizeMode: 'contain',
-    marginLeft: responsiveWidth(44.53),
     marginTop: responsiveHeight(4),
+    alignItems:'flex-end',
+    width:18,
+    height:18,
   },
   img1: {
     resizeMode: 'contain',
-    marginLeft: responsiveWidth(35.5),
     marginTop: responsiveHeight(4),
+    alignItems:'flex-end',
+    width:18,
+    height:18,
   },
   img2: {
     resizeMode: 'contain',
-    marginLeft: responsiveWidth(54),
     marginTop: responsiveHeight(4),
+    alignItems:'flex-end',
+    width:18,
+    height:18,
   },
   img3: {
     resizeMode: 'contain',
-    marginLeft: responsiveWidth(29),
     marginTop: responsiveHeight(4),
+    alignItems:'flex-end',
+    width:18,
+    height:18,
   },
   arrow: {
     width: responsiveWidth(3),

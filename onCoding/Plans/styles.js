@@ -5,24 +5,24 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMargin } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
-          flex:1,
-        backgroundColor: '#FFFFFF',
+        width: '100%',
+        height:'100%',
+        backgroundColor: 'white',
       },
       view1: {
-        flex: 0.5,
-        backgroundColor: '#FFFFFF',
-        marginTop: responsiveHeight(2),
-        // marginLeft: responsiveWidth(8),
-        alignSelf: 'center',
-        width: responsiveWidth(80),
+        flexDirection:'column',
+        backgroundColor: 'white',
+      
+        width: '90%',
       },
       view2:
       {
@@ -46,7 +46,7 @@ export default StyleSheet.create({
       },
       text_prg:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         marginTop: responsiveHeight(1),
         marginLeft: responsiveWidth(30),
@@ -122,23 +122,23 @@ export default StyleSheet.create({
     alignSelf: 'center',
     textAlign: 'center',
     color: '#CBE2F1',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2.5),
     width: responsiveWidth(100),
   },
   text2:{
     color: '#202020',
-    fontSize: responsiveFontSize(1.5),
-    fontFamily: 'SF-Regular',
-    fontWeight: 'bold',
-    width: '100%',
+    fontSize: 16,
+    marginTop: blockMargin * 2,
+    fontFamily: 'SFCompactDisplay-Regular',
+   
+  
 },
 buttonContainer: {
   height: responsiveHeight(6.5),
   justifyContent: 'center',
   alignItems: 'center',
   marginTop: responsiveHeight(5),
-  marginLeft: responsiveHeight(7.45),
   width: responsiveWidth(70),
   borderRadius: 30,
 },
@@ -147,7 +147,7 @@ confirmbutton: {
 },
 confirmtext: {
   color: '#FFFFFF',
-  fontFamily: 'SF-Medium',
+  fontFamily: 'SFCompactDisplay-Medium',
   fontSize: responsiveFontSize(2),
 },
 img: {

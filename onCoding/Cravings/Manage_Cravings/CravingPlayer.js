@@ -9,12 +9,13 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TouchableOpacity } from 'r
 
 //Import React Native Video to play video
 import Video from 'react-native-video';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 //Media Controls to control Play/Pause/Seek and full screen
 import MediaControls, { PLAYER_STATES } from 'react-native-media-controls';
 import { blockMarginHalf, blockMargin } from '../../ui/common/responsive';
 
 const CravingPlayer = ({videoUrl}) => {
+ 
   const videoPlayer = useRef(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -37,15 +38,15 @@ const CravingPlayer = ({videoUrl}) => {
 
   const onReplay = () => {
     //Handler for Replay
-    setPlayerState(PLAYER_STATES.PLAYING);
+    //setPlayerState(PLAYER_STATES.PLAYING);
     videoPlayer.current.seek(0);
   };
 
   const onProgress = (data) => {
     // Video Player will continue progress even if the video already ended
-    if (!isLoading && playerState !== PLAYER_STATES.ENDED) {
-      setCurrentTime(data.currentTime);
-    }
+    // if (!isLoading && playerState !== PLAYER_STATES.ENDED) {
+    //   setCurrentTime(data.currentTime);
+    // }
   };
 
   const onLoad = (data) => {
@@ -55,12 +56,14 @@ const CravingPlayer = ({videoUrl}) => {
 
   const onLoadStart = (data) => setIsLoading(true);
 
-  const onEnd = () => setPlayerState(PLAYER_STATES.ENDED);
+  const onEnd = () => {
+    //setPlayerState(PLAYER_STATES.ENDED)
+  };
 
-  const onError = () => alert('Oh! ', error);
+  const onError = () => console.log('Oh! ', error);
 
   const exitFullScreen = () => {
-    alert('Exit full screen');
+    console.log('Exit full screen');
   };
 
   const enterFullScreen = () => { };
@@ -80,8 +83,9 @@ const CravingPlayer = ({videoUrl}) => {
   const onSeeking = (currentTime) => setCurrentTime(currentTime);
 
   return (
-    <View style={{ flex: 1, }}>
-
+    <SafeAreaView style={{ flex: 1}}>
+      
+      <View style={{ flex: 1}}>
 
       <Video
         onEnd={onEnd}
@@ -114,7 +118,8 @@ const CravingPlayer = ({videoUrl}) => {
         progress={currentTime}
         
       />
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

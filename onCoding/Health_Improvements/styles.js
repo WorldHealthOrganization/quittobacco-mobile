@@ -5,16 +5,18 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMarginHalf } from '../ui/common/responsive';
 export default StyleSheet.create({
     container: {
       flex:1,
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
-        height: responsiveHeight(100),
-        width: responsiveWidth(100),
+        height: '100%',
+        width: '100%',
       },
       view: {
-        backgroundColor: '#FFFFFF',
+        flex:1,flexDirection:'column',
+        backgroundColor: '#FFFFFF',  width: '100%',
       },
       view2:
       {
@@ -24,7 +26,7 @@ export default StyleSheet.create({
       },
       text_prg:{
         color: '#FFFFFF',
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: responsiveFontSize(2.5),
         marginTop: responsiveHeight(0.6),
         marginLeft: responsiveWidth(18),
@@ -51,10 +53,11 @@ export default StyleSheet.create({
       height:'90%',
     },
     text1:{
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       textAlign: 'center',
       fontSize: responsiveFontSize(2),
       lineHeight: responsiveHeight(3),
+      marginBottom: 15
     
     },
     viewtext:{
@@ -63,7 +66,7 @@ export default StyleSheet.create({
     },
    pulse:{
     color: '#0072BB',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontSize: responsiveFontSize(2),
     marginTop: responsiveHeight(1),
    },

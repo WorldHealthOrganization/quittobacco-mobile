@@ -15,7 +15,7 @@ export default StyleSheet.create({
   },
   text: {
     color: '#E8FF00',
-    fontFamily: 'SF-Semibold',
+    fontFamily: 'SFCompactDisplay-Semibold',
     fontSize: responsiveFontSize(2.5),
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -42,7 +42,7 @@ export default StyleSheet.create({
   },
   text_small: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Medium',
+    fontFamily: 'SFCompactDisplay-Medium',
     fontWeight: 'normal',
     fontSize: responsiveFontSize(2),
     textTransform: 'capitalize',
@@ -53,6 +53,6 @@ export default StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0072bb'
+    backgroundColor: '#3071B5'
   },
 });

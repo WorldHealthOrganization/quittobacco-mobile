@@ -7,35 +7,35 @@ import {
 } from 'react-native-responsive-dimensions';
 export default StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1,flexDirection:'column',
     backgroundColor: '#0072BB',
     alignItems: 'center',
     height: responsiveHeight(100),
     width: responsiveWidth(100),
   },
   text: {
-    color: '#E8FF00',
-    fontFamily: 'SF-Semibold',
+    color: '#FFFFFF',
+    fontFamily: 'SFCompactDisplay-Semibold',
     fontSize: responsiveFontSize(2),
     textAlign: 'center',
     marginTop: responsiveHeight(1),
-    marginLeft: responsiveWidth(25),
-    marginRight: responsiveWidth(24),
+    
     textTransform: 'uppercase',
     lineHeight: responsiveHeight(3),
   },
   contentText: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Regular',
-    fontSize: responsiveFontSize(1.62),
+    fontFamily: 'SFCompactDisplay-Regular',
+    fontSize: 12,
     textAlign: 'center',
+    justifyContent:'center',alignSelf:'center'
     // marginLeft: responsiveWidth(3),
     // marginRight: responsiveWidth(20),
   },
   logo: {
     width: responsiveWidth(95),
     height: responsiveHeight(15),
-    marginTop: responsiveHeight(1),
+    marginTop: responsiveHeight(5),
     marginLeft: responsiveWidth(15),
     marginRight: responsiveWidth(15),
     resizeMode: 'contain',
@@ -51,11 +51,10 @@ export default StyleSheet.create({
     resizeMode: 'contain',
   },
   textView: {
-    height: responsiveHeight(35),
-    width: responsiveHeight(50),
+    
+    
     marginTop: responsiveHeight(2),
-    marginLeft: responsiveWidth(10),
-    marginRight: responsiveWidth(10),
+   
     paddingBottom: responsiveHeight(2),
   },
   button_view:{

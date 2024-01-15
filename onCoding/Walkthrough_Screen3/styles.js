@@ -5,6 +5,7 @@ import {
   responsiveWidth,
   responsiveFontSize,
 } from 'react-native-responsive-dimensions';
+import { blockMarginHalf,blockMargin } from '../ui/common/responsive';
 
 export default StyleSheet.create({
   container: {
@@ -15,8 +16,8 @@ export default StyleSheet.create({
     width: responsiveWidth(100),
   },
   text: {
-    color: '#E8FF00',
-    fontFamily: 'SF-Semibold',
+    color: '#FFFFFF',
+    fontFamily: 'SFCompactDisplay-Semibold',
     fontSize: responsiveFontSize(2),
     textTransform: 'uppercase',
     textAlign: 'center',
@@ -27,7 +28,7 @@ export default StyleSheet.create({
   logo: {
     width: responsiveWidth(95),
     height: responsiveHeight(15),
-    marginTop: responsiveHeight(1),
+    marginTop: responsiveHeight(5),
     marginLeft: responsiveWidth(14),
     marginRight: responsiveWidth(15),
     resizeMode: 'contain',
@@ -37,7 +38,7 @@ export default StyleSheet.create({
     height: responsiveHeight(11),
     backgroundColor: '#FFFFFF',
     opacity: 100,
-    marginTop: responsiveHeight(2),
+
     marginLeft: responsiveWidth(5),
     marginRight: responsiveWidth(5),
   },
@@ -80,31 +81,32 @@ export default StyleSheet.create({
       },
   textcontent: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Regular',
+    fontFamily: 'SFCompactDisplay-Semibold',
     fontWeight: 'normal',
-    fontSize: responsiveFontSize(2),
+    fontSize: 14,
     textAlign: 'left',
-    marginTop: responsiveHeight(2),
+    
     marginLeft: responsiveWidth(6),
     marginRight: responsiveWidth(10),
   },
   textcontent1: {
     color: '#FFFFFF',
-    fontFamily: 'SF-Regular',
+    fontFamily: 'SFCompactDisplay-Regular',
     fontWeight: 'normal',
-    fontSize: responsiveFontSize(1.5),
+    fontSize: 12,
     textAlign: 'left',
-    marginTop: responsiveHeight(1),
+    marginTop: blockMarginHalf,
     marginLeft: responsiveWidth(6),
   },
   view: {
-    backgroundColor: '#0072BB',
+    
     flexDirection:'row',
+    marginTop:blockMarginHalf * 2
   },
   view1: {
     backgroundColor: '#0072BB',
     flexDirection:'row',
-    marginRight:responsiveWidth(22),
+    marginRight:responsiveWidth(22),marginTop: blockMargin,
   },
   button_view:{
     flex:1,

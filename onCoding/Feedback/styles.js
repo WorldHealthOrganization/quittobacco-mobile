@@ -13,15 +13,14 @@ import {
 } from '../ui/common/responsive';
 export default StyleSheet.create({
     text: {
-      fontFamily: 'SF-Medium',
+      fontFamily: 'SFCompactDisplay-Medium',
       color: '#202020',
       fontSize: scalable(16),
       textAlign: 'center',
-      lineHeight: deviceHeight / 30,
       marginTop: blockMarginHalf * 2,
     },
     view1: {
-        flex: 0.5,
+       
         backgroundColor: '#FFFFFF',
         marginTop: blockMarginHalf * 2,
         alignSelf: 'center',
@@ -29,9 +28,10 @@ export default StyleSheet.create({
       },
       text2:{
         color: '#202020',
-        fontSize: scalable(12),
-        fontFamily: 'SF-Regular',
-        fontWeight: 'bold',
+        fontSize: scalable(14),
+        fontFamily: 'SFCompactDisplay-Regular',
         width: '100%',
+        height:45,
+        marginTop:blockMargin
     },
 });

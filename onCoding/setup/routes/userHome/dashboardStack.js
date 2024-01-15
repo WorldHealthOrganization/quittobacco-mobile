@@ -29,7 +29,7 @@ import Members from '../../../Members/index';
 import Update_Members from '../../../Update_Members/index';
 import ManageCravings from '../../../Cravings/Manage_Cravings/index';
 import Change_tobacco_data from '../../../Change_tobacco_data/index';
-import Notifications from '../../../Notifications/Notifications';
+import Notification_Settings from '../../../Notifications/Notifications';
 import Quit_Reasons from '../../../Quit_Reasons/Quit_Reasons';
 
 // Routes
@@ -119,10 +119,10 @@ export const routesDashboard = {
     path: 'Change_tobacco_data',
     screen: Change_tobacco_data,
   },
-  notifications: {
-    name: 'Notifications',
-    path: 'Notifications',
-    screen: Notifications,
+  notification_settings: {
+    name: 'Notification_Settings',
+    path: 'Notification_Settings',
+    screen: Notification_Settings,
   },
   aboutus: {
     name: 'AboutUs',

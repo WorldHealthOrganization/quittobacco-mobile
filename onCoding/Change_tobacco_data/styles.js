@@ -28,7 +28,7 @@ export default StyleSheet.create({
       },
       toolbar_title:{
         color: '#FFFFFF',
-        fontFamily: 'SF Display',
+        fontFamily: 'SFCompactDisplay-Regular',
         fontSize: responsiveFontSize(2.5),
         alignContent: 'center',
       },

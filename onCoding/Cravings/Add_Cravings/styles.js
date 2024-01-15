@@ -21,7 +21,7 @@ import {
 export default StyleSheet.create({
     text: {
       marginTop: blockMarginHalf * 2,
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
       },
       arrow: {
         width: 10,
@@ -45,19 +45,35 @@ export default StyleSheet.create({
         borderWidth: 0,
       },
       snapslider: {
-        borderWidth: 0,
+        // borderWidth: 0,
         width:'100%',
+        color:'black'
       
       },
       snapsliderItemWrapper: {
-        borderWidth: 0,
+        borderWidth: 2,
         marginLeft: 15,
         marginRight: 15,
       },
       snapsliderItem: {
-        fontFamily: 'SF-Medium',
+        fontFamily: 'SFCompactDisplay-Medium',
         fontSize: scalable(12),
         color:'#0072BB',
         borderWidth: 0,
-      }
+      },
+     
+      slider: {
+        width: '100%',
+      },
+      labelContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+
+      },
+      label: {
+        fontSize: scalable(12),
+        width:'70%',
+        textAlign: 'center',
+        color:'#0072BB'
+      },
 });

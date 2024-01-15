@@ -16,7 +16,6 @@ import {
   FlatList,
   KeyboardAvoidingView,
   ScrollView,
-  Alert,
   TextInput,
   Platform, ActivityIndicator, Share,
   TouchableOpacity,
@@ -25,7 +24,7 @@ import {  TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import axios from 'react-native-axios';
 import ApiName from '../utils/Constants';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';;
 import Toast from 'react-native-simple-toast';
 
 
@@ -104,7 +103,7 @@ export default class Achievements extends Component {
           <View style={{ alignItems: 'center', justifyContent: 'center' }} >
             <Text numberOfLines={2} style={{
               color: '#555555',
-              fontFamily: 'SF-Medium',
+              fontFamily: 'SFCompactDisplay-Medium',
               fontSize: scalable(14), alignItems: 'center'
             }}>No Achievements Yet</Text>
           </View>
@@ -127,8 +126,7 @@ export default class Achievements extends Component {
     let jwt_token = await AsyncStorage.getItem('Login_JwtToken');
     const {title, description, image} = this.state;
 this.setState({isHidden: true})
-    console.log('screen input ==> ' + description);
-
+  
     axios
       .post(
         ApiName.Achievements,
@@ -140,15 +138,10 @@ this.setState({isHidden: true})
         },
       )
       .then((response) => {
-        console.log(
-          'View diary response ',
-          'response get details:==> ' + JSON.stringify(response.data),
-        );
+        this.setState({isHidden: false})
 
         if (response.data.status == 200) {
-          console.log(JSON.stringify(response.data));
-
-
+          
           var quit_date = new Date(response.data.data.quit_date);
           let quitFormatDate = dateFormat(quit_date, 'dd/MM/yyyy');
         
@@ -159,23 +152,28 @@ this.setState({isHidden: true})
             quitDate: quitFormatDate
 
           });  
-                  this.setState({isHidden: false})
-          // Toast.show(response.data.message);
-        } else {
-          this.setState({isHidden: false})
-          console.log(response.data.message);
+                
         }
       })
       .catch((error) => {
         this.setState({isHidden: false})
         Toast.show('There was some error. Please try again')
-        console.log('reactNativeDemo axios error:', error);
+       
       });
+  };
+
+  getExtensionFormat = (filename) => {
+   
+    if(filename.split('.').pop() === 'png' || filename.split('.').pop() ==='jpg' || filename.split('.').pop() ==='jpeg'){
+      return false
+    }
+    return true
   };
 
   render() {
     const {isHidden, quitDate} = this.state;
     return (
+      <SafeAreaView style={{flex: 1,}}>
       <View
         style={{
           flex: 1,
@@ -208,7 +206,7 @@ this.setState({isHidden: true})
             <View style={{ width: '76%', height: responsiveHeight(10), alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{
                 color: '#FFFFFF',
-                fontFamily: 'SF-Medium',
+                fontFamily: 'SFCompactDisplay-Medium',
                 fontSize: scalable(18),
                 justifyContent: 'center',
                 textAlign: 'center',
@@ -237,7 +235,7 @@ this.setState({isHidden: true})
                     <Text numberOfLines={2} style={{
                       marginLeft: blockMarginHalf,
                       color: '#000',
-                      fontFamily: 'SF-Medium',
+                      fontFamily: 'SFCompactDisplay-Medium',
                       fontSize: scalable(20),
                       textAlign: 'center'
                     }}>
@@ -247,7 +245,7 @@ this.setState({isHidden: true})
                     <Text numberOfLines={2} style={{
                       marginTop: blockMarginHalf / 6, marginLeft: blockMarginHalf, marginBottom: blockMarginHalf / 2,
                       color: '#0072BB',
-                      fontFamily: 'SF-Medium',
+                      fontFamily: 'SFCompactDisplay-Medium',
                       fontSize: scalable(15),
                       textAlign: 'center'
                     }}>
@@ -270,10 +268,12 @@ this.setState({isHidden: true})
 
             <View style={{ flexDirection: 'column',marginRight: blockMargin * 2,marginLeft: blockMargin * 2 ,marginTop: blockMargin}}>
            <Image style={{height:120,width: deviceWidth/4,alignSelf: 'center'}}
-           resizeMode={'contain'} source={{uri:'http://whoapp.dci.in/uploads/files/' +item.image} }/>             
-          <Text style={{alignSelf: 'center', fontFamily: 'SF-Heavy',fontSize: scalable(14)}}>{item.badge+'th Batch'}</Text>
-          <Text style={{alignSelf: 'center',color:'#0072BB', fontFamily: 'SF-Heavy',fontSize: scalable(14)}}>{'Tobacco Free'}</Text>
-          {/* <Text style={{alignSelf: 'center', fontFamily: 'SF-Medium',fontSize: scalable(12),color: '#0072BB'}}>{item.description}</Text> */}
+           resizeMode={'contain'} source={ item.image === '' || item.image === null || this.getExtensionFormat(item.image)
+           ? require('../../images/placeholder.png')
+           : {uri:ApiName.baseLink +item.image} }/>             
+          <Text style={{alignSelf: 'center', fontFamily: 'SFCompactDisplay-Semibold',fontSize: scalable(14)}}>{item.badge+' Batch'}</Text>
+          <Text style={{alignSelf: 'center',color:'#0072BB', fontFamily: 'SFCompactDisplay-Bold',fontSize: scalable(14)}}>{'Tobacco Free'}</Text>
+          {/* <Text style={{alignSelf: 'center', fontFamily: 'SFCompactDisplay-Medium',fontSize: scalable(12),color: '#0072BB'}}>{item.description}</Text> */}
 
 </View>
 
@@ -307,7 +307,7 @@ this.setState({isHidden: true})
           ) : null} 
         </View>
 
-
+</SafeAreaView>
 
 
     
